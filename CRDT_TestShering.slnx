@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="QuestionsRequirements.txt" />
+  </Folder>
+  <Project Path="CRDT_TestShering/CRDT_TestShering.csproj">
+    <Deploy Solution="Debug|*" />
+  </Project>
+  <Project Path="DatabaseLibrary/DatabaseLibrary.csproj" />
+  <Project Path="Server/Server.csproj" Id="3ed61fcf-1e36-4cb4-84da-574121dbb90b" />
+</Solution>
