@@ -1,0 +1,54 @@
+﻿using DatabaseLibrary.Entities;
+using CRDT_TestShering.MVVM;
+
+namespace CRDT_TestShering.UserInterface;
+
+public partial class NoteView : ContentPage
+{
+	private Note _currentNote;
+	private DbContextUser _dbContext;
+
+	public NoteView(Note note)
+	{
+		InitializeComponent();
+		_currentNote = note;
+		_dbContext = new DbContextUser();
+		LoadNoteData();
+	}
+
+	private void LoadNoteData()
+	{
+		if (_currentNote != null)
+		{
+			TitleEntry.Text = _currentNote.Title;
+			ContentEditor.Text = _currentNote.Content;
+		}
+	}
+
+	private async void OnSaveClicked(object sender, EventArgs e)
+	{
+		if (_currentNote != null)
+		{
+			_currentNote.Title = TitleEntry.Text;
+			_currentNote.Content = ContentEditor.Text;
+			_currentNote.lastUpdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+			_dbContext.Notes.Update(_currentNote);
+			await _dbContext.SaveChangesAsync();
+
+			await DisplayAlert("Success", "Note saved successfully!", "OK");
+			await Navigation.PopAsync();
+		}
+	}
+
+	private async void OnCancelClicked(object sender, EventArgs e)
+	{
+		await Navigation.PopAsync();
+	}
+
+	protected override void OnDisappearing()
+	{
+		base.OnDisappearing();
+		_dbContext?.Dispose();
+	}
+}

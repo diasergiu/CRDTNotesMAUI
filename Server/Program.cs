@@ -1,0 +1,37 @@
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+
+builder.Services.AddControllers();
+// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddOpenApi();
+
+// Configure specific ports for development
+builder.WebHost.UseUrls("https://localhost:5001", "http://localhost:5000");
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+}
+
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+
+app.MapControllers();
+
+// Test endpoint for login
+app.MapGet("/api/test", (string? username) =>
+{
+    return Results.Ok(new
+    {
+        message = $"Hello {username ?? "Guest"}!",
+        timestamp = DateTime.UtcNow,
+        serverStatus = "Running"
+    });
+});
+
+app.Run();

@@ -1,0 +1,9 @@
+﻿namespace CRDT_TestShering.UserInterface;
+
+public partial class NoteView : ContentPage
+{
+	public NoteView()
+	{
+		InitializeComponent();
+	}
+}

@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "0siofFhDUz4=",
+  "success": true,
+  "projectFilePath": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\Server\\Server.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Dia Sergiu Robert\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.8\\microsoft.aspnetcore.openapi.10.0.8.nupkg.sha512",
+    "C:\\Users\\Dia Sergiu Robert\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

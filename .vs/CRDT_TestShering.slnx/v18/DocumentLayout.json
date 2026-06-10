@@ -1,0 +1,536 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{F2B9FB55-84B4-498B-8A86-AF931F3D75B0}|Solution Items{F2B9FB55-84B4-498B-8A86-AF931F3D75B0}|D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\QuestionsRequirements.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{F2B9FB55-84B4-498B-8A86-AF931F3D75B0}|Solution Items{F2B9FB55-84B4-498B-8A86-AF931F3D75B0}|solutionrelative:QuestionsRequirements.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3ED61FCF-1E36-4CB4-84DA-574121DBB90B}|Server\\Server.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\server\\server.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|",
+      "RelativeMoniker": "D:0:0:{3ED61FCF-1E36-4CB4-84DA-574121DBB90B}|Server\\Server.csproj|solutionrelative:server\\server.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\crdt_testshering\\crdt_testshering.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|",
+      "RelativeMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|solutionrelative:crdt_testshering\\crdt_testshering.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\crdt_testshering\\crdt_testshering.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|solutionrelative:crdt_testshering\\crdt_testshering.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{73C7E3C1-7BEF-E542-6352-9C6C033928B5}|DatabaseLibrary\\DatabaseLibrary.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\databaselibrary\\databaselibrary.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|",
+      "RelativeMoniker": "D:0:0:{73C7E3C1-7BEF-E542-6352-9C6C033928B5}|DatabaseLibrary\\DatabaseLibrary.csproj|solutionrelative:databaselibrary\\databaselibrary.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{73C7E3C1-7BEF-E542-6352-9C6C033928B5}|DatabaseLibrary\\DatabaseLibrary.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\databaselibrary\\databaselibrary.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{73C7E3C1-7BEF-E542-6352-9C6C033928B5}|DatabaseLibrary\\DatabaseLibrary.csproj|solutionrelative:databaselibrary\\databaselibrary.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\crdt_testshering\\mauiprogram.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|solutionrelative:crdt_testshering\\mauiprogram.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\crdt_testshering\\appshell.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|solutionrelative:crdt_testshering\\appshell.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\crdt_testshering\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|solutionrelative:crdt_testshering\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3ED61FCF-1E36-4CB4-84DA-574121DBB90B}|Server\\Server.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\server\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3ED61FCF-1E36-4CB4-84DA-574121DBB90B}|Server\\Server.csproj|solutionrelative:server\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3ED61FCF-1E36-4CB4-84DA-574121DBB90B}|Server\\Server.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\server\\weatherforecast.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3ED61FCF-1E36-4CB4-84DA-574121DBB90B}|Server\\Server.csproj|solutionrelative:server\\weatherforecast.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\crdt_testshering\\userinterface\\loginpopup.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|solutionrelative:crdt_testshering\\userinterface\\loginpopup.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\crdt_testshering\\userinterface\\mainpagenotes.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|solutionrelative:crdt_testshering\\userinterface\\mainpagenotes.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{73C7E3C1-7BEF-E542-6352-9C6C033928B5}|DatabaseLibrary\\DatabaseLibrary.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\databaselibrary\\entities\\servernote.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{73C7E3C1-7BEF-E542-6352-9C6C033928B5}|DatabaseLibrary\\DatabaseLibrary.csproj|solutionrelative:databaselibrary\\entities\\servernote.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\crdt_testshering\\userinterface\\loginpopup.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|solutionrelative:crdt_testshering\\userinterface\\loginpopup.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\crdt_testshering\\userinterface\\mainpagenotes.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|solutionrelative:crdt_testshering\\userinterface\\mainpagenotes.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{73C7E3C1-7BEF-E542-6352-9C6C033928B5}|DatabaseLibrary\\DatabaseLibrary.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\databaselibrary\\entities\\dbcontextserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{73C7E3C1-7BEF-E542-6352-9C6C033928B5}|DatabaseLibrary\\DatabaseLibrary.csproj|solutionrelative:databaselibrary\\entities\\dbcontextserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{73C7E3C1-7BEF-E542-6352-9C6C033928B5}|DatabaseLibrary\\DatabaseLibrary.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\databaselibrary\\entities\\note.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{73C7E3C1-7BEF-E542-6352-9C6C033928B5}|DatabaseLibrary\\DatabaseLibrary.csproj|solutionrelative:databaselibrary\\entities\\note.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{73C7E3C1-7BEF-E542-6352-9C6C033928B5}|DatabaseLibrary\\DatabaseLibrary.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\databaselibrary\\entities\\device.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{73C7E3C1-7BEF-E542-6352-9C6C033928B5}|DatabaseLibrary\\DatabaseLibrary.csproj|solutionrelative:databaselibrary\\entities\\device.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\DatabaseLibrary\\Migrations\\Server\\20260610132030_InitialServerCreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:DatabaseLibrary\\Migrations\\Server\\20260610132030_InitialServerCreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{73C7E3C1-7BEF-E542-6352-9C6C033928B5}|DatabaseLibrary\\DatabaseLibrary.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\databaselibrary\\entities\\servernoteuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{73C7E3C1-7BEF-E542-6352-9C6C033928B5}|DatabaseLibrary\\DatabaseLibrary.csproj|solutionrelative:databaselibrary\\entities\\servernoteuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{73C7E3C1-7BEF-E542-6352-9C6C033928B5}|DatabaseLibrary\\DatabaseLibrary.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\databaselibrary\\entities\\dbcontextuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{73C7E3C1-7BEF-E542-6352-9C6C033928B5}|DatabaseLibrary\\DatabaseLibrary.csproj|solutionrelative:databaselibrary\\entities\\dbcontextuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{73C7E3C1-7BEF-E542-6352-9C6C033928B5}|DatabaseLibrary\\DatabaseLibrary.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\databaselibrary\\entities\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{73C7E3C1-7BEF-E542-6352-9C6C033928B5}|DatabaseLibrary\\DatabaseLibrary.csproj|solutionrelative:databaselibrary\\entities\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\crdt_testshering\\app.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|solutionrelative:crdt_testshering\\app.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\crdt_testshering\\userinterface\\noteview.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|solutionrelative:crdt_testshering\\userinterface\\noteview.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\obj\\Debug\\net10.0-windows10.0.19041.0\\win-x64\\Platforms\\Windows\\App.g.i.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:CRDT_TestShering\\obj\\Debug\\net10.0-windows10.0.19041.0\\win-x64\\Platforms\\Windows\\App.g.i.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\crdt_testshering\\mvvm\\notesviewmodel.cs||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|solutionrelative:crdt_testshering\\mvvm\\notesviewmodel.cs||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\crdt_testshering\\userinterface\\noteview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|solutionrelative:crdt_testshering\\userinterface\\noteview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\crdt_testshering\\appshell.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{29A93DFE-4C1C-382A-BB0B-86F396FBD4C6}|CRDT_TestShering\\CRDT_TestShering.csproj|solutionrelative:crdt_testshering\\appshell.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{73C7E3C1-7BEF-E542-6352-9C6C033928B5}|DatabaseLibrary\\DatabaseLibrary.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\databaselibrary\\migrations\\20260607210500_initialcreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{73C7E3C1-7BEF-E542-6352-9C6C033928B5}|DatabaseLibrary\\DatabaseLibrary.csproj|solutionrelative:databaselibrary\\migrations\\20260607210500_initialcreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{73C7E3C1-7BEF-E542-6352-9C6C033928B5}|DatabaseLibrary\\DatabaseLibrary.csproj|d:\\programming\\visual_studio\\projectdevelopment\\crdt_testshering\\databaselibrary\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{73C7E3C1-7BEF-E542-6352-9C6C033928B5}|DatabaseLibrary\\DatabaseLibrary.csproj|solutionrelative:databaselibrary\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 4,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "DatabaseLibrary",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\DatabaseLibrary\\DatabaseLibrary.csproj",
+              "RelativeDocumentMoniker": "DatabaseLibrary\\DatabaseLibrary.csproj",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\DatabaseLibrary\\DatabaseLibrary.csproj",
+              "RelativeToolTip": "DatabaseLibrary\\DatabaseLibrary.csproj",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-06-10T15:20:43.546Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Server",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\Server\\Server.csproj",
+              "RelativeDocumentMoniker": "Server\\Server.csproj",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\Server\\Server.csproj",
+              "RelativeToolTip": "Server\\Server.csproj",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-06-10T15:20:23.642Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "CRDT_TestShering.csproj",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\CRDT_TestShering.csproj",
+              "RelativeDocumentMoniker": "CRDT_TestShering\\CRDT_TestShering.csproj",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\CRDT_TestShering.csproj",
+              "RelativeToolTip": "CRDT_TestShering\\CRDT_TestShering.csproj",
+              "ViewState": "AgIAACwAAAAAAAAAAAAAAF0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-06-08T10:44:56.658Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "CRDT_TestShering",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\CRDT_TestShering.csproj",
+              "RelativeDocumentMoniker": "CRDT_TestShering\\CRDT_TestShering.csproj",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\CRDT_TestShering.csproj",
+              "RelativeToolTip": "CRDT_TestShering\\CRDT_TestShering.csproj",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-06-08T09:46:40.006Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "QuestionsRequirements.txt",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\QuestionsRequirements.txt",
+              "RelativeDocumentMoniker": "QuestionsRequirements.txt",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\QuestionsRequirements.txt",
+              "RelativeToolTip": "QuestionsRequirements.txt",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAADAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
+              "WhenOpened": "2026-06-10T14:40:18.779Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "MauiProgram.cs",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\MauiProgram.cs",
+              "RelativeDocumentMoniker": "CRDT_TestShering\\MauiProgram.cs",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\MauiProgram.cs",
+              "RelativeToolTip": "CRDT_TestShering\\MauiProgram.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-10T15:12:35.454Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "AppShell.xaml",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\AppShell.xaml",
+              "RelativeDocumentMoniker": "CRDT_TestShering\\AppShell.xaml",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\AppShell.xaml",
+              "RelativeToolTip": "CRDT_TestShering\\AppShell.xaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-06-08T19:59:15.717Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "App.xaml",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\App.xaml",
+              "RelativeDocumentMoniker": "CRDT_TestShering\\App.xaml",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\App.xaml",
+              "RelativeToolTip": "CRDT_TestShering\\App.xaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-06-09T18:05:52.037Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\Server\\Program.cs",
+              "RelativeDocumentMoniker": "Server\\Program.cs",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\Server\\Program.cs",
+              "RelativeToolTip": "Server\\Program.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-10T15:02:43.943Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "DatabaseLibrary.csproj",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\DatabaseLibrary\\DatabaseLibrary.csproj",
+              "RelativeDocumentMoniker": "DatabaseLibrary\\DatabaseLibrary.csproj",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\DatabaseLibrary\\DatabaseLibrary.csproj",
+              "RelativeToolTip": "DatabaseLibrary\\DatabaseLibrary.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-06-07T20:30:10.917Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "ServerNote.cs",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\DatabaseLibrary\\Entities\\ServerNote.cs",
+              "RelativeDocumentMoniker": "DatabaseLibrary\\Entities\\ServerNote.cs",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\DatabaseLibrary\\Entities\\ServerNote.cs",
+              "RelativeToolTip": "DatabaseLibrary\\Entities\\ServerNote.cs",
+              "ViewState": "AgIAAAEAAAAAAAAAAAAYwAsAAAAkAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-10T12:11:12.296Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "WeatherForecast.cs",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\Server\\WeatherForecast.cs",
+              "RelativeDocumentMoniker": "Server\\WeatherForecast.cs",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\Server\\WeatherForecast.cs",
+              "RelativeToolTip": "Server\\WeatherForecast.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-10T15:10:09.657Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "MainPageNotes.xaml.cs",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\UserInterface\\MainPageNotes.xaml.cs",
+              "RelativeDocumentMoniker": "CRDT_TestShering\\UserInterface\\MainPageNotes.xaml.cs",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\UserInterface\\MainPageNotes.xaml.cs",
+              "RelativeToolTip": "CRDT_TestShering\\UserInterface\\MainPageNotes.xaml.cs",
+              "ViewState": "AgIAADEAAAAAAAAAAAAkwD0AAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-08T19:56:36.4Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "LoginPopup.xaml.cs",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\UserInterface\\LoginPopup.xaml.cs",
+              "RelativeDocumentMoniker": "CRDT_TestShering\\UserInterface\\LoginPopup.xaml.cs",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\UserInterface\\LoginPopup.xaml.cs",
+              "RelativeToolTip": "CRDT_TestShering\\UserInterface\\LoginPopup.xaml.cs",
+              "ViewState": "AgIAADAAAAAAAAAAAAAqwAsAAAALAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-10T15:02:22.215Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "LoginPopup.xaml",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\UserInterface\\LoginPopup.xaml",
+              "RelativeDocumentMoniker": "CRDT_TestShering\\UserInterface\\LoginPopup.xaml",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\UserInterface\\LoginPopup.xaml",
+              "RelativeToolTip": "CRDT_TestShering\\UserInterface\\LoginPopup.xaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAE4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-06-10T15:02:09.005Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "MainPageNotes.xaml",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\UserInterface\\MainPageNotes.xaml",
+              "RelativeDocumentMoniker": "CRDT_TestShering\\UserInterface\\MainPageNotes.xaml",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\UserInterface\\MainPageNotes.xaml",
+              "RelativeToolTip": "CRDT_TestShering\\UserInterface\\MainPageNotes.xaml",
+              "ViewState": "AgIAABMAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-06-08T10:30:58.828Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "DbContextServer.cs",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\DatabaseLibrary\\Entities\\DbContextServer.cs",
+              "RelativeDocumentMoniker": "DatabaseLibrary\\Entities\\DbContextServer.cs",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\DatabaseLibrary\\Entities\\DbContextServer.cs",
+              "RelativeToolTip": "DatabaseLibrary\\Entities\\DbContextServer.cs",
+              "ViewState": "AgIAACIAAAAAAAAAAADwvyUAAAAyAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-10T12:28:44.845Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "20260610132030_InitialServerCreate.cs",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\DatabaseLibrary\\Migrations\\Server\\20260610132030_InitialServerCreate.cs",
+              "RelativeDocumentMoniker": "DatabaseLibrary\\Migrations\\Server\\20260610132030_InitialServerCreate.cs",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\DatabaseLibrary\\Migrations\\Server\\20260610132030_InitialServerCreate.cs",
+              "RelativeToolTip": "DatabaseLibrary\\Migrations\\Server\\20260610132030_InitialServerCreate.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-10T13:20:30.886Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "Device.cs",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\DatabaseLibrary\\Entities\\Device.cs",
+              "RelativeDocumentMoniker": "DatabaseLibrary\\Entities\\Device.cs",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\DatabaseLibrary\\Entities\\Device.cs",
+              "RelativeToolTip": "DatabaseLibrary\\Entities\\Device.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-10T12:47:14.633Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "Note.cs",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\DatabaseLibrary\\Entities\\Note.cs",
+              "RelativeDocumentMoniker": "DatabaseLibrary\\Entities\\Note.cs",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\DatabaseLibrary\\Entities\\Note.cs",
+              "RelativeToolTip": "DatabaseLibrary\\Entities\\Note.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAwAAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-07T20:32:39.206Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "ServerNoteUser.cs",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\DatabaseLibrary\\Entities\\ServerNoteUser.cs",
+              "RelativeDocumentMoniker": "DatabaseLibrary\\Entities\\ServerNoteUser.cs",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\DatabaseLibrary\\Entities\\ServerNoteUser.cs",
+              "RelativeToolTip": "DatabaseLibrary\\Entities\\ServerNoteUser.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAAAgAAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-10T12:14:05.402Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "DbContextUser.cs",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\DatabaseLibrary\\Entities\\DbContextUser.cs",
+              "RelativeDocumentMoniker": "DatabaseLibrary\\Entities\\DbContextUser.cs",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\DatabaseLibrary\\Entities\\DbContextUser.cs",
+              "RelativeToolTip": "DatabaseLibrary\\Entities\\DbContextUser.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAAwAkAAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-07T20:34:32.647Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "User.cs",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\DatabaseLibrary\\Entities\\User.cs",
+              "RelativeDocumentMoniker": "DatabaseLibrary\\Entities\\User.cs",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\DatabaseLibrary\\Entities\\User.cs",
+              "RelativeToolTip": "DatabaseLibrary\\Entities\\User.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAAoAAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-10T12:09:10.004Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "NoteView.xaml",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\UserInterface\\NoteView.xaml",
+              "RelativeDocumentMoniker": "CRDT_TestShering\\UserInterface\\NoteView.xaml",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\UserInterface\\NoteView.xaml",
+              "RelativeToolTip": "CRDT_TestShering\\UserInterface\\NoteView.xaml",
+              "ViewState": "AgIAABoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-06-09T17:35:56.282Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "NoteView.xaml.cs",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\UserInterface\\NoteView.xaml.cs",
+              "RelativeDocumentMoniker": "CRDT_TestShering\\UserInterface\\NoteView.xaml.cs",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\UserInterface\\NoteView.xaml.cs",
+              "RelativeToolTip": "CRDT_TestShering\\UserInterface\\NoteView.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-09T17:38:50.051Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "App.xaml.cs",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\App.xaml.cs",
+              "RelativeDocumentMoniker": "CRDT_TestShering\\App.xaml.cs",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\App.xaml.cs",
+              "RelativeToolTip": "CRDT_TestShering\\App.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-08T10:28:32.984Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "App.g.i.cs",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\obj\\Debug\\net10.0-windows10.0.19041.0\\win-x64\\Platforms\\Windows\\App.g.i.cs",
+              "RelativeDocumentMoniker": "CRDT_TestShering\\obj\\Debug\\net10.0-windows10.0.19041.0\\win-x64\\Platforms\\Windows\\App.g.i.cs",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\obj\\Debug\\net10.0-windows10.0.19041.0\\win-x64\\Platforms\\Windows\\App.g.i.cs",
+              "RelativeToolTip": "CRDT_TestShering\\obj\\Debug\\net10.0-windows10.0.19041.0\\win-x64\\Platforms\\Windows\\App.g.i.cs",
+              "ViewState": "AgIAADgAAAAAAAAAAAAlwEQAAABEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-09T17:55:36.076Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "NotesViewModel.cs",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\MVVM\\NotesViewModel.cs",
+              "RelativeDocumentMoniker": "CRDT_TestShering\\MVVM\\NotesViewModel.cs",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\MVVM\\NotesViewModel.cs",
+              "RelativeToolTip": "CRDT_TestShering\\MVVM\\NotesViewModel.cs",
+              "ViewState": "AgIAABQAAAAAAAAAAAAlwCAAAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-08T19:11:41.551Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 28,
+              "Title": "AppShell.xaml.cs",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\AppShell.xaml.cs",
+              "RelativeDocumentMoniker": "CRDT_TestShering\\AppShell.xaml.cs",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\AppShell.xaml.cs",
+              "RelativeToolTip": "CRDT_TestShering\\AppShell.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-08T10:28:37.632Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 29,
+              "Title": "20260607210500_InitialCreate.cs",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\DatabaseLibrary\\Migrations\\20260607210500_InitialCreate.cs",
+              "RelativeDocumentMoniker": "DatabaseLibrary\\Migrations\\20260607210500_InitialCreate.cs",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\DatabaseLibrary\\Migrations\\20260607210500_InitialCreate.cs",
+              "RelativeToolTip": "DatabaseLibrary\\Migrations\\20260607210500_InitialCreate.cs",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-07T21:05:00.506Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 30,
+              "Title": "Class1.cs",
+              "DocumentMoniker": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\DatabaseLibrary\\Class1.cs",
+              "RelativeDocumentMoniker": "DatabaseLibrary\\Class1.cs",
+              "ToolTip": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\DatabaseLibrary\\Class1.cs",
+              "RelativeToolTip": "DatabaseLibrary\\Class1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-07T20:29:56.97Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

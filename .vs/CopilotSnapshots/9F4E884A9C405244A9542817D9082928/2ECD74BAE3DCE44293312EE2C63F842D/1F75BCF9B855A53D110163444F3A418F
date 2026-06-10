@@ -1,0 +1,12 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using DatabaseLibrary.Entityes.Note
+
+namespace CRDT_TestShering.MVVM
+{
+    public class NotesViewModel : INotifyPropertyChanged 
+    {
+        public List<Note> listOfNotes { get; set; }
+    }
+}
