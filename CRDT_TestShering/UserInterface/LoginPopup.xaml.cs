@@ -1,3 +1,4 @@
+using CRDT_TestShering.Services;
 using System;
 using System.Net.Http;
 using System.Text.Json;
@@ -7,26 +8,12 @@ namespace CRDT_TestShering.UserInterface;
 
 public partial class LoginPopup : ContentPage
 {
-    private readonly HttpClient _httpClient;
+    private ServicesConnectionLayer _apiService;
 
     public LoginPopup()
     {
         InitializeComponent();
-
-        // Configure HttpClient for local server
-#if DEBUG
-        var baseUrl = DeviceInfo.Platform == DevicePlatform.Android
-            ? "http://10.0.2.2:5000"  // Android emulator
-            : "http://localhost:5000"; // Windows/iOS/Mac
-#else
-        var baseUrl = "https://your-production-api.com";
-#endif
-
-        _httpClient = new HttpClient
-        {
-            BaseAddress = new Uri(baseUrl),
-            Timeout = TimeSpan.FromSeconds(30)
-        };
+        _apiService = new ServicesConnectionLayer();        
     }
 
     private async void OnLoginSubmitClicked(object sender, EventArgs e)
@@ -47,47 +34,46 @@ public partial class LoginPopup : ContentPage
             return;
         }
 
-        // Disable button and show loading
-        LoginSubmitButton.IsEnabled = false;
-        LoginSubmitButton.Text = "Logging in...";
-        StatusLabel.IsVisible = false;
+        // Show loading state
+        SetLoadingState(true);
 
-        try
-        {
-            // Make GET request to server (for testing)
-            var response = await _httpClient.GetAsync($"/api/test?username={Uri.EscapeDataString(username)}");
+        // Call the service - NO TRY/CATCH needed!
+        var result = await _apiService.LoginAstnc(
+            username,
+            password
+        );
 
-            if (response.IsSuccessStatusCode)
+        // Handle the result
+        //if (result.IsSuccess)
+        //{
+        //    // Save authentication
+        //    await _authService.SaveLoginAsync(
+        //        result.Data.AuthToken,
+        //        result.Data.User.IdUser,
+        //        result.Data.User.Username
+        //    );
+
+        //    // TODO: Save notes to local database
+        //    // await SaveNotesToLocalDb(result.Data.Notes);
+
+        //    ShowStatus("Login successful!", false);
+        //    await Task.Delay(1000);
+        //    await Navigation.PopModalAsync();
+        //}
+        //else
+        if( !result.IsSuccess){
+            // Display the error message from the service
+            ShowStatus(result.ErrorMessage, true);
+
+            // Optional: Handle different error types differently
+            if (result.ErrorType == ApiErrorType.ConnectionError)
             {
-                var content = await response.Content.ReadAsStringAsync();
-                ShowStatus($"Success! Response: {content}", false);
+                // Maybe show a "Retry" button or different UI
+            }
+        }
 
-                // Wait a moment then close the popup
-                await Task.Delay(1500);
-                await Navigation.PopModalAsync();
-            }
-            else
-            {
-                ShowStatus($"Login failed: {response.StatusCode}", true);
-            }
-        }
-        catch (HttpRequestException ex)
-        {
-            ShowStatus($"Connection error: {ex.Message}", true);
-        }
-        catch (TaskCanceledException)
-        {
-            ShowStatus("Request timeout. Is the server running?", true);
-        }
-        catch (Exception ex)
-        {
-            ShowStatus($"Error: {ex.Message}", true);
-        }
-        finally
-        {
-            LoginSubmitButton.IsEnabled = true;
-            LoginSubmitButton.Text = "Login";
-        }
+        SetLoadingState(false);
+
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)
@@ -95,10 +81,22 @@ public partial class LoginPopup : ContentPage
         await Navigation.PopModalAsync();
     }
 
+    private async void OnCreateAccountTapped(object sender, EventArgs e)
+    {
+        await Navigation.PushModalAsync(new RegisterPopup());
+    }
+
     private void ShowStatus(string message, bool isError)
     {
         StatusLabel.Text = message;
         StatusLabel.TextColor = isError ? Colors.Red : Colors.Green;
         StatusLabel.IsVisible = true;
+    }
+
+    private void SetLoadingState(bool isLoading)
+    {
+        LoginSubmitButton.IsEnabled = !isLoading;
+        LoginSubmitButton.Text = isLoading ? "Logging in... " : "Login";
+        StatusLabel.IsVisible = false;
     }
 }

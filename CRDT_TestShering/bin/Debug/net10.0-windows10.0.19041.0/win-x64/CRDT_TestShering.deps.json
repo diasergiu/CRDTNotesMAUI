@@ -12,10 +12,7 @@
           "DatabaseLibrary": "1.0.0",
           "Microsoft.Extensions.Logging.Debug": "10.0.0",
           "Microsoft.Maui.Controls": "10.0.20",
-          "Microsoft.Maui.Controls.HotReload.Forms": "18.0.0.0",
-          "Microsoft.VisualStudio.DesignTools.MobileTapContracts": "18.0.0.0",
-          "Microsoft.VisualStudio.DesignTools.TapContract": "18.0.0.0",
-          "Microsoft.VisualStudio.DesignTools.XamlTapContract": "18.0.0.0",
+          "SlackAPI": "1.1.14",
           "Microsoft.Web.WebView2.Core.Projection": "1.0.3179.45",
           "runtimepack.Microsoft.Windows.SDK.NET.Ref": "10.0.19041.57"
         },
@@ -622,6 +619,25 @@
           }
         }
       },
+      "Newtonsoft.Json/9.0.1": {
+        "runtime": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.1.19813"
+          }
+        }
+      },
+      "SlackAPI/1.1.14": {
+        "dependencies": {
+          "Newtonsoft.Json": "9.0.1"
+        },
+        "runtime": {
+          "lib/netstandard2.0/SlackAPI.dll": {
+            "assemblyVersion": "1.2.0.0",
+            "fileVersion": "1.2.0.0"
+          }
+        }
+      },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
         "dependencies": {
           "SQLitePCLRaw.lib.e_sqlite3": "2.1.11",
@@ -668,38 +684,6 @@
           "DatabaseLibrary.dll": {
             "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
-          }
-        }
-      },
-      "Microsoft.Maui.Controls.HotReload.Forms/18.0.0.0": {
-        "runtime": {
-          "Microsoft.Maui.Controls.HotReload.Forms.dll": {
-            "assemblyVersion": "18.0.0.0",
-            "fileVersion": "18.6.39481.13683"
-          }
-        }
-      },
-      "Microsoft.VisualStudio.DesignTools.MobileTapContracts/18.0.0.0": {
-        "runtime": {
-          "Microsoft.VisualStudio.DesignTools.MobileTapContracts.dll": {
-            "assemblyVersion": "18.0.0.0",
-            "fileVersion": "18.6.39481.13683"
-          }
-        }
-      },
-      "Microsoft.VisualStudio.DesignTools.TapContract/18.0.0.0": {
-        "runtime": {
-          "Microsoft.VisualStudio.DesignTools.TapContract.dll": {
-            "assemblyVersion": "18.0.0.0",
-            "fileVersion": "18.6.39481.13683"
-          }
-        }
-      },
-      "Microsoft.VisualStudio.DesignTools.XamlTapContract/18.0.0.0": {
-        "runtime": {
-          "Microsoft.VisualStudio.DesignTools.XamlTapContract.dll": {
-            "assemblyVersion": "18.0.0.0",
-            "fileVersion": "18.6.39481.13683"
           }
         }
       },
@@ -948,6 +932,20 @@
       "path": "microsoft.windowsappsdk/1.7.250909003",
       "hashPath": "microsoft.windowsappsdk.1.7.250909003.nupkg.sha512"
     },
+    "Newtonsoft.Json/9.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-U82mHQSKaIk+lpSVCbWYKNavmNH1i5xrExDEquU1i6I5pV6UMOqRnJRSlKO3cMPfcpp0RgDY+8jUXHdQ4IfXvw==",
+      "path": "newtonsoft.json/9.0.1",
+      "hashPath": "newtonsoft.json.9.0.1.nupkg.sha512"
+    },
+    "SlackAPI/1.1.14": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-1mqKq+faHsWZfyWTXKpSLZH9g/KbpcHhTQx0q+h9BeAEXm0unlr1rGcVDIgEku44/X09dJM60Y9qz4pnMTQGrg==",
+      "path": "slackapi/1.1.14",
+      "hashPath": "slackapi.1.1.14.nupkg.sha512"
+    },
     "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
       "type": "package",
       "serviceable": true,
@@ -978,26 +976,6 @@
     },
     "DatabaseLibrary/1.0.0": {
       "type": "project",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Microsoft.Maui.Controls.HotReload.Forms/18.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Microsoft.VisualStudio.DesignTools.MobileTapContracts/18.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Microsoft.VisualStudio.DesignTools.TapContract/18.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Microsoft.VisualStudio.DesignTools.XamlTapContract/18.0.0.0": {
-      "type": "reference",
       "serviceable": false,
       "sha512": ""
     },

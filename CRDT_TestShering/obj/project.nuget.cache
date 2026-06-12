@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "fBz9PKR9FYI=",
+  "dgSpecHash": "NKsCFVEKDJw=",
   "success": true,
   "projectFilePath": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\CRDT_TestShering.csproj",
   "expectedPackageFiles": [
@@ -42,6 +42,8 @@
     "C:\\Users\\Dia Sergiu Robert\\.nuget\\packages\\microsoft.web.webview2\\1.0.3179.45\\microsoft.web.webview2.1.0.3179.45.nupkg.sha512",
     "C:\\Users\\Dia Sergiu Robert\\.nuget\\packages\\microsoft.windows.sdk.buildtools\\10.0.22621.756\\microsoft.windows.sdk.buildtools.10.0.22621.756.nupkg.sha512",
     "C:\\Users\\Dia Sergiu Robert\\.nuget\\packages\\microsoft.windowsappsdk\\1.7.250909003\\microsoft.windowsappsdk.1.7.250909003.nupkg.sha512",
+    "C:\\Users\\Dia Sergiu Robert\\.nuget\\packages\\newtonsoft.json\\9.0.1\\newtonsoft.json.9.0.1.nupkg.sha512",
+    "C:\\Users\\Dia Sergiu Robert\\.nuget\\packages\\slackapi\\1.1.14\\slackapi.1.1.14.nupkg.sha512",
     "C:\\Users\\Dia Sergiu Robert\\.nuget\\packages\\sqlitepclraw.bundle_e_sqlite3\\2.1.11\\sqlitepclraw.bundle_e_sqlite3.2.1.11.nupkg.sha512",
     "C:\\Users\\Dia Sergiu Robert\\.nuget\\packages\\sqlitepclraw.core\\2.1.11\\sqlitepclraw.core.2.1.11.nupkg.sha512",
     "C:\\Users\\Dia Sergiu Robert\\.nuget\\packages\\sqlitepclraw.lib.e_sqlite3\\2.1.11\\sqlitepclraw.lib.e_sqlite3.2.1.11.nupkg.sha512",
@@ -144,5 +146,41 @@
     "C:\\Users\\Dia Sergiu Robert\\.nuget\\packages\\xamarin.kotlinx.serialization.core.jvm\\1.9.0.1\\xamarin.kotlinx.serialization.core.jvm.1.9.0.1.nupkg.sha512",
     "C:\\Users\\Dia Sergiu Robert\\.nuget\\packages\\microsoft.windows.sdk.net.ref\\10.0.19041.57\\microsoft.windows.sdk.net.ref.10.0.19041.57.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "Package 'Newtonsoft.Json' 9.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-5crp-9r3c-p9vr",
+      "projectPath": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\CRDT_TestShering.csproj",
+      "warningLevel": 1,
+      "filePath": "D:\\Programming\\Visual_Studio\\ProjectDevelopment\\CRDT_TestShering\\CRDT_TestShering\\CRDT_TestShering.csproj",
+      "libraryId": "Newtonsoft.Json",
+      "targetGraphs": [
+        "net10.0-android",
+        "net10.0-android/android-arm64",
+        "net10.0-android/android-x64",
+        "net10.0-android/iossimulator-x64",
+        "net10.0-android/maccatalyst-x64",
+        "net10.0-android/win-x64",
+        "net10.0-ios",
+        "net10.0-ios/android-arm64",
+        "net10.0-ios/android-x64",
+        "net10.0-ios/iossimulator-x64",
+        "net10.0-ios/maccatalyst-x64",
+        "net10.0-ios/win-x64",
+        "net10.0-maccatalyst",
+        "net10.0-maccatalyst/android-arm64",
+        "net10.0-maccatalyst/android-x64",
+        "net10.0-maccatalyst/iossimulator-x64",
+        "net10.0-maccatalyst/maccatalyst-x64",
+        "net10.0-maccatalyst/win-x64",
+        "net10.0-windows10.0.19041.0",
+        "net10.0-windows10.0.19041.0/android-arm64",
+        "net10.0-windows10.0.19041.0/android-x64",
+        "net10.0-windows10.0.19041.0/iossimulator-x64",
+        "net10.0-windows10.0.19041.0/maccatalyst-x64",
+        "net10.0-windows10.0.19041.0/win-x64"
+      ]
+    }
+  ]
 }

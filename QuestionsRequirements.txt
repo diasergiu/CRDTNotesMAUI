@@ -1,10 +1,26 @@
-1. When loging in from a device that already had a user how should the files be treated. should we copy all files from that account into the device. dose that mean that the device should have a more information about the users and whos data is it
-2. what is the most efficient way to log in. when logging in should we send device id, User Id, or both?
-should the search in the database for the username and password when it was send
+1. When loging in from a device that already had a user how should the files be treated.
+should we copy all files from that account into the device. dose that mean that the 
+device should have a more information about the users and whos data is it
+2. what is the most efficient way to log in. when logging in should we send device id,
+User Id, or both? should the search in the database for the username and password 
+when it was send
 3. How do i handle the pages after login. After login we should send the changes we made to the 
 notes solve the conflicts with CRDT and receive the new updated notes, after that save the client database(probably) 
-4. 
+4. How do you remain logged in.
+5. How do you make XAML textbox create CRDT tokens instead of just characters
+6. when we receive updated files best is if we update only the changed files in the client
+7. too much logic on the UI is
+
 
 
 non important but nice to have
 1. Password Hashing Algorithm
+
+
+
+
+
+Things to learn 
+XAML
+Entity Framework
+Web API 

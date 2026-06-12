@@ -18,7 +18,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CRDT_TestShering")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+68cbeebf60f75c1b60201c915837c20967845ad4")]
 [assembly: System.Reflection.AssemblyProductAttribute("CRDT_TestShering")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CRDT_TestShering")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

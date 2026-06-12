@@ -4,6 +4,16 @@
         <name>CRDT_TestShering</name>
     </assembly>
     <members>
+        <member name="M:CRDT_TestShering.Services.ServicesConnectionLayer.TestConnectionAsync">
+            <summary>
+            Test server connection
+            </summary>
+        </member>
+        <member name="T:CRDT_TestShering.Services.ApiResult`1">
+            <summary>
+            Represents the result of an API operation
+            </summary>
+        </member>
         <member name="T:CRDT_TestShering.Resource">
             <summary>
             Android Resource Designer class.

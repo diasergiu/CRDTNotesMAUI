@@ -1,0 +1,350 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Server | v1",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://localhost:5001"
+    },
+    {
+      "url": "http://localhost:5000"
+    }
+  ],
+  "paths": {
+    "/api/test": {
+      "get": {
+        "tags": [
+          "Server"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/users": {
+      "get": {
+        "tags": [
+          "Server"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Server"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "tags": [
+          "Server"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Register": {
+      "post": {
+        "tags": [
+          "Register"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/WeatherForecast": {
+      "get": {
+        "tags": [
+          "WeatherForecast"
+        ],
+        "operationId": "GetWeatherForecast",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WeatherForecast"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WeatherForecast"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WeatherForecast"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Device": {
+        "type": "object",
+        "properties": {
+          "idDevice": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "idUser": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "ServerNote": {
+        "type": "object",
+        "properties": {
+          "serverNoteUser": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServerNoteUser"
+            }
+          },
+          "idNote": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "title": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "startingDate": {
+            "type": "string"
+          },
+          "lastUpdate": {
+            "type": "string"
+          }
+        }
+      },
+      "ServerNoteUser": {
+        "type": "object",
+        "properties": {
+          "idUser": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "idServerNote": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "serverNotes": {
+            "$ref": "#/components/schemas/ServerNote"
+          }
+        }
+      },
+      "User": {
+        "required": [
+          "username",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "idUser": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "username": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "serverNotesUsers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServerNoteUser"
+            }
+          },
+          "devices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Device"
+            }
+          }
+        }
+      },
+      "WeatherForecast": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "temperatureC": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "temperatureF": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "summary": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Server"
+    },
+    {
+      "name": "Register"
+    },
+    {
+      "name": "WeatherForecast"
+    }
+  ]
+}

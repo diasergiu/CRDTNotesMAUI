@@ -665,6 +665,31 @@
           "build/Microsoft.NET.ILLink.Tasks.props": {}
         }
       },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "SlackAPI/1.1.14": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "9.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        }
+      },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
         "type": "package",
         "dependencies": {
@@ -3383,6 +3408,31 @@
         "type": "package",
         "build": {
           "build/Microsoft.NET.ILLink.Tasks.props": {}
+        }
+      },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "SlackAPI/1.1.14": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "9.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
         }
       },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
@@ -6105,6 +6155,31 @@
           "build/Microsoft.NET.ILLink.Tasks.props": {}
         }
       },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "SlackAPI/1.1.14": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "9.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        }
+      },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
         "type": "package",
         "dependencies": {
@@ -8823,6 +8898,31 @@
         "type": "package",
         "build": {
           "build/Microsoft.NET.ILLink.Tasks.props": {}
+        }
+      },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "SlackAPI/1.1.14": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "9.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
         }
       },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
@@ -11545,6 +11645,31 @@
           "build/Microsoft.NET.ILLink.Tasks.props": {}
         }
       },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "SlackAPI/1.1.14": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "9.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        }
+      },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
         "type": "package",
         "dependencies": {
@@ -14265,6 +14390,31 @@
           "build/Microsoft.NET.ILLink.Tasks.props": {}
         }
       },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "SlackAPI/1.1.14": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "9.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        }
+      },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
         "type": "package",
         "dependencies": {
@@ -16956,6 +17106,31 @@
           "build/Microsoft.NET.ILLink.Tasks.props": {}
         }
       },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "SlackAPI/1.1.14": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "9.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        }
+      },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
         "type": "package",
         "dependencies": {
@@ -17661,6 +17836,31 @@
         "type": "package",
         "build": {
           "build/Microsoft.NET.ILLink.Tasks.props": {}
+        }
+      },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "SlackAPI/1.1.14": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "9.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
         }
       },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
@@ -18370,6 +18570,31 @@
           "build/Microsoft.NET.ILLink.Tasks.props": {}
         }
       },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "SlackAPI/1.1.14": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "9.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        }
+      },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
         "type": "package",
         "dependencies": {
@@ -19075,6 +19300,31 @@
         "type": "package",
         "build": {
           "build/Microsoft.NET.ILLink.Tasks.props": {}
+        }
+      },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "SlackAPI/1.1.14": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "9.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
         }
       },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
@@ -19784,6 +20034,31 @@
           "build/Microsoft.NET.ILLink.Tasks.props": {}
         }
       },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "SlackAPI/1.1.14": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "9.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        }
+      },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
         "type": "package",
         "dependencies": {
@@ -20491,6 +20766,31 @@
           "build/Microsoft.NET.ILLink.Tasks.props": {}
         }
       },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "SlackAPI/1.1.14": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "9.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        }
+      },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
         "type": "package",
         "dependencies": {
@@ -21196,6 +21496,31 @@
         "type": "package",
         "build": {
           "build/Microsoft.NET.ILLink.Tasks.props": {}
+        }
+      },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "SlackAPI/1.1.14": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "9.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
         }
       },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
@@ -21987,6 +22312,31 @@
           "build/Microsoft.NET.ILLink.Tasks.props": {}
         }
       },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "SlackAPI/1.1.14": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "9.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        }
+      },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
         "type": "package",
         "dependencies": {
@@ -22683,6 +23033,31 @@
         "type": "package",
         "build": {
           "build/Microsoft.NET.ILLink.Tasks.props": {}
+        }
+      },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "SlackAPI/1.1.14": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "9.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
         }
       },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
@@ -23383,6 +23758,31 @@
           "build/Microsoft.NET.ILLink.Tasks.props": {}
         }
       },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "SlackAPI/1.1.14": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "9.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        }
+      },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
         "type": "package",
         "dependencies": {
@@ -24076,6 +24476,31 @@
         "type": "package",
         "build": {
           "build/Microsoft.NET.ILLink.Tasks.props": {}
+        }
+      },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "SlackAPI/1.1.14": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "9.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
         }
       },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
@@ -24774,6 +25199,31 @@
         "type": "package",
         "build": {
           "build/Microsoft.NET.ILLink.Tasks.props": {}
+        }
+      },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "SlackAPI/1.1.14": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "9.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
         }
       },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
@@ -25723,6 +26173,31 @@
             "assetType": "native",
             "rid": "win-x86"
           }
+        }
+      },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "SlackAPI/1.1.14": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "9.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
         }
       },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
@@ -26703,6 +27178,31 @@
           "buildTransitive/Microsoft.WindowsAppSDK.targets": {}
         }
       },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "SlackAPI/1.1.14": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "9.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        }
+      },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
         "type": "package",
         "dependencies": {
@@ -27588,6 +28088,31 @@
         "build": {
           "buildTransitive/Microsoft.WindowsAppSDK.props": {},
           "buildTransitive/Microsoft.WindowsAppSDK.targets": {}
+        }
+      },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "SlackAPI/1.1.14": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "9.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
         }
       },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
@@ -28477,6 +29002,31 @@
           "buildTransitive/Microsoft.WindowsAppSDK.targets": {}
         }
       },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "SlackAPI/1.1.14": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "9.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        }
+      },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
         "type": "package",
         "dependencies": {
@@ -29359,6 +29909,31 @@
         "build": {
           "buildTransitive/Microsoft.WindowsAppSDK.props": {},
           "buildTransitive/Microsoft.WindowsAppSDK.targets": {}
+        }
+      },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "SlackAPI/1.1.14": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "9.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
         }
       },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
@@ -30256,6 +30831,31 @@
         "build": {
           "buildTransitive/Microsoft.WindowsAppSDK.props": {},
           "buildTransitive/Microsoft.WindowsAppSDK.targets": {}
+        }
+      },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard1.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "SlackAPI/1.1.14": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "9.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/SlackAPI.dll": {}
         }
       },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
@@ -32613,6 +33213,46 @@
         "tools/net6.0/System.Text.Json.dll",
         "tools/x64/GenXbf.dll",
         "tools/x86/GenXbf.dll"
+      ]
+    },
+    "Newtonsoft.Json/9.0.1": {
+      "sha512": "U82mHQSKaIk+lpSVCbWYKNavmNH1i5xrExDEquU1i6I5pV6UMOqRnJRSlKO3cMPfcpp0RgDY+8jUXHdQ4IfXvw==",
+      "type": "package",
+      "path": "newtonsoft.json/9.0.1",
+      "hasTools": true,
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net20/Newtonsoft.Json.dll",
+        "lib/net20/Newtonsoft.Json.xml",
+        "lib/net35/Newtonsoft.Json.dll",
+        "lib/net35/Newtonsoft.Json.xml",
+        "lib/net40/Newtonsoft.Json.dll",
+        "lib/net40/Newtonsoft.Json.xml",
+        "lib/net45/Newtonsoft.Json.dll",
+        "lib/net45/Newtonsoft.Json.xml",
+        "lib/netstandard1.0/Newtonsoft.Json.dll",
+        "lib/netstandard1.0/Newtonsoft.Json.xml",
+        "lib/portable-net40+sl5+wp80+win8+wpa81/Newtonsoft.Json.dll",
+        "lib/portable-net40+sl5+wp80+win8+wpa81/Newtonsoft.Json.xml",
+        "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll",
+        "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.xml",
+        "newtonsoft.json.9.0.1.nupkg.sha512",
+        "newtonsoft.json.nuspec",
+        "tools/install.ps1"
+      ]
+    },
+    "SlackAPI/1.1.14": {
+      "sha512": "1mqKq+faHsWZfyWTXKpSLZH9g/KbpcHhTQx0q+h9BeAEXm0unlr1rGcVDIgEku44/X09dJM60Y9qz4pnMTQGrg==",
+      "type": "package",
+      "path": "slackapi/1.1.14",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net45/SlackAPI.dll",
+        "lib/netstandard2.0/SlackAPI.dll",
+        "slackapi.1.1.14.nupkg.sha512",
+        "slackapi.nuspec"
       ]
     },
     "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
@@ -35161,24 +35801,28 @@
       "DatabaseLibrary >= 1.0.0",
       "Microsoft.Extensions.Logging.Debug >= 10.0.0",
       "Microsoft.Maui.Controls >= 10.0.20",
-      "Microsoft.NET.ILLink.Tasks >= 10.0.8"
+      "Microsoft.NET.ILLink.Tasks >= 10.0.8",
+      "SlackAPI >= 1.1.14"
     ],
     "net10.0-ios": [
       "DatabaseLibrary >= 1.0.0",
       "Microsoft.Extensions.Logging.Debug >= 10.0.0",
       "Microsoft.Maui.Controls >= 10.0.20",
-      "Microsoft.NET.ILLink.Tasks >= 10.0.8"
+      "Microsoft.NET.ILLink.Tasks >= 10.0.8",
+      "SlackAPI >= 1.1.14"
     ],
     "net10.0-maccatalyst": [
       "DatabaseLibrary >= 1.0.0",
       "Microsoft.Extensions.Logging.Debug >= 10.0.0",
       "Microsoft.Maui.Controls >= 10.0.20",
-      "Microsoft.NET.ILLink.Tasks >= 10.0.8"
+      "Microsoft.NET.ILLink.Tasks >= 10.0.8",
+      "SlackAPI >= 1.1.14"
     ],
     "net10.0-windows10.0.19041.0": [
       "DatabaseLibrary >= 1.0.0",
       "Microsoft.Extensions.Logging.Debug >= 10.0.0",
-      "Microsoft.Maui.Controls >= 10.0.20"
+      "Microsoft.Maui.Controls >= 10.0.20",
+      "SlackAPI >= 1.1.14"
     ]
   },
   "packageFolders": {
@@ -35284,6 +35928,10 @@
             "target": "Package",
             "version": "[10.0.8, )",
             "autoReferenced": true
+          },
+          "SlackAPI": {
+            "target": "Package",
+            "version": "[1.1.14, )"
           }
         },
         "imports": [
@@ -35601,6 +36249,10 @@
             "target": "Package",
             "version": "[10.0.8, )",
             "autoReferenced": true
+          },
+          "SlackAPI": {
+            "target": "Package",
+            "version": "[1.1.14, )"
           }
         },
         "imports": [
@@ -35918,6 +36570,10 @@
             "target": "Package",
             "version": "[10.0.8, )",
             "autoReferenced": true
+          },
+          "SlackAPI": {
+            "target": "Package",
+            "version": "[1.1.14, )"
           }
         },
         "imports": [
@@ -36230,6 +36886,10 @@
           "Microsoft.Maui.Controls": {
             "target": "Package",
             "version": "[10.0.20, )"
+          },
+          "SlackAPI": {
+            "target": "Package",
+            "version": "[1.1.14, )"
           }
         },
         "imports": [
@@ -36551,5 +37211,40 @@
         "#import": []
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'Newtonsoft.Json' 9.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-5crp-9r3c-p9vr",
+      "libraryId": "Newtonsoft.Json",
+      "targetGraphs": [
+        "net10.0-android",
+        "net10.0-android/android-arm64",
+        "net10.0-android/android-x64",
+        "net10.0-android/iossimulator-x64",
+        "net10.0-android/maccatalyst-x64",
+        "net10.0-android/win-x64",
+        "net10.0-ios",
+        "net10.0-ios/android-arm64",
+        "net10.0-ios/android-x64",
+        "net10.0-ios/iossimulator-x64",
+        "net10.0-ios/maccatalyst-x64",
+        "net10.0-ios/win-x64",
+        "net10.0-maccatalyst",
+        "net10.0-maccatalyst/android-arm64",
+        "net10.0-maccatalyst/android-x64",
+        "net10.0-maccatalyst/iossimulator-x64",
+        "net10.0-maccatalyst/maccatalyst-x64",
+        "net10.0-maccatalyst/win-x64",
+        "net10.0-windows10.0.19041.0",
+        "net10.0-windows10.0.19041.0/android-arm64",
+        "net10.0-windows10.0.19041.0/android-x64",
+        "net10.0-windows10.0.19041.0/iossimulator-x64",
+        "net10.0-windows10.0.19041.0/maccatalyst-x64",
+        "net10.0-windows10.0.19041.0/win-x64"
+      ]
+    }
+  ]
 }

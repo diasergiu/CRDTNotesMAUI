@@ -319,7 +319,6 @@ D:\Programming\Visual_Studio\ProjectDevelopment\CRDT_TestShering\CRDT_TestSherin
 D:\Programming\Visual_Studio\ProjectDevelopment\CRDT_TestShering\CRDT_TestShering\bin\Debug\net10.0-maccatalyst\maccatalyst-x64\libe_sqlite3.dylib
 D:\Programming\Visual_Studio\ProjectDevelopment\CRDT_TestShering\CRDT_TestShering\bin\Debug\net10.0-maccatalyst\maccatalyst-x64\DatabaseLibrary.dll
 D:\Programming\Visual_Studio\ProjectDevelopment\CRDT_TestShering\CRDT_TestShering\bin\Debug\net10.0-maccatalyst\maccatalyst-x64\DatabaseLibrary.pdb
-D:\Programming\Visual_Studio\ProjectDevelopment\CRDT_TestShering\CRDT_TestShering\bin\Debug\net10.0-maccatalyst\maccatalyst-x64\Microsoft.Maui.Controls.HotReload.Forms.dll
-D:\Programming\Visual_Studio\ProjectDevelopment\CRDT_TestShering\CRDT_TestShering\bin\Debug\net10.0-maccatalyst\maccatalyst-x64\Microsoft.VisualStudio.DesignTools.MobileTapContracts.dll
-D:\Programming\Visual_Studio\ProjectDevelopment\CRDT_TestShering\CRDT_TestShering\bin\Debug\net10.0-maccatalyst\maccatalyst-x64\Microsoft.VisualStudio.DesignTools.TapContract.dll
-D:\Programming\Visual_Studio\ProjectDevelopment\CRDT_TestShering\CRDT_TestShering\bin\Debug\net10.0-maccatalyst\maccatalyst-x64\Microsoft.VisualStudio.DesignTools.XamlTapContract.dll
+D:\Programming\Visual_Studio\ProjectDevelopment\CRDT_TestShering\CRDT_TestShering\obj\Debug\net10.0-maccatalyst\maccatalyst-x64\CRDT_TestShering.sourcelink.json
+D:\Programming\Visual_Studio\ProjectDevelopment\CRDT_TestShering\CRDT_TestShering\bin\Debug\net10.0-maccatalyst\maccatalyst-x64\Newtonsoft.Json.dll
+D:\Programming\Visual_Studio\ProjectDevelopment\CRDT_TestShering\CRDT_TestShering\bin\Debug\net10.0-maccatalyst\maccatalyst-x64\SlackAPI.dll

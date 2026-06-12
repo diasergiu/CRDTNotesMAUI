@@ -12,3 +12,4 @@ D:\Programming\Visual_Studio\ProjectDevelopment\CRDT_TestShering\DatabaseLibrary
 D:\Programming\Visual_Studio\ProjectDevelopment\CRDT_TestShering\DatabaseLibrary\obj\Debug\net10.0\DatabaseLibrary.pdb
 D:\Programming\Visual_Studio\ProjectDevelopment\CRDT_TestShering\DatabaseLibrary\obj\Debug\net10.0\DatabaseLibrary.genruntimeconfig.cache
 D:\Programming\Visual_Studio\ProjectDevelopment\CRDT_TestShering\DatabaseLibrary\obj\Debug\net10.0\ref\DatabaseLibrary.dll
+D:\Programming\Visual_Studio\ProjectDevelopment\CRDT_TestShering\DatabaseLibrary\obj\Debug\net10.0\DatabaseLibrary.sourcelink.json

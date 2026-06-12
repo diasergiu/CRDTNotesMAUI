@@ -1,4 +1,4 @@
-<api type="debug" assembly-name="CRDT_TestShering" mvid="d73c648cdf7d4b3791cc24cbb6e4509a">
+<api type="debug" assembly-name="CRDT_TestShering" mvid="b0a79413fcf2424bb7033edc878be9f6">
   <java-to-managed>
     <entry java-name="crc646a65ab3cb0d3a491/MainActivity" managed-name="CRDT_TestShering.MainActivity, CRDT_TestShering" managed-type-token-id="33554442" />
     <entry java-name="crc646a65ab3cb0d3a491/MainApplication" managed-name="CRDT_TestShering.MainApplication, CRDT_TestShering" managed-type-token-id="33554443" />

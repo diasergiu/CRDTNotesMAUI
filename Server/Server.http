@@ -1,6 +1,27 @@
-@Server_HostAddress = http://localhost:5266
+@Server_HostAddress = http://localhost:5000
 
-GET {{Server_HostAddress}}/weatherforecast/
+### Test WeatherForecast
+GET {{Server_HostAddress}}/weatherforecast
 Accept: application/json
 
 ###
+
+### Test Server Connection
+GET {{Server_HostAddress}}/api/test?username=TestUser
+
+###
+
+### Get All Users
+GET {{Server_HostAddress}}/api/users
+
+###
+
+### Register New User
+POST {{Server_HostAddress}}/api/Register
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "username": "johndoe",
+  "password": "password123"
+}

@@ -68,6 +68,7 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+		<PackageReference Include="SlackAPI" Version="1.1.14" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -88,6 +89,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="UserInterface\NoteView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="UserInterface\RegisterPopup.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>

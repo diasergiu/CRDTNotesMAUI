@@ -12,7 +12,15 @@ namespace DatabaseLibrary.Entities
         public DbSet<User> Users { get; set; }
         public DbSet<ServerNoteUser> ServerNoteUsers { get; set; }
         public string DbPath { get; }
+        //Probably Delete
         public DbContextServer()
+        {
+            var folder = Environment.SpecialFolder.LocalApplicationData;
+            var path = Environment.GetFolderPath(folder);
+            DbPath = System.IO.Path.Join(path, "ServerDatabase.db");
+        }
+        public DbContextServer(DbContextOptions<DbContextServer> options)
+           : base(options)
         {
             var folder = Environment.SpecialFolder.LocalApplicationData;
             var path = Environment.GetFolderPath(folder);
