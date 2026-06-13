@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="CRDT_TestShering/CRDT_TestShering.csproj" />
+  <Project Path="DatabaseLibrary/DatabaseLibrary.csproj" />
+  <Project Path="Server/Server.csproj" />
+</Solution>

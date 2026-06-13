@@ -1,4 +1,4 @@
-﻿namespace CRDT_TestShering.Services
+﻿namespace DatabaseLibrary.WrapperClasses
 {
     /// <summary>
     /// Represents the result of an API operation

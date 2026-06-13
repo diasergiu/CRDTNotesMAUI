@@ -2,6 +2,7 @@
   <Folder Name="/Solution Items/">
     <File Path="QuestionsRequirements.txt" />
   </Folder>
+  <Project Path="CRDT_TestShering.Test/CRDT_TestShering.Test.csproj" Id="80a36fc0-eb2a-4b13-a696-63dd1ab43a9c" />
   <Project Path="CRDT_TestShering/CRDT_TestShering.csproj">
     <Deploy Solution="Debug|*" />
   </Project>

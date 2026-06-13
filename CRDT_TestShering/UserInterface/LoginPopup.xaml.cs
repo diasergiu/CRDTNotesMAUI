@@ -8,12 +8,12 @@ namespace CRDT_TestShering.UserInterface;
 
 public partial class LoginPopup : ContentPage
 {
-    private ServicesConnectionLayer _apiService;
+    private LoginConnectionServices loginServices;
 
     public LoginPopup()
     {
         InitializeComponent();
-        _apiService = new ServicesConnectionLayer();        
+        loginServices = new LoginConnectionServices();        
     }
 
     private async void OnLoginSubmitClicked(object sender, EventArgs e)
@@ -43,33 +43,9 @@ public partial class LoginPopup : ContentPage
             password
         );
 
-        // Handle the result
-        //if (result.IsSuccess)
-        //{
-        //    // Save authentication
-        //    await _authService.SaveLoginAsync(
-        //        result.Data.AuthToken,
-        //        result.Data.User.IdUser,
-        //        result.Data.User.Username
-        //    );
-
-        //    // TODO: Save notes to local database
-        //    // await SaveNotesToLocalDb(result.Data.Notes);
-
-        //    ShowStatus("Login successful!", false);
-        //    await Task.Delay(1000);
-        //    await Navigation.PopModalAsync();
-        //}
-        //else
         if( !result.IsSuccess){
             // Display the error message from the service
             ShowStatus(result.ErrorMessage, true);
-
-            // Optional: Handle different error types differently
-            if (result.ErrorType == ApiErrorType.ConnectionError)
-            {
-                // Maybe show a "Retry" button or different UI
-            }
         }
 
         SetLoadingState(false);
