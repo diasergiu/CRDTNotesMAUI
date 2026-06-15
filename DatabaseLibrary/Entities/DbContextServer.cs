@@ -27,7 +27,13 @@ namespace DatabaseLibrary.Entities
             DbPath = System.IO.Path.Join(path, "ServerDatabase.db");
         }
         protected override void OnConfiguring(DbContextOptionsBuilder options)
-        => options.UseSqlite($"Data Source={DbPath}");
+        {
+            // Only configure if not already configured by dependency injection
+            if (!options.IsConfigured)
+            {
+                options.UseSqlite($"Data Source={DbPath}");
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
