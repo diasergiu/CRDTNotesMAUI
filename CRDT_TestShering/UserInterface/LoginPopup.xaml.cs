@@ -1,4 +1,5 @@
 using CRDT_TestShering.Services;
+using DatabaseLibrary.Services;
 using System;
 using System.Net.Http;
 using System.Text.Json;
@@ -13,7 +14,7 @@ public partial class LoginPopup : ContentPage
     public LoginPopup()
     {
         InitializeComponent();
-        loginServices = new LoginConnectionServices();        
+        loginServices = new LoginConnectionServices(BaseURLGetter.getBaseURL());        
     }
 
     private async void OnLoginSubmitClicked(object sender, EventArgs e)
@@ -38,7 +39,7 @@ public partial class LoginPopup : ContentPage
         SetLoadingState(true);
 
         // Call the service - NO TRY/CATCH needed!
-        var result = await _apiService.LoginAstnc(
+        var result = await loginServices.LoginAsync(
             username,
             password
         );

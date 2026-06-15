@@ -1,24 +1,21 @@
 ﻿using DatabaseLibrary.WrapperClasses;
-using Microsoft.Maui.Devices;
 using System;
 using System.Collections.Generic;
 using System.Net.Http.Json;
 using System.Text;
 
-namespace CRDT_TestShering.Services
+namespace DatabaseLibrary.Services
 {
     public class ServicesConnectionLayer
     {
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl;
 
-        public ServicesConnectionLayer()
+        public ServicesConnectionLayer(string baseUrl)
         {
             // Configure HttpClient for local server
 
-            _baseUrl = DeviceInfo.Platform == DevicePlatform.Android
-                ? "http://10.0.2.2:5000"  // Android emulator
-                : "http://localhost:5000"; // Windows/iOS/Mac
+            _baseUrl = baseUrl;
             _httpClient = new HttpClient
             {
                 BaseAddress = new Uri(_baseUrl),

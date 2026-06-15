@@ -7,5 +7,6 @@
     <Deploy Solution="Debug|*" />
   </Project>
   <Project Path="DatabaseLibrary/DatabaseLibrary.csproj" />
+  <Project Path="Server.Test/Server.Test.csproj" Id="a32492ad-8a06-4e0d-9ea4-09e6cbaa609f" />
   <Project Path="Server/Server.csproj" Id="3ed61fcf-1e36-4cb4-84da-574121dbb90b" />
 </Solution>
