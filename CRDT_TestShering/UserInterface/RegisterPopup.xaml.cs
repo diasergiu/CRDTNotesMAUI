@@ -1,3 +1,5 @@
+using CRDT_TestShering.Services;
+using DatabaseLibrary.Services;
 using System;
 using System.Net.Http;
 using System.Text;
@@ -7,26 +9,14 @@ namespace CRDT_TestShering.UserInterface;
 
 public partial class RegisterPopup : ContentPage
 {
-    private readonly HttpClient _httpClient;
+    private readonly RegisterConnectionServices _registerServices;
 
     public RegisterPopup()
     {
         InitializeComponent();
 
-        // Configure HttpClient for local server
-#if DEBUG
-        var baseUrl = DeviceInfo.Platform == DevicePlatform.Android
-            ? "http://10.0.2.2:5000"  // Android emulator
-            : "http://localhost:5000"; // Windows/iOS/Mac
-#else
-        var baseUrl = "https://your-production-api.com";
-#endif
-
-        _httpClient = new HttpClient
-        {
-            BaseAddress = new Uri(baseUrl),
-            Timeout = TimeSpan.FromSeconds(30)
-        };
+        _registerServices = new RegisterConnectionServices(BaseURLGetter.getBaseURL());
+        
     }
 
     private async void OnRegisterClicked(object sender, EventArgs e)
@@ -78,65 +68,24 @@ public partial class RegisterPopup : ContentPage
         RegisterButton.Text = "Creating account...";
         StatusLabel.IsVisible = false;
 
-        try
-        {
-            var registerRequest = new
-            {
-                name = name,
-                username = username,
-                password = password
-            };
+        var result = await _registerServices.RegisterNewUser(name, username, password);
 
-            var json = JsonSerializer.Serialize(registerRequest);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-            var response = await _httpClient.PostAsync("/api/Register", content);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                var registerResponse = JsonSerializer.Deserialize<RegisterResponse>(responseContent,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-                if (registerResponse?.Success == true)
-                {
-                    ShowStatus("Account created successfully!", false);
-                    await Task.Delay(1500);
-
-                    // Navigate back to login
-                    await Navigation.PopModalAsync();
-                }
-                else
-                {
-                    ShowStatus(registerResponse?.Message ?? "Registration failed", true);
-                }
-            }
-            else if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
-            {
-                ShowStatus("Username already exists", true);
-            }
-            else
-            {
-                ShowStatus($"Registration failed: {response.StatusCode}", true);
-            }
-        }
-        catch (HttpRequestException ex)
+        if (result.IsSuccess)
         {
-            ShowStatus($"Connection error: {ex.Message}", true);
+            ShowStatus("Account created successfully!", false);
+            await Task.Delay(1500);
+
+            // Navigate back to login
+            await Navigation.PopModalAsync();
         }
-        catch (TaskCanceledException)
+        else
         {
-            ShowStatus("Request timeout. Is the server running?", true);
+            ShowStatus(result.ErrorMessage ?? "Registration failed", true);
         }
-        catch (Exception ex)
-        {
-            ShowStatus($"Error: {ex.Message}", true);
-        }
-        finally
-        {
-            RegisterButton.IsEnabled = true;
-            RegisterButton.Text = "Register";
-        }
+
+        // Re-enable button and reset text
+        RegisterButton.IsEnabled = true;
+        RegisterButton.Text = "Register";
     }
 
     private async void OnBackToLoginClicked(object sender, EventArgs e)

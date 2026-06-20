@@ -32,8 +32,8 @@ public partial class Program
 
         // ====== END EF CORE CONFIGURATION ======
 
-        // Configure specific ports for development
-        builder.WebHost.UseUrls("https://localhost:5001", "http://localhost:5000");
+        // Configure specific ports for development (matches launchSettings.json)
+        builder.WebHost.UseUrls("https://localhost:7282", "http://localhost:5266");
 
         var app = builder.Build();
 
