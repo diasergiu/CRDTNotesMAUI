@@ -12,6 +12,7 @@ namespace DatabaseLibrary.Entities
         public int IdDevice { get; set; }
         [ForeignKey("User")]
         public int IdUser { get; set; }
-        public User User { get; set; }
+
+        public List<User_Device> UserDevices { get; set; }
     }
 }

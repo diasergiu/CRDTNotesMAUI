@@ -43,7 +43,7 @@ public partial class MainPageNotes : ContentPage
 			Title = "",
 			Content = "",
 			StartingDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-			lastUpdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+			LastUpdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
 		};
 		await Navigation.PushAsync(new NoteView(newNote, isNewNote: true));
 	}

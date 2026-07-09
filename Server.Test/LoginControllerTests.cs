@@ -33,24 +33,24 @@ namespace Server.Tests
                 Password = "testpass"
             };
 
-            var note = new ServerNote
+            var note = new Note
             {
                 IdNote = 1,
                 Title = "Test Note",
                 Content = "Test Content",
                 StartingDate = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
-                lastUpdate = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")
+                LastUpdate = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")
             };
 
-            var serverNoteUser = new ServerNoteUser
+            var serverNoteUser = new Note_User
             {
                 IdUser = user.IdUser,
-                IdServerNote = note.IdNote,
-                ServerNotes = note,
+                IdNote = note.IdNote,
+                Note = note,
                 User = user
             };
 
-            user.ServerNotesUsers = new List<ServerNoteUser> { serverNoteUser };
+            user.NotesUsers = new List<Note_User> { serverNoteUser };
 
             context.Users.Add(user);
             context.ServerNotes.Add(note);

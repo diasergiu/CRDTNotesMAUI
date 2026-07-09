@@ -7,10 +7,11 @@ namespace DatabaseLibrary.Entities
 {
     public class DbContextServer : DbContext
     {
-        public DbSet<ServerNote> ServerNotes { get; set; }
+        public DbSet<Note> ServerNotes { get; set; }
         public DbSet<Device> Devices { get; set; }
         public DbSet<User> Users { get; set; }
-        public DbSet<ServerNoteUser> ServerNoteUsers { get; set; }
+        public DbSet<Note_User> ServerNoteUsers { get; set; }
+        public DbSet<User_Device> UserDevices { get; set; }
         public string DbPath { get; }
         //Probably Delete
         public DbContextServer()
@@ -38,25 +39,33 @@ namespace DatabaseLibrary.Entities
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Composite key for ServerNotesUser
-            modelBuilder.Entity<ServerNoteUser>()
-                .HasKey(snu => new { snu.IdUser, snu.IdServerNote });
+            modelBuilder.Entity<Note_User>()
+                .HasKey(snu => new { snu.IdUser, snu.IdNote });
 
             // Relationships
-            modelBuilder.Entity<ServerNoteUser>()
+            modelBuilder.Entity<Note_User>()
                 .HasOne(snu => snu.User)
-                .WithMany(u => u.ServerNotesUsers)
+                .WithMany(u => u.NotesUsers)
                 .HasForeignKey(snu => snu.IdUser);
 
-            modelBuilder.Entity<ServerNoteUser>()
-                .HasOne(snu => snu.ServerNotes)
-                .WithMany(sn => sn.ServerNoteUser)
-                .HasForeignKey(snu => snu.IdServerNote);
+            modelBuilder.Entity<Note_User>()
+                .HasOne(snu => snu.Note)
+                .WithMany(n => n.NoteUser)
+                .HasForeignKey(snu => snu.IdNote);
 
             // Device relationships
-            modelBuilder.Entity<Device>()
-                .HasOne(d => d.User)
-                .WithMany(u => u.Devices)
-                .HasForeignKey(d => d.IdUser);
+            modelBuilder.Entity<User_Device>()
+                .HasKey(ud => new { ud.IdUser, ud.IdDevice });
+
+            modelBuilder.Entity<User_Device>()
+                .HasOne(ud => ud.Device)
+                .WithMany(d => d.UserDevices)
+                .HasForeignKey(ud => ud.IdDevice);
+
+            modelBuilder.Entity<User_Device>()
+                .HasOne(ud => ud.User)
+                .WithMany(u => u.UserDevices)
+                .HasForeignKey(ud => ud.IdUser);
 
             base.OnModelCreating(modelBuilder);
         }

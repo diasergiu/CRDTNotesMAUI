@@ -21,21 +21,21 @@ namespace Server.Controllers
         public async Task<IActionResult> Login(string username, string password)
         {
             User user = await _context.Users
-                .Include(u => u.ServerNotesUsers)
-                    .ThenInclude(snu => snu.ServerNotes)
+                .Include(u => u.NotesUsers)
+                    .ThenInclude(snu => snu.Note)
                 .FirstOrDefaultAsync(u => u.Username == username && u.Password == password);
 
             if (user != null)
             {
                 // Get all notes for the user
-                var notes = user.ServerNotesUsers
+                var notes = user.NotesUsers
                     .Select(snu => new
                     {
-                        IdNote = snu.ServerNotes.IdNote,
-                        Title = snu.ServerNotes.Title,
-                        Content = snu.ServerNotes.Content,
-                        StartingDate = snu.ServerNotes.StartingDate,
-                        LastUpdate = snu.ServerNotes.lastUpdate
+                        IdNote = snu.Note.IdNote,
+                        Title = snu.Note.Title,
+                        Content = snu.Note.Content,
+                        StartingDate = snu.Note.StartingDate,
+                        LastUpdate = snu.Note.LastUpdate
                     })
                     .ToList();
 

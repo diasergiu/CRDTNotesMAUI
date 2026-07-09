@@ -48,9 +48,12 @@ public partial class NoteView : ContentPage
 		{
 			_currentNote.Title = TitleEntry.Text;
 			_currentNote.Content = ContentEditor.Text ?? "";
-			_currentNote.lastUpdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+			_currentNote.LastUpdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");			
+			_currentNote.hasPassword = IsSecured.IsChecked;
+            _currentNote.PasswordNote = IsSecured.IsChecked ? PasswordEntry.Text : "";
 
-			using (var dbContext = new DbContextUser())
+
+            using (var dbContext = new DbContextUser())
 			{
 				if (_isNewNote)
 				{

@@ -2,28 +2,30 @@
 
 #nullable disable
 
-namespace DatabaseLibrary.Migrations.Server
+namespace DatabaseLibrary.Migrations.Client
 {
     /// <inheritdoc />
-    public partial class InitialServerCreate : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "ServerNotes",
+                name: "Notes",
                 columns: table => new
                 {
                     IdNote = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Title = table.Column<string>(type: "TEXT", nullable: false),
+                    PasswordNote = table.Column<string>(type: "TEXT", nullable: false),
                     Content = table.Column<string>(type: "TEXT", nullable: false),
                     StartingDate = table.Column<string>(type: "TEXT", nullable: false),
-                    lastUpdate = table.Column<string>(type: "TEXT", nullable: false)
+                    LastUpdate = table.Column<string>(type: "TEXT", nullable: false),
+                    hasPassword = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ServerNotes", x => x.IdNote);
+                    table.PrimaryKey("PK_Notes", x => x.IdNote);
                 });
 
             migrationBuilder.CreateTable(
@@ -33,7 +35,7 @@ namespace DatabaseLibrary.Migrations.Server
                     IdUser = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Username = table.Column<string>(type: "TEXT", nullable: false),
+                    Username = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
                     Password = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
@@ -42,42 +44,23 @@ namespace DatabaseLibrary.Migrations.Server
                 });
 
             migrationBuilder.CreateTable(
-                name: "Devices",
-                columns: table => new
-                {
-                    IdDevice = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    IdUser = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Devices", x => x.IdDevice);
-                    table.ForeignKey(
-                        name: "FK_Devices_Users_IdUser",
-                        column: x => x.IdUser,
-                        principalTable: "Users",
-                        principalColumn: "IdUser",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ServerNoteUsers",
+                name: "NoteUsers",
                 columns: table => new
                 {
                     IdUser = table.Column<int>(type: "INTEGER", nullable: false),
-                    IdServerNote = table.Column<int>(type: "INTEGER", nullable: false)
+                    IdNote = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ServerNoteUsers", x => new { x.IdUser, x.IdServerNote });
+                    table.PrimaryKey("PK_NoteUsers", x => new { x.IdUser, x.IdNote });
                     table.ForeignKey(
-                        name: "FK_ServerNoteUsers_ServerNotes_IdServerNote",
-                        column: x => x.IdServerNote,
-                        principalTable: "ServerNotes",
+                        name: "FK_NoteUsers_Notes_IdNote",
+                        column: x => x.IdNote,
+                        principalTable: "Notes",
                         principalColumn: "IdNote",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ServerNoteUsers_Users_IdUser",
+                        name: "FK_NoteUsers_Users_IdUser",
                         column: x => x.IdUser,
                         principalTable: "Users",
                         principalColumn: "IdUser",
@@ -85,27 +68,19 @@ namespace DatabaseLibrary.Migrations.Server
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Devices_IdUser",
-                table: "Devices",
-                column: "IdUser");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ServerNoteUsers_IdServerNote",
-                table: "ServerNoteUsers",
-                column: "IdServerNote");
+                name: "IX_NoteUsers_IdNote",
+                table: "NoteUsers",
+                column: "IdNote");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Devices");
+                name: "NoteUsers");
 
             migrationBuilder.DropTable(
-                name: "ServerNoteUsers");
-
-            migrationBuilder.DropTable(
-                name: "ServerNotes");
+                name: "Notes");
 
             migrationBuilder.DropTable(
                 name: "Users");

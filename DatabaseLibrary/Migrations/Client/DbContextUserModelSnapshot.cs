@@ -6,29 +6,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace DatabaseLibrary.Migrations.Server
+namespace DatabaseLibrary.Migrations.Client
 {
-    [DbContext(typeof(DbContextServer))]
-    partial class DbContextServerModelSnapshot : ModelSnapshot
+    [DbContext(typeof(DbContextUser))]
+    partial class DbContextUserModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.9");
-
-            modelBuilder.Entity("DatabaseLibrary.Entities.Device", b =>
-                {
-                    b.Property<int>("IdDevice")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("IdUser")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("IdDevice");
-
-                    b.ToTable("Devices");
-                });
 
             modelBuilder.Entity("DatabaseLibrary.Entities.Note", b =>
                 {
@@ -61,7 +47,7 @@ namespace DatabaseLibrary.Migrations.Server
 
                     b.HasKey("IdNote");
 
-                    b.ToTable("ServerNotes");
+                    b.ToTable("Notes");
                 });
 
             modelBuilder.Entity("DatabaseLibrary.Entities.Note_User", b =>
@@ -76,7 +62,7 @@ namespace DatabaseLibrary.Migrations.Server
 
                     b.HasIndex("IdNote");
 
-                    b.ToTable("ServerNoteUsers");
+                    b.ToTable("NoteUsers");
                 });
 
             modelBuilder.Entity("DatabaseLibrary.Entities.UserClient", b =>
@@ -84,11 +70,6 @@ namespace DatabaseLibrary.Migrations.Server
                     b.Property<int>("IdUser")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -105,33 +86,7 @@ namespace DatabaseLibrary.Migrations.Server
 
                     b.HasKey("IdUser");
 
-                    b.ToTable("UserClient");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("UserClient");
-
-                    b.UseTphMappingStrategy();
-                });
-
-            modelBuilder.Entity("DatabaseLibrary.Entities.User_Device", b =>
-                {
-                    b.Property<int>("IdUser")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("IdDevice")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("IdUser", "IdDevice");
-
-                    b.HasIndex("IdDevice");
-
-                    b.ToTable("UserDevices");
-                });
-
-            modelBuilder.Entity("DatabaseLibrary.Entities.User", b =>
-                {
-                    b.HasBaseType("DatabaseLibrary.Entities.UserClient");
-
-                    b.HasDiscriminator().HasValue("User");
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("DatabaseLibrary.Entities.Note_User", b =>
@@ -153,30 +108,6 @@ namespace DatabaseLibrary.Migrations.Server
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("DatabaseLibrary.Entities.User_Device", b =>
-                {
-                    b.HasOne("DatabaseLibrary.Entities.Device", "Device")
-                        .WithMany("UserDevices")
-                        .HasForeignKey("IdDevice")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DatabaseLibrary.Entities.User", "User")
-                        .WithMany("UserDevices")
-                        .HasForeignKey("IdUser")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Device");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("DatabaseLibrary.Entities.Device", b =>
-                {
-                    b.Navigation("UserDevices");
-                });
-
             modelBuilder.Entity("DatabaseLibrary.Entities.Note", b =>
                 {
                     b.Navigation("NoteUser");
@@ -185,11 +116,6 @@ namespace DatabaseLibrary.Migrations.Server
             modelBuilder.Entity("DatabaseLibrary.Entities.UserClient", b =>
                 {
                     b.Navigation("NotesUsers");
-                });
-
-            modelBuilder.Entity("DatabaseLibrary.Entities.User", b =>
-                {
-                    b.Navigation("UserDevices");
                 });
 #pragma warning restore 612, 618
         }

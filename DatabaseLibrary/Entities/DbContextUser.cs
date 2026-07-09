@@ -8,6 +8,8 @@ namespace DatabaseLibrary.Entities
     public class DbContextUser : DbContext
     {
         public DbSet<Note> Notes { get; set; }
+        public DbSet<Note_User> NoteUsers { get; set; }
+        public DbSet<UserClient> Users { get; set; }
 
         public string DbPath { get; }
 
