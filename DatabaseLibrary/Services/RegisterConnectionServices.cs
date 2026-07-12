@@ -1,4 +1,5 @@
 ﻿using DatabaseLibrary.Entities;
+using DatabaseLibrary.ServerServices;
 using DatabaseLibrary.WrapperClasses;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace DatabaseLibrary.Services
     {
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl;
+        private readonly LoginConnectionServices _loginConnectionServices;
 
         public RegisterConnectionServices(string baseUrl)
         {
@@ -19,6 +21,7 @@ namespace DatabaseLibrary.Services
                 BaseAddress = new Uri(baseUrl),
                 Timeout = TimeSpan.FromSeconds(30)
             };
+            _loginConnectionServices = new LoginConnectionServices(baseUrl);
         }
 
         public async Task<ApiResult<List<Note>>> RegisterNewUser(String name, string username, string password, List<Note> listOfNotes)
@@ -30,7 +33,8 @@ namespace DatabaseLibrary.Services
                 var response = await _httpClient.PostAsync("/api/register", content);
                 if (response.IsSuccessStatusCode)
                 {
-                    return ApiResult<List<Note>>.Success(await response.Content.ReadFromJsonAsync<List<Note>>());
+                    var result = await _loginConnectionServices.LoginAsync(username, password);
+                    return ApiResult<List<Note>>.Success(result.Data);
                 }
                 else
                 {
@@ -40,7 +44,7 @@ namespace DatabaseLibrary.Services
             }
             catch (Exception ex)
             {
-                return ApiResult<List<Note>>.Failure(ex.Message, ApiErrorType.ConnectionError);
+                return ApiResult<List<Entities.Note>>.Failure(ex.Message, ApiErrorType.ConnectionError);
             }
             //catch (HttpRequestException ex)
             //{

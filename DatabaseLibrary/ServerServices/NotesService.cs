@@ -9,15 +9,15 @@ namespace DatabaseLibrary.ServerServices
 {
     public class NotesService
     {
-        private DbContextServer dbContextServer;
+        private DbContextServer _dbContextServer;
         public NotesService(DbContextServer context)
         {
-            dbContextServer = context;
+            _dbContextServer = context;
         }
 
         public async Task<User> getUser(string username, string password)
         {
-            User user = await dbContextServer.Users
+            User user = await _dbContextServer.Users
                 .Include(u => u.NotesUsers)
                     .ThenInclude(snu => snu.Note)
                 .FirstOrDefaultAsync(u => u.Username == username && u.Password == password);
@@ -32,23 +32,23 @@ namespace DatabaseLibrary.ServerServices
                 foreach (var note in notesUpdate)
                 {
                     note.DirtyFlagChangesMade = false; // Reset the dirty flag after saving
-                    var existingNote = await dbContextServer.Notes.FirstOrDefaultAsync(n => n.IdNote == note.IdNote);
+                    var existingNote = await _dbContextServer.Notes.FirstOrDefaultAsync(n => n.IdNote == note.IdNote);
                     if (existingNote != null)
                     {
-                        dbContextServer.Entry(existingNote).CurrentValues.SetValues(note);
+                        _dbContextServer.Entry(existingNote).CurrentValues.SetValues(note);
                     }
                     else
                     {
                         listNewNotes.Add(note);
-                        dbContextServer.Notes.Add(note);
+                        _dbContextServer.Notes.Add(note);
                     }
                 }
 
-                await dbContextServer.SaveChangesAsync();
+                await _dbContextServer.SaveChangesAsync();
 
                 foreach (var note in listNewNotes)
                 {
-                    var noteExists = await dbContextServer.Notes.FirstOrDefaultAsync(n => n.IdNote == note.IdNote);
+                    var noteExists = await _dbContextServer.Notes.FirstOrDefaultAsync(n => n.IdNote == note.IdNote);
                     if (noteExists != null)
                     {
                         //var existingRelationship = await dbContextServer.NoteUsers.FirstOrDefaultAsync(nu => nu.IdNote == note.IdNote && nu.IdUser == user.IdUser);
@@ -60,20 +60,20 @@ namespace DatabaseLibrary.ServerServices
                             IdNote = note.IdNote,
                             IdUser = user.IdUser
                         };
-                        dbContextServer.Note_Users.Add(noteUser);
+                        _dbContextServer.Note_Users.Add(noteUser);
                         //}
                         
                     }
                 }
 
-                await dbContextServer.SaveChangesAsync();
+                await _dbContextServer.SaveChangesAsync();
             }
             return user;
         }
 
         public async Task<List<Note>> GetNotesToUpdateClient(User user)
         {
-            var notesToUpdate = await dbContextServer.Note_Users
+            var notesToUpdate = await _dbContextServer.Note_Users
                 .Where(nu => nu.IdUser == user.IdUser)
                 .Select(nu => nu.Note)
                 .ToListAsync();

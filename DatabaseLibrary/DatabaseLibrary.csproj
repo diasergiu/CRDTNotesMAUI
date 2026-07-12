@@ -20,6 +20,7 @@
   <ItemGroup>
     <Folder Include="Migrations\Client\" />
     <Folder Include="Migrations\Server\" />
+    <Folder Include="RepositoryService\" />
   </ItemGroup>
 
 </Project>

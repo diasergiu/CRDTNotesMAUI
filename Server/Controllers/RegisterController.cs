@@ -70,6 +70,7 @@ namespace Server.Controllers
 
             try
             {
+                // should put in repository
                 _context.Users.Add(newUser);
                 await _context.SaveChangesAsync();
 

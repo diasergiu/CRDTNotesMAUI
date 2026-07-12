@@ -1,4 +1,5 @@
-﻿using DatabaseLibrary.WrapperClasses;
+﻿using DatabaseLibrary.Entities;
+using DatabaseLibrary.WrapperClasses;
 using System;
 using System.Net.Http.Json;
 
@@ -22,7 +23,7 @@ namespace DatabaseLibrary.Services
             };
         }
 
-        public async Task<ApiResult<List<NoteInfo>>> LoginAsync(string username, string password)
+        public async Task<ApiResult<List<Note>>> LoginAsync(string username, string password)
         {
             try
             {
@@ -30,14 +31,14 @@ namespace DatabaseLibrary.Services
                 var response = await _httpClient.GetAsync(url);
                 if (response.IsSuccessStatusCode)
                 {
-                    var notes = await response.Content.ReadFromJsonAsync<List<NoteInfo>>();
-                    return ApiResult<List<NoteInfo>>.Success(notes);
+                    var notes = await response.Content.ReadFromJsonAsync<List<Note>>();
+                    return ApiResult<List<Note>>.Success(notes);
 
                 }
                 else
                 {
                     string errorMessage = await response.Content.ReadAsStringAsync();
-                    return ApiResult<List<NoteInfo>>.Failure(
+                    return ApiResult<List<Note>>.Failure(
                         $"Server returned error: {response.StatusCode}. Message: {errorMessage}",
                         ApiErrorType.ServerError
                     );
@@ -45,21 +46,21 @@ namespace DatabaseLibrary.Services
             }
             catch (HttpRequestException ex)
             {
-                return ApiResult<List<NoteInfo>>.Failure(
+                return ApiResult<List<Note>>.Failure(
                     $"Connection error: {ex.Message}. Is the server running?",
                     ApiErrorType.ConnectionError
                 );
             }
             catch (TaskCanceledException)
             {
-                return ApiResult<List<NoteInfo>>.Failure(
+                return ApiResult<List<Note>>.Failure(
                     "Request timeout. The server is not responding.",
                     ApiErrorType.Timeout
                 );
             }
             catch (Exception ex)
             {
-                return ApiResult<List<NoteInfo>>.Failure(
+                return ApiResult<List<Note>>.Failure(
                     $"Unexpected error: {ex.Message}",
                     ApiErrorType.Unknown
                 );
