@@ -10,6 +10,7 @@ namespace DatabaseLibrary.Services
 
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl;
+        private readonly ClientNoteServices _noteServices;
 
         public LoginConnectionServices(string baseUrl)
         {

@@ -1,4 +1,6 @@
 using CRDT_TestShering.Services;
+using DatabaseLibrary.Entities;
+using DatabaseLibrary.RepositoryClient;
 using DatabaseLibrary.Services;
 using System;
 using System.Net.Http;
@@ -9,12 +11,15 @@ namespace CRDT_TestShering.UserInterface;
 
 public partial class LoginPopup : ContentPage
 {
-    private LoginConnectionServices loginServices;
+    //private LoginConnectionServices loginServices; // might delete this
+    private ClientNoteServices noteServices;
+    private NoteRepository noteRepository;
 
     public LoginPopup()
     {
         InitializeComponent();
-        loginServices = new LoginConnectionServices(BaseURLGetter.getBaseURL());        
+        noteRepository = new NoteRepository(new DbContextUser()); // should DbContext be singleton
+        noteServices = new ClientNoteServices(BaseURLGetter.getBaseURL());
     }
 
     private async void OnLoginSubmitClicked(object sender, EventArgs e)
@@ -39,7 +44,9 @@ public partial class LoginPopup : ContentPage
         SetLoadingState(true);
 
         // Call the service - NO TRY/CATCH needed!
-        var result = await loginServices.LoginAsync(
+        List<Note> changedNotes = noteRepository.getAllFlagedNotes();
+        var result = await noteServices.SendAndReceiveNoteUpdates(
+            changedNotes,
             username,
             password
         );

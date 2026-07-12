@@ -18,7 +18,6 @@ namespace DatabaseLibrary.Entities
         //[Column(Order = 1)]
         //[ForeignKey("Note")]
         public int IdNote { get; set; }
-
         public UserClient User { get; set; }
         public Note Note { get; set; }
     }

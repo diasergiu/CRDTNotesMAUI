@@ -1,4 +1,5 @@
 ﻿using DatabaseLibrary.Entities;
+using DatabaseLibrary.ServerServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,37 +8,29 @@ namespace Server.Controllers
     public class LoginController : Controller
     {
 
-        private DbContextServer _context;
+        //private DbContextServer _context;
+        private NotesService _notesService;
 
         public LoginController(DbContextServer context)
         {
-            _context = context;
+            //_context = context;
+            _notesService = new NotesService(context);
         }
         public IActionResult Index()
         {
             return View();
         }
 
-        public async Task<IActionResult> Login(string username, string password)
+        public async Task<IActionResult> Login(string username, string password, List<Note> listNewNotes)
         {
-            User user = await _context.Users
-                .Include(u => u.NotesUsers)
-                    .ThenInclude(snu => snu.Note)
-                .FirstOrDefaultAsync(u => u.Username == username && u.Password == password);
-
+            var user = await _notesService.getUser(username, password);
             if (user != null)
             {
+                // save all changes done offline
+                await _notesService.SaveOrUpdateNotes(user, listNewNotes);
+
                 // Get all notes for the user
-                var notes = user.NotesUsers
-                    .Select(snu => new
-                    {
-                        IdNote = snu.Note.IdNote,
-                        Title = snu.Note.Title,
-                        Content = snu.Note.Content,
-                        StartingDate = snu.Note.StartingDate,
-                        LastUpdate = snu.Note.LastUpdate
-                    })
-                    .ToList();
+                var notes = await _notesService.GetNotesToUpdateClient(user);
 
                 // Return user info and notes as JSON
                 return Json(new

@@ -17,7 +17,7 @@ namespace Server.Repositories
         {
             try
             {
-                var serverNotes = await DbContextServer.ServerNotes
+                var serverNotes = await DbContextServer.Notes
                     .Where(sn => sn.NoteUser.Any(snu => snu.IdUser == idUser))
                     .ToListAsync();
                 return serverNotes;

@@ -7,11 +7,11 @@ namespace DatabaseLibrary.Entities
 {
     public class DbContextServer : DbContext
     {
-        public DbSet<Note> ServerNotes { get; set; }
+        public DbSet<Note> Notes { get; set; }
         public DbSet<Device> Devices { get; set; }
         public DbSet<User> Users { get; set; }
-        public DbSet<Note_User> ServerNoteUsers { get; set; }
-        public DbSet<User_Device> UserDevices { get; set; }
+        public DbSet<Note_User> Note_Users { get; set; }
+        public DbSet<User_Device> User_Devices { get; set; }
         public string DbPath { get; }
         //Probably Delete
         public DbContextServer()

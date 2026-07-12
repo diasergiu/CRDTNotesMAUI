@@ -40,6 +40,16 @@ namespace DatabaseLibrary.Migrations.Server
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("CreationDate")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("DirtyFlagChangesMade")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("HasPassword")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("LastUpdate")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -48,20 +58,13 @@ namespace DatabaseLibrary.Migrations.Server
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("StartingDate")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("hasPassword")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("IdNote");
 
-                    b.ToTable("ServerNotes");
+                    b.ToTable("Notes");
                 });
 
             modelBuilder.Entity("DatabaseLibrary.Entities.Note_User", b =>
@@ -76,7 +79,7 @@ namespace DatabaseLibrary.Migrations.Server
 
                     b.HasIndex("IdNote");
 
-                    b.ToTable("ServerNoteUsers");
+                    b.ToTable("Note_Users");
                 });
 
             modelBuilder.Entity("DatabaseLibrary.Entities.UserClient", b =>
@@ -124,7 +127,7 @@ namespace DatabaseLibrary.Migrations.Server
 
                     b.HasIndex("IdDevice");
 
-                    b.ToTable("UserDevices");
+                    b.ToTable("User_Devices");
                 });
 
             modelBuilder.Entity("DatabaseLibrary.Entities.User", b =>

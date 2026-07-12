@@ -1,4 +1,6 @@
 using CRDT_TestShering.Services;
+using DatabaseLibrary.Entities;
+using DatabaseLibrary.RepositoryClient;
 using DatabaseLibrary.Services;
 using System;
 using System.Net.Http;
@@ -10,11 +12,12 @@ namespace CRDT_TestShering.UserInterface;
 public partial class RegisterPopup : ContentPage
 {
     private readonly RegisterConnectionServices _registerServices;
+    private readonly NoteRepository _noteRepository;
 
     public RegisterPopup()
     {
         InitializeComponent();
-
+        _noteRepository = new NoteRepository(new DbContextUser());
         _registerServices = new RegisterConnectionServices(BaseURLGetter.getBaseURL());
         
     }
@@ -68,7 +71,7 @@ public partial class RegisterPopup : ContentPage
         RegisterButton.Text = "Creating account...";
         StatusLabel.IsVisible = false;
 
-        var result = await _registerServices.RegisterNewUser(name, username, password);
+        var result = await _registerServices.RegisterNewUser(name, username, password, _noteRepository.getAllFlagedNotes());
 
         if (result.IsSuccess)
         {

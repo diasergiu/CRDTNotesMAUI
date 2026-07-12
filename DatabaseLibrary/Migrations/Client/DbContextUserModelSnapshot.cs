@@ -26,6 +26,16 @@ namespace DatabaseLibrary.Migrations.Client
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("CreationDate")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("DirtyFlagChangesMade")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("HasPassword")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("LastUpdate")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -34,16 +44,9 @@ namespace DatabaseLibrary.Migrations.Client
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("StartingDate")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<bool>("hasPassword")
-                        .HasColumnType("INTEGER");
 
                     b.HasKey("IdNote");
 

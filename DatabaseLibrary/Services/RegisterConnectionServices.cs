@@ -1,4 +1,5 @@
-﻿using DatabaseLibrary.WrapperClasses;
+﻿using DatabaseLibrary.Entities;
+using DatabaseLibrary.WrapperClasses;
 using System;
 using System.Collections.Generic;
 using System.Net.Http.Json;
@@ -20,7 +21,7 @@ namespace DatabaseLibrary.Services
             };
         }
 
-        public async Task<ApiResult<List<NoteInfo>>> RegisterNewUser(String name, string username, string password)
+        public async Task<ApiResult<List<Note>>> RegisterNewUser(String name, string username, string password, List<Note> listOfNotes)
         {
             var requestData = new { Name = name, Username = username, Password = password };
             var content = new StringContent(System.Text.Json.JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");
@@ -29,17 +30,17 @@ namespace DatabaseLibrary.Services
                 var response = await _httpClient.PostAsync("/api/register", content);
                 if (response.IsSuccessStatusCode)
                 {
-                    return ApiResult<List<NoteInfo>>.Success(await response.Content.ReadFromJsonAsync<List<NoteInfo>>());
+                    return ApiResult<List<Note>>.Success(await response.Content.ReadFromJsonAsync<List<Note>>());
                 }
                 else
                 {
                     var errorMessage = await response.Content.ReadAsStringAsync();
-                    return ApiResult<List<NoteInfo>>.Failure(errorMessage, ApiErrorType.ServerError);
+                    return ApiResult<List<Note>>.Failure(errorMessage, ApiErrorType.ServerError);
                 }
             }
             catch (Exception ex)
             {
-                return ApiResult<List<NoteInfo>>.Failure(ex.Message, ApiErrorType.ConnectionError);
+                return ApiResult<List<Note>>.Failure(ex.Message, ApiErrorType.ConnectionError);
             }
             //catch (HttpRequestException ex)
             //{

@@ -5,22 +5,12 @@
       {
         "Path": "CRDT_TestShering\\CRDT_TestShering.csproj",
         "Action": "Start",
-        "DebugTarget": "Pixel 7 - API 36.0 (Android 16.0 - API 36)"
+        "DebugTarget": "Windows Machine"
       },
       {
         "Path": "Server\\Server.csproj",
         "Action": "Start",
         "DebugTarget": "http"
-      }
-    ]
-  },
-  {
-    "Name": "New Profile (1)",
-    "Projects": [
-      {
-        "Path": "CRDT_TestShering\\CRDT_TestShering.csproj",
-        "Action": "Start",
-        "DebugTarget": "Windows Machine"
       }
     ]
   },
