@@ -1,9 +1,9 @@
-﻿using DatabaseLibrary.Entities;
+using DatabaseLibrary.Entities;
 using DatabaseLibrary.WrapperClasses;
 using System;
 using System.Net.Http.Json;
 
-namespace DatabaseLibrary.Services
+namespace MAUIClientUI.Services
 {
 
     public class LoginConnectionServices

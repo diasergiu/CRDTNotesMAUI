@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DatabaseLibrary.Services
+namespace MAUIClientUI.Services
 {
     public abstract class ServicesClient
     {

@@ -1,12 +1,9 @@
-﻿using DatabaseLibrary.Entities;
-using DatabaseLibrary.ServerServices;
+using DatabaseLibrary.Entities;
 using DatabaseLibrary.WrapperClasses;
-using System;
-using System.Collections.Generic;
 using System.Net.Http.Json;
 using System.Text;
 
-namespace DatabaseLibrary.Services
+namespace MAUIClientUI.Services
 {
     public class RegisterConnectionServices
     {
@@ -44,7 +41,7 @@ namespace DatabaseLibrary.Services
             }
             catch (Exception ex)
             {
-                return ApiResult<List<Entities.Note>>.Failure(ex.Message, ApiErrorType.ConnectionError);
+                return ApiResult<List<Note>>.Failure(ex.Message, ApiErrorType.ConnectionError);
             }
             //catch (HttpRequestException ex)
             //{

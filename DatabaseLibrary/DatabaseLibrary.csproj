@@ -21,6 +21,7 @@
     <Folder Include="Migrations\Client\" />
     <Folder Include="Migrations\Server\" />
     <Folder Include="RepositoryService\" />
+    <Folder Include="Services\" />
   </ItemGroup>
 
 </Project>

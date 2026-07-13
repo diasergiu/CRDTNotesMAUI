@@ -1,7 +1,6 @@
 using MAUIClientUI.Services;
 using DatabaseLibrary.Entities;
 using DatabaseLibrary.RepositoryClient;
-using DatabaseLibrary.Services;
 using System;
 using System.Net.Http;
 using System.Text;

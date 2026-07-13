@@ -1,4 +1,4 @@
-﻿using DatabaseLibrary.Entities;
+using DatabaseLibrary.Entities;
 using DatabaseLibrary.WrapperClasses;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -6,11 +6,11 @@ using System.Collections.Generic;
 using System.Net.Http.Json;
 using System.Text;
 
-namespace DatabaseLibrary.Services
+namespace MAUIClientUI.Services
 {
     public class ClientNoteServices
     {
-        
+
         private HttpClient _httpClient;
         private string _baseUrl;
         public ClientNoteServices(string serverUrl)
@@ -22,8 +22,8 @@ namespace DatabaseLibrary.Services
                     Timeout = TimeSpan.FromSeconds(30)
                 };
         }
-        
-        public async Task<ApiResult<List<Entities.Note>>> SendAndReceiveNoteUpdates(List<Entities.Note> flaggedNotes, string username, string password)
+
+        public async Task<ApiResult<List<Note>>> SendAndReceiveNoteUpdates(List<Note> flaggedNotes, string username, string password)
         {
             try
             {
@@ -31,19 +31,19 @@ namespace DatabaseLibrary.Services
                 var response = await _httpClient.PostAsJsonAsync(url, flaggedNotes);
                 if (response.IsSuccessStatusCode)
                 {
-                    var updatedNotes = await response.Content.ReadFromJsonAsync<List<Entities.Note>>();
-                    return ApiResult<List<Entities.Note>>.Success(updatedNotes);
+                    var updatedNotes = await response.Content.ReadFromJsonAsync<List<Note>>();
+                    return ApiResult<List<Note>>.Success(updatedNotes);
                 }
                 else
                 {
                     Console.WriteLine($"Server returned error: {response.StatusCode}");
-                    return ApiResult<List<Entities.Note>>.Failure($"Server returned error: {response.StatusCode}");
+                    return ApiResult<List<Note>>.Failure($"Server returned error: {response.StatusCode}");
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error sending notes to server: {ex.Message}");
-                return ApiResult<List<Entities.Note>>.Failure($"Error sending notes to server: {ex.Message}");
+                return ApiResult<List<Note>>.Failure($"Error sending notes to server: {ex.Message}");
             }
         }
 
