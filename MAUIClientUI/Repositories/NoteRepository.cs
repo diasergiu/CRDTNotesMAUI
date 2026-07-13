@@ -1,9 +1,9 @@
-﻿using DatabaseLibrary.Entities;
+using DatabaseLibrary.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DatabaseLibrary.RepositoryClient
+namespace MAUIClientUI.Repositories
 {
     public class NoteRepository
     {

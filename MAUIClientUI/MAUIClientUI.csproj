@@ -98,8 +98,4 @@
 	  </MauiXaml>
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Repositories\" />
-	</ItemGroup>
-
 </Project>

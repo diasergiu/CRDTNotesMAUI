@@ -1,11 +1,11 @@
-﻿using DatabaseLibrary.Entities;
+using DatabaseLibrary.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DatabaseLibrary.ServerServices
+namespace Server.ServerServices
 {
     public class NotesService
     {
@@ -62,7 +62,7 @@ namespace DatabaseLibrary.ServerServices
                         };
                         _dbContextServer.Note_Users.Add(noteUser);
                         //}
-                        
+
                     }
                 }
 

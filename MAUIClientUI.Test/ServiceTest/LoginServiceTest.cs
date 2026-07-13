@@ -5,6 +5,7 @@ using DatabaseLibrary.WrapperClasses;
 using Moq;
 using Moq.Protected;
 using Xunit;
+using DatabaseLibrary.Entities;
 
 namespace MAUIClientUI.Test.ServiceTest
 {
