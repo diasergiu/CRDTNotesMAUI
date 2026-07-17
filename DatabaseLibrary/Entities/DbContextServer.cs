@@ -9,9 +9,10 @@ namespace DatabaseLibrary.Entities
     {
         public DbSet<Note> Notes { get; set; }
         public DbSet<Device> Devices { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<Note_User> Note_Users { get; set; }
+        public DbSet<UserServer> Users { get; set; }
+        public DbSet<Note_UserServer> Note_Users { get; set; }
         public DbSet<User_Device> User_Devices { get; set; }
+        public DbSet<SyncQueueServer> Sync_Queues { get; set; }
         public string DbPath { get; }
         //Probably Delete
         public DbContextServer()
@@ -39,16 +40,16 @@ namespace DatabaseLibrary.Entities
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Composite key for ServerNotesUser
-            modelBuilder.Entity<Note_User>()
+            modelBuilder.Entity<Note_UserClient>()
                 .HasKey(snu => new { snu.IdUser, snu.IdNote });
 
             // Relationships
-            modelBuilder.Entity<Note_User>()
+            modelBuilder.Entity<Note_UserClient>()
                 .HasOne(snu => snu.User)
                 .WithMany(u => u.NotesUsers)
                 .HasForeignKey(snu => snu.IdUser);
 
-            modelBuilder.Entity<Note_User>()
+            modelBuilder.Entity<Note_UserClient>()
                 .HasOne(snu => snu.Note)
                 .WithMany(n => n.NoteUser)
                 .HasForeignKey(snu => snu.IdNote);

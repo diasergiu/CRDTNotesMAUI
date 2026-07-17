@@ -57,7 +57,8 @@ public partial class Program
             app.UseSwaggerUI();
         }
 
-        app.UseHttpsRedirection();
+        // Disable HTTPS redirection for development/testing with local clients
+        // app.UseHttpsRedirection();
         app.UseAuthorization();
 
         app.MapControllers();
@@ -93,7 +94,7 @@ public partial class Program
         });
 
         // Create new user
-        app.MapPost("/api/users", async (User user, DbContextServer db) =>
+        app.MapPost("/api/users", async (UserServer user, DbContextServer db) =>
         {
             db.Users.Add(user);
             await db.SaveChangesAsync();

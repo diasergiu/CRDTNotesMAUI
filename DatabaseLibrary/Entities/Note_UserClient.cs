@@ -8,7 +8,8 @@ using System.Text;
 namespace DatabaseLibrary.Entities
 {
     [PrimaryKey(nameof(IdUser), nameof(IdNote))]
-    public class Note_User
+    [Table("Note_User")]
+    public class Note_UserClient : INote_User
     {
         //[Key]
         //[Column(Order = 0)]
@@ -18,7 +19,12 @@ namespace DatabaseLibrary.Entities
         //[Column(Order = 1)]
         //[ForeignKey("Note")]
         public int IdNote { get; set; }
-        public UserClient User { get; set; }
-        public Note Note { get; set; }
+        public UserClient? User { get; set; }
+        public Note? Note { get; set; }
+
+        public Note_UserClient()
+        {
+                
+        }
     }
 }

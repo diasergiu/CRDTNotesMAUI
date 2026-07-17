@@ -11,7 +11,7 @@ namespace DatabaseLibrary.Entities
         public int IdUser { get; set; }
         public int IdDevice { get; set; }
 
-        public User User { get; set; }
-        public Device Device { get; set; }
+        public UserServer? User { get; set; }
+        public Device? Device { get; set; }
     }
 }

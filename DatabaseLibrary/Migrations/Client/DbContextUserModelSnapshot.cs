@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DatabaseLibrary.Migrations.Client
 {
-    [DbContext(typeof(DbContextUser))]
+    [DbContext(typeof(DbContextClient))]
     partial class DbContextUserModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

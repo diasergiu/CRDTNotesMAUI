@@ -28,7 +28,7 @@ namespace MAUIClientUI.MVVM
             ListOfNotes = new ObservableCollection<Note>();
         }
 
-        public async Task LoadNotesAsync(DbContextUser dbContext)
+        public async Task LoadNotesAsync(DbContextClient dbContext)
         {
             var notes = await dbContext.Notes.ToListAsync();
             ListOfNotes.Clear();

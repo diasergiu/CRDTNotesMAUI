@@ -1,22 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace DatabaseLibrary.Entities
 {
-    [Table("User")]
-    public class UserClient : IUser
+    // this is what AI sugested instead of inheritance
+    public interface IUser
     {
-        [Key]
         public int IdUser { get; set; }
         public string Name { get; set; }
-        [Required]
-        [StringLength(50)]
         public string Username { get; set; }
-        [Required]
         public string Password { get; set; }
-        public List<Note_UserClient>? NotesUsers { get; set; }
     }
 }

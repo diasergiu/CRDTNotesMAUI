@@ -19,6 +19,6 @@ namespace DatabaseLibrary.Entities
         public bool HasPassword { get; set; }
         public string PasswordNote { get; set; }
         public bool DirtyFlagChangesMade { get; set; }
-        public List<Note_User> NoteUser { get; set; }
+        public List<Note_UserClient>? NoteUser { get; set; }
     }
 }

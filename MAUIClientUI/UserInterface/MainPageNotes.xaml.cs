@@ -18,7 +18,7 @@ public partial class MainPageNotes : ContentPage
 
 	private async void LoadData()
 	{
-		using (var dbContext = new DbContextUser())
+		using (var dbContext = new DbContextClient())
 		{
 			// Ensure database is created
 			await dbContext.Database.EnsureCreatedAsync();
@@ -51,7 +51,7 @@ public partial class MainPageNotes : ContentPage
 	protected override async void OnAppearing()
 	{
 		base.OnAppearing();
-		using (var dbContext = new DbContextUser())
+		using (var dbContext = new DbContextClient())
 		{
 			await _viewModel.LoadNotesAsync(dbContext);
 		}

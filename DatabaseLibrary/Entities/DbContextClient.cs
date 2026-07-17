@@ -5,15 +5,16 @@ using System.Text;
 
 namespace DatabaseLibrary.Entities
 {
-    public class DbContextUser : DbContext
+    public class DbContextClient : DbContext
     {
         public DbSet<Note> Notes { get; set; }
-        public DbSet<Note_User> NoteUsers { get; set; }
+        public DbSet<Note_UserClient> NoteUsers { get; set; }
         public DbSet<UserClient> Users { get; set; }
+        public DbSet<SyncQueueClient> SyncQueues { get; set; }
 
         public string DbPath { get; }
 
-        public DbContextUser()
+        public DbContextClient()
         {
             var folder = Environment.SpecialFolder.LocalApplicationData;
             var path = Environment.GetFolderPath(folder);

@@ -6,15 +6,16 @@ namespace MAUIClientUI.Services
 {
     public abstract class ServicesClient
     {
-        string baseURL;
-        private HttpClient httpClient;
+        protected string _baseURL { get; set; }
+        protected HttpClient _httpClient;
 
         protected ServicesClient(string URLModifier)
         {
-            baseURL = URLModifier;
-            httpClient = new HttpClient()
+            _baseURL = BaseURLGetter.getBaseURL() + URLModifier;
+            _httpClient = new HttpClient()
             {
-                //BaseAddress = new Uri(BaseURLGetter.getBaseURL() + baseURL)
+                BaseAddress = new Uri(_baseURL),
+                Timeout = TimeSpan.FromSeconds(30)
             };
         }
     }

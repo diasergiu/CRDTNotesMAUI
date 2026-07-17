@@ -10,14 +10,14 @@ namespace MAUIClientUI.UserInterface;
 
 public partial class RegisterPopup : ContentPage
 {
-    private readonly RegisterConnectionServices _registerServices;
+    private readonly LoginConnectionServices _registerServices;
     private readonly NoteRepository _noteRepository;
 
     public RegisterPopup()
     {
         InitializeComponent();
-        _noteRepository = new NoteRepository(new DbContextUser());
-        _registerServices = new RegisterConnectionServices(BaseURLGetter.getBaseURL());
+        _noteRepository = new NoteRepository(new DbContextClient());
+        _registerServices = new LoginConnectionServices("/User");
         
     }
 

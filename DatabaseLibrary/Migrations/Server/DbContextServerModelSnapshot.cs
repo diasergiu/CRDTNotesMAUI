@@ -82,16 +82,49 @@ namespace DatabaseLibrary.Migrations.Server
                     b.ToTable("Note_Users");
                 });
 
+            modelBuilder.Entity("DatabaseLibrary.Entities.SyncQueueServer", b =>
+                {
+                    b.Property<int>("IdSync")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ContentChanges")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("IdDevice")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("IdNote")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("IdUser")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("LastUpdate")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Operation")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("IdSync");
+
+                    b.HasIndex("IdDevice");
+
+                    b.HasIndex("IdNote");
+
+                    b.HasIndex("IdUser");
+
+                    b.ToTable("SyncQueue");
+                });
+
             modelBuilder.Entity("DatabaseLibrary.Entities.UserClient", b =>
                 {
                     b.Property<int>("IdUser")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -108,11 +141,30 @@ namespace DatabaseLibrary.Migrations.Server
 
                     b.HasKey("IdUser");
 
-                    b.ToTable("UserClient");
+                    b.ToTable("User");
+                });
 
-                    b.HasDiscriminator<string>("Discriminator").HasValue("UserClient");
+            modelBuilder.Entity("DatabaseLibrary.Entities.UserServer", b =>
+                {
+                    b.Property<int>("IdUser")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
-                    b.UseTphMappingStrategy();
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("IdUser");
+
+                    b.ToTable("user");
                 });
 
             modelBuilder.Entity("DatabaseLibrary.Entities.User_Device", b =>
@@ -128,13 +180,6 @@ namespace DatabaseLibrary.Migrations.Server
                     b.HasIndex("IdDevice");
 
                     b.ToTable("User_Devices");
-                });
-
-            modelBuilder.Entity("DatabaseLibrary.Entities.User", b =>
-                {
-                    b.HasBaseType("DatabaseLibrary.Entities.UserClient");
-
-                    b.HasDiscriminator().HasValue("User");
                 });
 
             modelBuilder.Entity("DatabaseLibrary.Entities.Note_User", b =>
@@ -156,6 +201,33 @@ namespace DatabaseLibrary.Migrations.Server
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("DatabaseLibrary.Entities.SyncQueueServer", b =>
+                {
+                    b.HasOne("DatabaseLibrary.Entities.Device", "Device")
+                        .WithMany()
+                        .HasForeignKey("IdDevice")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DatabaseLibrary.Entities.Note", "Note")
+                        .WithMany()
+                        .HasForeignKey("IdNote")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DatabaseLibrary.Entities.UserServer", "User")
+                        .WithMany()
+                        .HasForeignKey("IdUser")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Device");
+
+                    b.Navigation("Note");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("DatabaseLibrary.Entities.User_Device", b =>
                 {
                     b.HasOne("DatabaseLibrary.Entities.Device", "Device")
@@ -164,7 +236,7 @@ namespace DatabaseLibrary.Migrations.Server
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DatabaseLibrary.Entities.User", "User")
+                    b.HasOne("DatabaseLibrary.Entities.UserServer", "User")
                         .WithMany("UserDevices")
                         .HasForeignKey("IdUser")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -190,7 +262,7 @@ namespace DatabaseLibrary.Migrations.Server
                     b.Navigation("NotesUsers");
                 });
 
-            modelBuilder.Entity("DatabaseLibrary.Entities.User", b =>
+            modelBuilder.Entity("DatabaseLibrary.Entities.UserServer", b =>
                 {
                     b.Navigation("UserDevices");
                 });

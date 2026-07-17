@@ -24,3 +24,6 @@ Things to learn
 XAML
 Entity Framework
 Web API 
+
+
+http://localhost:5266/WeatherForecast to test if server is open

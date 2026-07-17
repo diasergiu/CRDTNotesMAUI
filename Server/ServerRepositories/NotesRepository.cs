@@ -1,34 +1,35 @@
 using DatabaseLibrary.Entities;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Server.ServerServices
+namespace Server.ServeRepositories
 {
-    public class NotesService
+    public class NotesRepository
     {
         private DbContextServer _dbContextServer;
-        public NotesService(DbContextServer context)
+        public NotesRepository(DbContextServer context)
         {
             _dbContextServer = context;
         }
 
-        public async Task<User> getUser(string username, string password)
+        public async Task<UserServer> getUser(string username, string password)
         {
-            User user = await _dbContextServer.Users
+            UserServer user = await _dbContextServer.Users
                 .Include(u => u.NotesUsers)
                     .ThenInclude(snu => snu.Note)
                 .FirstOrDefaultAsync(u => u.Username == username && u.Password == password);
             return user;
         }
 
-        public async Task<User> SaveOrUpdateNotes(User user, List<Note> notesUpdate)
+        public async Task<UserServer> SaveOrUpdateNotes(UserServer user, List<Note> notesUpdate)
         {
             List<Note> listNewNotes = new List<Note>();
 
-            if (user == null) {
+            if (user != null) {
                 foreach (var note in notesUpdate)
                 {
                     note.DirtyFlagChangesMade = false; // Reset the dirty flag after saving
@@ -55,7 +56,7 @@ namespace Server.ServerServices
 
                         //if (existingRelationship == null)
                         //{
-                        var noteUser = new Note_User
+                        var noteUser = new Note_UserServer
                         {
                             IdNote = note.IdNote,
                             IdUser = user.IdUser
@@ -71,13 +72,34 @@ namespace Server.ServerServices
             return user;
         }
 
-        public async Task<List<Note>> GetNotesToUpdateClient(User user)
+        public async Task<List<Note>> GetNotesToUpdateClient(UserServer user)
         {
             var notesToUpdate = await _dbContextServer.Note_Users
                 .Where(nu => nu.IdUser == user.IdUser)
                 .Select(nu => nu.Note)
                 .ToListAsync();
             return notesToUpdate;
+        }
+
+
+        public async Task saveOrUpdateNewNote(UserServer user, Note note)
+        {
+            Note existingNote = await _dbContextServer.Notes.FirstOrDefaultAsync(n => n.IdNote == note.IdNote);
+            if (existingNote != null)
+            {
+                _dbContextServer.Entry(existingNote).CurrentValues.SetValues(note);
+            }
+            else
+            {
+                _dbContextServer.Add(note);
+                Note_UserClient connection = new Note_UserClient();
+                connection.IdNote = note.IdNote;
+                connection.IdUser = user.IdUser;
+                connection.Note = note;
+                //connection.User = user;
+                _dbContextServer.Add(connection);
+            }
+            _dbContextServer.SaveChangesAsync();
         }
     }
 }

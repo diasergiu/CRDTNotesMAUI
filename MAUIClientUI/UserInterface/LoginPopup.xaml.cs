@@ -17,8 +17,8 @@ public partial class LoginPopup : ContentPage
     public LoginPopup()
     {
         InitializeComponent();
-        noteRepository = new NoteRepository(new DbContextUser()); // should DbContext be singleton
-        noteServices = new ClientNoteServices(BaseURLGetter.getBaseURL());
+        noteRepository = new NoteRepository(new DbContextClient()); // should DbContext be singleton
+        noteServices = new ClientNoteServices("/api/user");
     }
 
     private async void OnLoginSubmitClicked(object sender, EventArgs e)
@@ -50,12 +50,22 @@ public partial class LoginPopup : ContentPage
             password
         );
 
-        if( !result.IsSuccess){
+        // update notes based on changes on the server
+        noteRepository.UpdateListNotes(changedNotes);
+        SetLoadingState(false);
+
+        if (result.IsSuccess)
+        {
+            // Login successful - close the popup
+            ShowStatus("Login successful!", false);
+            await Task.Delay(500); // Brief delay to show success message
+            await Navigation.PopModalAsync();
+        }
+        else
+        {
             // Display the error message from the service
             ShowStatus(result.ErrorMessage, true);
         }
-
-        SetLoadingState(false);
 
     }
 

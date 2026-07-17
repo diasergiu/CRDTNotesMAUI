@@ -54,7 +54,7 @@ public partial class NoteView : ContentPage
             _currentNote.PasswordNote = IsSecured.IsChecked ? PasswordEntry.Text : "";
 			_currentNote.DirtyFlagChangesMade = true;
 
-            using (var dbContext = new DbContextUser())
+            using (var dbContext = new DbContextClient())
 			{
 				if (_isNewNote)
 				{
