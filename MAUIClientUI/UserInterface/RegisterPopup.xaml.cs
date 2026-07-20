@@ -5,6 +5,7 @@ using System;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using DatabaseLibrary.Entities.Client;
 
 namespace MAUIClientUI.UserInterface;
 
@@ -70,7 +71,7 @@ public partial class RegisterPopup : ContentPage
         RegisterButton.Text = "Creating account...";
         StatusLabel.IsVisible = false;
 
-        var result = await _registerServices.RegisterNewUser(name, username, password, _noteRepository.getAllFlagedNotes());
+        var result = await _registerServices.RegisterNewUser(name, username, password);
 
         if (result.IsSuccess)
         {

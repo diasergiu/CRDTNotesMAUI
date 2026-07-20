@@ -1,13 +1,14 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
-namespace DatabaseLibrary.Entities
+namespace DatabaseLibrary.Entities.Server
 {
     [Table("User")]
-    public class UserClient : IUser
+    public class UserServer : IUser
     {
         [Key]
         public int IdUser { get; set; }
@@ -17,6 +18,7 @@ namespace DatabaseLibrary.Entities
         public string Username { get; set; }
         [Required]
         public string Password { get; set; }
-        public List<Note_UserClient>? NotesUsers { get; set; }
+        public List<Note_UserServer>? NotesUser { get; set; }
+        public List<User_Device>? DevicesUser { get; set; }
     }
 }

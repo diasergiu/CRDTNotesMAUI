@@ -1,4 +1,5 @@
 ﻿using DatabaseLibrary.Entities;
+using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.WrapperClasses;
 using System;
 using System.Net.Http.Json;
@@ -13,7 +14,7 @@ namespace MAUIClientUI.Services
 
         public LoginConnectionServices(string baseUrl) : base(baseUrl) { }
 
-        public async Task<ApiResult<List<Note>>> LoginAsync(string username, string password)
+        public async Task<ApiResult<List<ISyncQueue>>> LoginAsync(string username, string password)
         {
             try
             {
@@ -21,14 +22,14 @@ namespace MAUIClientUI.Services
                 var response = await _httpClient.GetAsync(url);
                 if (response.IsSuccessStatusCode)
                 {
-                    var notes = await response.Content.ReadFromJsonAsync<List<Note>>();
-                    return ApiResult<List<Note>>.Success(notes);
+                    var notes = await response.Content.ReadFromJsonAsync<List<ISyncQueue>>();
+                    return ApiResult<List<ISyncQueue>>.Success(notes);
 
                 }
                 else
                 {
                     string errorMessage = await response.Content.ReadAsStringAsync();
-                    return ApiResult<List<Note>>.Failure(
+                    return ApiResult<List<ISyncQueue>>.Failure(
                         $"Server returned error: {response.StatusCode}. Message: {errorMessage}",
                         ApiErrorType.ServerError
                     );
@@ -36,21 +37,21 @@ namespace MAUIClientUI.Services
             }
             catch (HttpRequestException ex)
             {
-                return ApiResult<List<Note>>.Failure(
+                return ApiResult<List<ISyncQueue>>.Failure(
                     $"Connection error: {ex.Message}. Is the server running?",
                     ApiErrorType.ConnectionError
                 );
             }
             catch (TaskCanceledException)
             {
-                return ApiResult<List<Note>>.Failure(
+                return ApiResult<List<ISyncQueue>>.Failure(
                     "Request timeout. The server is not responding.",
                     ApiErrorType.Timeout
                 );
             }
             catch (Exception ex)
             {
-                return ApiResult<List<Note>>.Failure(
+                return ApiResult<List<ISyncQueue>>.Failure(
                     $"Unexpected error: {ex.Message}",
                     ApiErrorType.Unknown
                 );
@@ -58,7 +59,7 @@ namespace MAUIClientUI.Services
 
         }
 
-        public async Task<ApiResult<List<Note>>> RegisterNewUser(String name, string username, string password, List<Note> listOfNotes)
+        public async Task<ApiResult<UserClient>> RegisterNewUser(String name, string username, string password)
         {
             var requestData = new { Name = name, Username = username, Password = password };
             var content = new StringContent(System.Text.Json.JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");
@@ -67,18 +68,18 @@ namespace MAUIClientUI.Services
                 var response = await _httpClient.PostAsync("/api/user/register", content);
                 if (response.IsSuccessStatusCode)
                 {
-                    var result = await LoginAsync(username, password);
-                    return ApiResult<List<Note>>.Success(result.Data);
+                    //var result = await LoginAsync(username, password);
+                    return ApiResult<UserClient>.Success(await response.Content.ReadFromJsonAsync<UserClient>());
                 }
                 else
                 {
                     var errorMessage = await response.Content.ReadAsStringAsync();
-                    return ApiResult<List<Note>>.Failure(errorMessage, ApiErrorType.ServerError);
+                    return ApiResult<UserClient>.Failure(errorMessage, ApiErrorType.ServerError);
                 }
             }
             catch (Exception ex)
             {
-                return ApiResult<List<Note>>.Failure(ex.Message, ApiErrorType.ConnectionError);
+                return ApiResult<UserClient>.Failure(ex.Message, ApiErrorType.ConnectionError);
             }
         }
 

@@ -3,11 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DatabaseLibrary.Entities
+namespace DatabaseLibrary.Entities.Client
 {
     public class DbContextClient : DbContext
     {
-        public DbSet<Note> Notes { get; set; }
+        public DbSet<NoteClient> Notes { get; set; }
         public DbSet<Note_UserClient> NoteUsers { get; set; }
         public DbSet<UserClient> Users { get; set; }
         public DbSet<SyncQueueClient> SyncQueues { get; set; }

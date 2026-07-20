@@ -1,14 +1,16 @@
 using DatabaseLibrary.Entities;
+using DatabaseLibrary.Entities.Client;
 using MAUIClientUI.MVVM;
 
 namespace MAUIClientUI.UserInterface;
 
 public partial class NoteView : ContentPage
 {
-	private Note _currentNote;
+	private NoteClient _currentNote;
 	private bool _isNewNote;
+	private int _IdUser;
 
-	public NoteView(Note note, bool isNewNote = false)
+	public NoteView(NoteClient note, bool isNewNote = false)
 	{
 		InitializeComponent();
 		_currentNote = note;
@@ -53,6 +55,7 @@ public partial class NoteView : ContentPage
 			_currentNote.HasPassword = IsSecured.IsChecked;
             _currentNote.PasswordNote = IsSecured.IsChecked ? PasswordEntry.Text : "";
 			_currentNote.DirtyFlagChangesMade = true;
+
 
             using (var dbContext = new DbContextClient())
 			{

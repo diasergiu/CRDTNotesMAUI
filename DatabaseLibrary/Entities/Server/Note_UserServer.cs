@@ -5,11 +5,11 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
-namespace DatabaseLibrary.Entities
+namespace DatabaseLibrary.Entities.Server
 {
     [PrimaryKey(nameof(IdUser), nameof(IdNote))]
     [Table("Note_User")]
-    public class Note_UserClient : INote_User
+    public class Note_UserServer : INote_User
     {
         //[Key]
         //[Column(Order = 0)]
@@ -19,12 +19,7 @@ namespace DatabaseLibrary.Entities
         //[Column(Order = 1)]
         //[ForeignKey("Note")]
         public int IdNote { get; set; }
-        public UserClient? User { get; set; }
-        public Note? Note { get; set; }
-
-        public Note_UserClient()
-        {
-                
-        }
+        public UserServer? User { get; set; }
+        public NoteServer? Note { get; set; }
     }
 }

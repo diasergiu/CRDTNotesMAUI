@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DatabaseLibrary.Entities
+namespace DatabaseLibrary.Entities.Server
 {
     [PrimaryKey(nameof(IdUser), nameof(IdDevice))]
     public class User_Device

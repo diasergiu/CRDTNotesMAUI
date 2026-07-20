@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
-namespace DatabaseLibrary.Entities
+namespace DatabaseLibrary.Entities.Server
 {
     public class Device
     {

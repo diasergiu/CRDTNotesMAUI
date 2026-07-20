@@ -1,4 +1,5 @@
 ﻿using DatabaseLibrary.Entities;
+using DatabaseLibrary.Entities.Server;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,7 +10,7 @@ namespace DatabaseLibrary.ResponsBody
     {
         public string? message { get; set; }
         public bool? success { get; set; }
-        public List<Note> notes { get; set; }
-        
+        public List<ISyncQueue> ChangesToMake { get; set; }
+
     }
 }

@@ -1,4 +1,5 @@
 using DatabaseLibrary.Entities;
+using DatabaseLibrary.Entities.Client;
 using MAUIClientUI.MVVM;
 
 namespace MAUIClientUI.UserInterface;
@@ -30,7 +31,7 @@ public partial class MainPageNotes : ContentPage
 
 	private async void OnOpenNoteClicked(object sender, EventArgs e)
 	{
-		if (sender is Button button && button.CommandParameter is Note note)
+		if (sender is Button button && button.CommandParameter is NoteClient note)
 		{
 			await Navigation.PushAsync(new NoteView(note));
 		}
@@ -38,7 +39,7 @@ public partial class MainPageNotes : ContentPage
 
 	private async void OnCreateNoteClicked(object sender, EventArgs e)
 	{
-		var newNote = new Note
+		var newNote = new NoteClient
 		{
 			Title = "",
 			Content = "",

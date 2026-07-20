@@ -5,6 +5,7 @@ using System;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using DatabaseLibrary.Entities.Client;
 
 namespace MAUIClientUI.UserInterface;
 
@@ -38,24 +39,30 @@ public partial class LoginPopup : ContentPage
             ShowStatus("Please enter a password", true);
             return;
         }
+        
+        SetLoadingState(false);
+        // Login to the server
+        // lets pretend this korks
+        var result = noteServices.Login(username, password);
 
         // Show loading state
         SetLoadingState(true);
 
         // Call the service - NO TRY/CATCH needed!
-        List<Note> changedNotes = noteRepository.getAllFlagedNotes();
-        var result = await noteServices.SendAndReceiveNoteUpdates(
-            changedNotes,
-            username,
-            password
-        );
 
-        // update notes based on changes on the server
-        noteRepository.UpdateListNotes(changedNotes);
-        SetLoadingState(false);
+
 
         if (result.IsSuccess)
         {
+            // sync the notes with the server
+            List<SyncQueueClient> changedNotes = noteRepository.getAllChanges(result.Data);
+            var getServerChanges = await noteServices.SendAndReceiveNoteUpdates(
+                changedNotes,
+                result.Data
+            );
+            
+            // update notes based on changes on the server
+            noteRepository.UpdateListNotes(getServerChanges.Data);
             // Login successful - close the popup
             ShowStatus("Login successful!", false);
             await Task.Delay(500); // Brief delay to show success message
@@ -65,6 +72,7 @@ public partial class LoginPopup : ContentPage
         {
             // Display the error message from the service
             ShowStatus(result.ErrorMessage, true);
+
         }
 
     }

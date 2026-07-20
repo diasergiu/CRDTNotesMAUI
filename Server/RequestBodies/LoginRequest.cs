@@ -7,6 +7,6 @@ namespace Server.RequestBodies
         public string Username { get; set; }
         public string Password { get; set; }
         public string DeviceId { get; set; }
-        public List<Note> OfflineNotes { get; set; } = new();
+        public List<ISyncQueue> ChangesMade { get; set; }
     }
 }

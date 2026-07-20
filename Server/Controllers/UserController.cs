@@ -3,6 +3,8 @@ using Server.ServeRepositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DatabaseLibrary.RequestBody;
+using DatabaseLibrary.Entities.Server;
+using DatabaseLibrary.RequestBody.EntityMappers;
 
 namespace Server.Controllers
 {
@@ -12,38 +14,26 @@ namespace Server.Controllers
     {
 
         private DbContextServer _context;
-        private NotesRepository _notesService;
+        private NotesRepository _notesRepository;
 
         public UserController(DbContextServer context)
         {
             _context = context;
-            _notesService = new NotesRepository(context);
+            _notesRepository = new NotesRepository(context);
         }
 
         [HttpPost("login")]
         [HttpGet("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest loginBody)
+        public async Task<IActionResult> Login(string username, string password)
         {
-            var user = await _notesService.getUser(loginBody.Username, loginBody.Password);
+            var user = await _notesRepository.getUser(username, password);
             if (user != null)
             {
-                // save all changes done offline
-                await _notesService.SaveOrUpdateNotes(user, loginBody.OfflineNotes ?? new List<Note>());
-         
-                // Get all notes for the user
-                var notes = await _notesService.GetNotesToUpdateClient(user);
-
                 // Return user info and notes as JSON
                 return Ok(new
                 {
                     success = true,
-                    user = new
-                    {
-                        IdUser = user.IdUser,
-                        Name = user.Name,
-                        Username = user.Username
-                    },
-                    notes = notes
+                    user = user,
                 });
             }
             else
@@ -136,12 +126,43 @@ namespace Server.Controllers
                 });
             }
         }
+
+
+        [HttpPost("SyncChanges")]
+        public async Task<IActionResult> SyncChanges([FromBody] LoginRequest loginBody)
+        {
+            try
+            {
+                UserServer user = EntityMapper.MapUserClientToUserServer(loginBody.user);
+                List<SyncQueueServer> syncChanges = new List<SyncQueueServer>();
+                foreach (var change in loginBody.ChangesMade)
+                {
+                    syncChanges.Add(EntityMapper.MapSyncQueueClientToSyncQueueServer(change, loginBody.IdDevice));
+                }
+                // save all changes done offline
+                await _notesRepository.SyncData(syncChanges);
+
+
+                await _notesRepository.GetServerSyncChanges(loginBody.user, loginBody.IdDevice);
+
+                return Ok(new { 
+                    success = true, 
+                    message = "Changes synced successfully.",
+                    data = syncChanges    // i dont know if it should name things like this
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = $"Error syncing changes: {ex.Message}" });
+            }
+        }
+
+        public class RegisterRequest
+        {
+            public string Name { get; set; }
+            public string Username { get; set; }
+            public string Password { get; set; }
+        }
     }
 
-    public class RegisterRequest
-    {
-        public string Name { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-    }
 }

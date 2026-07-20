@@ -9,7 +9,8 @@ namespace MAUIClientUI.Services
         /// <summary>
         /// Get or create a unique device ID for this client
         /// </summary>
-        public static string GetDeviceId()
+        /// // this should change to string and the Id device should be string
+        public static int GetDeviceId()
         {
             var deviceId = Preferences.Get(DeviceIdKey, string.Empty);
 
@@ -20,7 +21,8 @@ namespace MAUIClientUI.Services
                 Preferences.Set(DeviceIdKey, deviceId);
             }
 
-            return deviceId;
+            //return int.Parse(deviceId);
+            return 1;
         }
 
         /// <summary>

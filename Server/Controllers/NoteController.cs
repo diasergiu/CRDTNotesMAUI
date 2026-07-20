@@ -1,4 +1,4 @@
-﻿using DatabaseLibrary.Entities;
+﻿using DatabaseLibrary.Entities.Server;
 using Microsoft.AspNetCore.Mvc;
 using Server.ServeRepositories;
 

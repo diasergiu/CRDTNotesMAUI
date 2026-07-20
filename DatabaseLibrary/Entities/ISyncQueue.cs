@@ -6,12 +6,7 @@ using System.Text;
 
 namespace DatabaseLibrary.Entities
 {
-    internal interface ISyncQueue
-    {
-        [Table("SyncQueue")]
-        public class SyncQueueClient : ISyncQueue
-        {
-            public interface ISyncQueue
+   public interface ISyncQueue
             {
                 int IdSync { get; set; }
                 int IdNote { get; set; }
@@ -19,7 +14,7 @@ namespace DatabaseLibrary.Entities
                 string Operation { get; set; }
                 string ContentChanges { get; set; }
                 string LastUpdate { get; set; }
-            }
-        }
-    }
+           }
+    
+    
 }

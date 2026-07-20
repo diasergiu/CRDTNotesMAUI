@@ -5,15 +5,16 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using DatabaseLibrary.Entities;
+using DatabaseLibrary.Entities.Client;
 using Microsoft.EntityFrameworkCore;
 
 namespace MAUIClientUI.MVVM
 {
     public class NotesViewModel : INotifyPropertyChanged
     {
-        private ObservableCollection<Note> _listOfNotes = new ObservableCollection<Note>();
+        private ObservableCollection<NoteClient> _listOfNotes = new ObservableCollection<NoteClient>();
 
-        public ObservableCollection<Note> ListOfNotes
+        public ObservableCollection<NoteClient> ListOfNotes
         {
             get => _listOfNotes;
             set
@@ -25,7 +26,7 @@ namespace MAUIClientUI.MVVM
 
         public NotesViewModel()
         {
-            ListOfNotes = new ObservableCollection<Note>();
+            ListOfNotes = new ObservableCollection<NoteClient>();
         }
 
         public async Task LoadNotesAsync(DbContextClient dbContext)

@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
+using DatabaseLibrary.Entities;
 
-namespace DatabaseLibrary.Entities
+namespace DatabaseLibrary.Entities.Client
 {
-    public class Note 
+    [Table("Note")]
+    public class NoteClient : INote
     {
         //[ForeignKey("User")]
         //public int IdOwner { get; set; }

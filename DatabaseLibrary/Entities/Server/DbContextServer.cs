@@ -3,11 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DatabaseLibrary.Entities
+namespace DatabaseLibrary.Entities.Server
 {
     public class DbContextServer : DbContext
     {
-        public DbSet<Note> Notes { get; set; }
+        public DbSet<NoteServer> Notes { get; set; }
         public DbSet<Device> Devices { get; set; }
         public DbSet<UserServer> Users { get; set; }
         public DbSet<Note_UserServer> Note_Users { get; set; }
@@ -40,16 +40,16 @@ namespace DatabaseLibrary.Entities
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Composite key for ServerNotesUser
-            modelBuilder.Entity<Note_UserClient>()
+            modelBuilder.Entity<Note_UserServer>()
                 .HasKey(snu => new { snu.IdUser, snu.IdNote });
 
             // Relationships
-            modelBuilder.Entity<Note_UserClient>()
+            modelBuilder.Entity<Note_UserServer>()
                 .HasOne(snu => snu.User)
-                .WithMany(u => u.NotesUsers)
+                .WithMany(u => u.NotesUser)
                 .HasForeignKey(snu => snu.IdUser);
 
-            modelBuilder.Entity<Note_UserClient>()
+            modelBuilder.Entity<Note_UserServer>()
                 .HasOne(snu => snu.Note)
                 .WithMany(n => n.NoteUser)
                 .HasForeignKey(snu => snu.IdNote);
@@ -65,7 +65,7 @@ namespace DatabaseLibrary.Entities
 
             modelBuilder.Entity<User_Device>()
                 .HasOne(ud => ud.User)
-                .WithMany(u => u.UserDevices)
+                .WithMany(u => u.DevicesUser)
                 .HasForeignKey(ud => ud.IdUser);
 
             base.OnModelCreating(modelBuilder);

@@ -1,4 +1,4 @@
-using DatabaseLibrary.Entities;
+using DatabaseLibrary.Entities.Server;
 using Microsoft.EntityFrameworkCore;
 
 public partial class Program

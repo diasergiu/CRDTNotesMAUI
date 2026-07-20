@@ -1,4 +1,5 @@
 using DatabaseLibrary.Entities;
+using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.RequestBody;
 using DatabaseLibrary.ResponsBody;
 using DatabaseLibrary.WrapperClasses;
@@ -19,15 +20,15 @@ namespace MAUIClientUI.Services
 
         }
 
-        public async Task<ApiResult<List<Note>>> SendAndReceiveNoteUpdates(List<Note> flaggedNotes, string username, string password)
+        public async Task<ApiResult<List<ISyncQueue>>> SendAndReceiveNoteUpdates(List<SyncQueueClient> listChanges, UserClient user)
         {
             try
             {
                 // Construct relative URL with query parameters
-                string url = _baseURL + "/login";
+                string url = _baseURL + "/SyncChanges";
 
                 // Serialize notes to JSON and create content
-                var requestObject = new LoginRequest(username, password, flaggedNotes);
+                var requestObject = new LoginRequest(user, DeviceIdentityService.GetDeviceId(), listChanges);
                 
                 var json = JsonConvert.SerializeObject(requestObject);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -39,13 +40,13 @@ namespace MAUIClientUI.Services
                 {
                     // Parse the LoginResponse from server
                     var loginResponse = await response.Content.ReadFromJsonAsync<LoginRespons>();
-                    if (loginResponse?.success == true && loginResponse.notes != null)
+                    if (loginResponse?.success == true && loginResponse.ChangesToMake != null)
                     {
-                        return ApiResult<List<Note>>.Success(loginResponse.notes);
+                        return ApiResult<List<ISyncQueue>>.Success(loginResponse.ChangesToMake);
                     }
                     else
                     {
-                        return ApiResult<List<Note>>.Failure(
+                        return ApiResult<List<ISyncQueue>>.Failure(
                             loginResponse?.message ?? "Login failed",
                             ApiErrorType.ServerError
                         );
@@ -55,24 +56,58 @@ namespace MAUIClientUI.Services
                 {
                     string errorContent = await response.Content.ReadAsStringAsync();
                     Console.WriteLine($"Server returned error: {response.StatusCode} - {errorContent}");
-                    return ApiResult<List<Note>>.Failure($"Server returned error: {response.StatusCode}", ApiErrorType.ServerError);
+                    return ApiResult<List<ISyncQueue>>.Failure($"Server returned error: {response.StatusCode}", ApiErrorType.ServerError);
                 }
             }
             catch (HttpRequestException ex)
             {
                 Console.WriteLine($"HTTP Error sending notes to server: {ex.Message}");
-                return ApiResult<List<Note>>.Failure($"Connection error: {ex.Message}", ApiErrorType.ConnectionError);
+                return ApiResult<List<ISyncQueue>>.Failure($"Connection error: {ex.Message}", ApiErrorType.ConnectionError);
             }
             catch (TaskCanceledException)
             {
                 Console.WriteLine("Request timeout");
-                return ApiResult<List<Note>>.Failure("Request timeout. The server is not responding.", ApiErrorType.Timeout);
+                return ApiResult<List<ISyncQueue>>.Failure("Request timeout. The server is not responding.", ApiErrorType.Timeout);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error sending notes to server: {ex.Message}");
-                return ApiResult<List<Note>>.Failure($"Error sending notes to server: {ex.Message}", ApiErrorType.Unknown);
+                return ApiResult<List<ISyncQueue>>.Failure($"Error sending notes to server: {ex.Message}", ApiErrorType.Unknown);
             }
         }
+        // untested if it workes
+        public ApiResult<UserClient> Login(string username, string password)
+        {
+            try
+            {
+                string url = $"{_baseURL}/login?username={username}&password={password}";
+
+                var response = _httpClient.GetAsync(url).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    var user = response.Content.ReadFromJsonAsync<UserClient>().Result;
+                    return ApiResult<UserClient>.Success(user);
+                }
+                else
+                {
+                    return ApiResult<UserClient>.Failure($"Login failed: {response.ReasonPhrase}", ApiErrorType.ServerError);
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"HTTP Error sending notes to server: {ex.Message}");
+                return ApiResult<UserClient>.Failure($"Connection error: {ex.Message}", ApiErrorType.ConnectionError);
+            }
+            catch (TaskCanceledException)
+            {
+                Console.WriteLine("Request timeout");
+                return ApiResult<UserClient>.Failure("Request timeout. The server is not responding.", ApiErrorType.Timeout);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error during login: {ex.Message}");
+                return ApiResult<UserClient>.Failure($"Error during login: {ex.Message}", ApiErrorType.Unknown);
+            }
+        }        
     }
 }

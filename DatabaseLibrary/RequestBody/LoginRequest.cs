@@ -1,4 +1,5 @@
 ﻿using DatabaseLibrary.Entities;
+using DatabaseLibrary.Entities.Client;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -8,15 +9,17 @@ namespace DatabaseLibrary.RequestBody
 {
     public class LoginRequest
     {
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public List<Note> OfflineNotes { get; set; } = new();
+        //public string Username { get; set; }
+        //public string Password { get; set; }
+        public UserClient user { get;set; }
+        public int IdDevice { get; set; }
+        public List<SyncQueueClient> ChangesMade { get; set; } = new();
 
-        public LoginRequest(string username, string password, List<Note> offlineNotes)
+        public LoginRequest(UserClient user, int deviceId, List<SyncQueueClient> changesMade)
         {
-            Username = username;
-            Password = password;
-            OfflineNotes = offlineNotes;
+            this.user = user;
+            IdDevice = deviceId;
+            ChangesMade = changesMade;
         }
     }
 }
