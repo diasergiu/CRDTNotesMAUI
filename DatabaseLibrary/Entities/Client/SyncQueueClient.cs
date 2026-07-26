@@ -7,19 +7,20 @@ using System.Text;
 namespace DatabaseLibrary.Entities.Client
 {
     [Table("SyncQueue")]
+    // at this moment will make without changing the title
     public class SyncQueueClient: ISyncQueue
     {
         [Key]
         public int IdSync { get; set; }
         [ForeignKey("Note")]
         public int IdNote { get; set; }
-        [ForeignKey("User")]
+        //[ForeignKey("User")]
         public int IdUser { get; set; }
         public string Operation { get; set; }
         public string ContentChanges { get; set; }
         public string LastUpdate { get; set; }
 
-        public UserClient User { get; set; }
+        //public UserClient User { get; set; }
         public NoteClient Note { get; set; }
     }
 }

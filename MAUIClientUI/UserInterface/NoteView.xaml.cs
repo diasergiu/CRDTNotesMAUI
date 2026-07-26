@@ -1,12 +1,19 @@
 using DatabaseLibrary.Entities;
 using DatabaseLibrary.Entities.Client;
+using DatabaseLibrary.WrapperClasses;
 using MAUIClientUI.MVVM;
+using MAUIClientUI.Repositories;
+using MAUIClientUI.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace MAUIClientUI.UserInterface;
 
 public partial class NoteView : ContentPage
 {
 	private NoteClient _currentNote;
+	private readonly IDatabaseServices _databaseService;
+	private readonly NoteRepository _noteRepository;
+	private readonly ClientNoteServices _clientNoteServices;
 	private bool _isNewNote;
 	private int _IdUser;
 
@@ -15,7 +22,10 @@ public partial class NoteView : ContentPage
 		InitializeComponent();
 		_currentNote = note;
 		_isNewNote = isNewNote;
-		LoadNoteData();
+		_databaseService = IPlatformApplication.Current.Services.GetService<IDatabaseServices>();
+		_noteRepository = IPlatformApplication.Current.Services.GetService<NoteRepository>();
+		_clientNoteServices = new ClientNoteServices("/api/notes/"); // should split clientNoteServices into multiple classes
+        LoadNoteData();
 	}
 
 	private void LoadNoteData()
@@ -45,8 +55,8 @@ public partial class NoteView : ContentPage
 			await DisplayAlert("Validation Error", "Please enter a title for the note.", "OK");
 			return;
 		}
-
-		if (_currentNote != null)
+        SyncQueueClient changesMade = new SyncQueueClient();
+        if (_currentNote != null)
 		{
 			_currentNote.Title = TitleEntry.Text;
 			_currentNote.Content = ContentEditor.Text ?? "";
@@ -56,22 +66,35 @@ public partial class NoteView : ContentPage
             _currentNote.PasswordNote = IsSecured.IsChecked ? PasswordEntry.Text : "";
 			_currentNote.DirtyFlagChangesMade = true;
 
-
-            using (var dbContext = new DbContextClient())
-			{
-				if (_isNewNote)
+            // save Changes to SyncQueueClient
+            changesMade.Note = _currentNote;
+			changesMade.ContentChanges = ContentEditor.Text ?? "";
+			changesMade.LastUpdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+			changesMade.IdUser = UserDevice.LocalUser;
+            
+			if (_isNewNote)
+            {
+                //_clientNoteServices.SaveChangesIfOnline(changesMade, DeviceIdentityService.GetDeviceId());
+				var createResult = await _clientNoteServices.CreateNewNote(_currentNote);
+				if (createResult.IsSuccess)
 				{
-					dbContext.Notes.Add(_currentNote);
+					_currentNote.IdNote = createResult.Data;
 				}
 				else
 				{
-					dbContext.Notes.Update(_currentNote);
+					await DisplayAlert("Error", createResult.ErrorMessage, "OK");
+					return;
 				}
+            }
+            else
+            {
+                _clientNoteServices.UpdateChangtes(changesMade);
+            }
+            _noteRepository.SaveChangesNotes(_currentNote, changesMade, _isNewNote);
+			
 
-				await dbContext.SaveChangesAsync();
-			}
 
-			await DisplayAlert("Success", "Note saved successfully!", "OK");
+            await DisplayAlert("Success", "Note saved successfully!", "OK");
 			await Navigation.PopAsync();
 		}
 	}

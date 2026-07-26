@@ -14,12 +14,14 @@ namespace DatabaseLibrary.Entities.Client
 
         public string DbPath { get; }
 
-        public DbContextClient()
+        public DbContextClient(string instanceId = "")
         {
             var folder = Environment.SpecialFolder.LocalApplicationData;
             var path = Environment.GetFolderPath(folder);
-            DbPath = System.IO.Path.Join(path, "NotesDatabase.db");
+            string instanceSuffix = string.IsNullOrEmpty(instanceId) ? "" : instanceId;
+            DbPath = System.IO.Path.Join(path, $"NotesDatabase{instanceSuffix}.db");
         }
+
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseSqlite($"Data Source={DbPath}");
     }

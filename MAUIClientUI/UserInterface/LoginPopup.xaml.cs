@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using DatabaseLibrary.Entities.Client;
+using DatabaseLibrary.WrapperClasses;
 
 namespace MAUIClientUI.UserInterface;
 
@@ -18,7 +19,7 @@ public partial class LoginPopup : ContentPage
     public LoginPopup()
     {
         InitializeComponent();
-        noteRepository = new NoteRepository(new DbContextClient()); // should DbContext be singleton
+        noteRepository = IPlatformApplication.Current.Services.GetService<NoteRepository>(); // should DbContext be singleton
         noteServices = new ClientNoteServices("/api/user");
     }
 
@@ -54,6 +55,7 @@ public partial class LoginPopup : ContentPage
 
         if (result.IsSuccess)
         {
+     //       UserDevice.SaveLastUserToFile(result.Data);
             // sync the notes with the server
             List<SyncQueueClient> changedNotes = noteRepository.getAllChanges(result.Data);
             var getServerChanges = await noteServices.SendAndReceiveNoteUpdates(

@@ -12,7 +12,7 @@ namespace DatabaseLibrary.RequestBody.EntityMappers
         {
             return new NoteServer
             {
-                IdNote = noteClient.IdNote,
+                //IdNote = noteClient.IdNote,
                 Title = noteClient.Title,
                 Content = noteClient.Content,
                 LastUpdate = noteClient.LastUpdate,
@@ -64,7 +64,7 @@ namespace DatabaseLibrary.RequestBody.EntityMappers
             return new SyncQueueServer
             {
                 IdSync = syncQueueClient.IdSync,
-                IdUser = syncQueueClient.IdUser,
+             //   IdUser = syncQueueClient.IdUser,
                 IdDevice = IdDevice,
                 IdNote = syncQueueClient.IdNote,
                 Operation = syncQueueClient.Operation,
@@ -79,7 +79,7 @@ namespace DatabaseLibrary.RequestBody.EntityMappers
             return new SyncQueueClient
             {
                 IdSync = syncQueueServer.IdSync,
-                IdUser = syncQueueServer.IdUser,
+              //  IdUser = syncQueueServer.IdUser,
                 IdNote = syncQueueServer.IdNote,
                 Operation = syncQueueServer.Operation,
                 ContentChanges = syncQueueServer.ContentChanges,

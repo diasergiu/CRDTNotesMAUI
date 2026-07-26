@@ -68,6 +68,15 @@ namespace DatabaseLibrary.Entities.Server
                 .WithMany(u => u.DevicesUser)
                 .HasForeignKey(ud => ud.IdUser);
 
+
+            modelBuilder.Entity<NoteServer>()
+                .Property(n => n.CreationDate)
+                .HasDefaultValueSql("datetime('now')");
+
+            modelBuilder.Entity<NoteServer>()
+                .Property(n => n.LastUpdate)
+                .HasDefaultValueSql("datetime('now')");
+
             base.OnModelCreating(modelBuilder);
         }
     }

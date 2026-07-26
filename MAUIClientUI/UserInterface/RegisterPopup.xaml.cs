@@ -17,7 +17,7 @@ public partial class RegisterPopup : ContentPage
     public RegisterPopup()
     {
         InitializeComponent();
-        _noteRepository = new NoteRepository(new DbContextClient());
+        _noteRepository = IPlatformApplication.Current.Services.GetService<NoteRepository>();
         _registerServices = new LoginConnectionServices("/User");
         
     }
@@ -75,6 +75,9 @@ public partial class RegisterPopup : ContentPage
 
         if (result.IsSuccess)
         {
+            // save new User in local Database
+            _noteRepository.SaveNewUser(result.Data);
+
             ShowStatus("Account created successfully!", false);
             await Task.Delay(1500);
 

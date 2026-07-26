@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace DatabaseLibrary.Migrations.Client
+namespace DatabaseLibrary.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -11,25 +11,26 @@ namespace DatabaseLibrary.Migrations.Client
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Notes",
+                name: "Note",
                 columns: table => new
                 {
                     IdNote = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Title = table.Column<string>(type: "TEXT", nullable: false),
-                    PasswordNote = table.Column<string>(type: "TEXT", nullable: false),
                     Content = table.Column<string>(type: "TEXT", nullable: false),
-                    StartingDate = table.Column<string>(type: "TEXT", nullable: false),
+                    CreationDate = table.Column<string>(type: "TEXT", nullable: false),
                     LastUpdate = table.Column<string>(type: "TEXT", nullable: false),
-                    hasPassword = table.Column<bool>(type: "INTEGER", nullable: false)
+                    HasPassword = table.Column<bool>(type: "INTEGER", nullable: false),
+                    PasswordNote = table.Column<string>(type: "TEXT", nullable: false),
+                    DirtyFlagChangesMade = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Notes", x => x.IdNote);
+                    table.PrimaryKey("PK_Note", x => x.IdNote);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "User",
                 columns: table => new
                 {
                     IdUser = table.Column<int>(type: "INTEGER", nullable: false)
@@ -40,11 +41,34 @@ namespace DatabaseLibrary.Migrations.Client
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.IdUser);
+                    table.PrimaryKey("PK_User", x => x.IdUser);
                 });
 
             migrationBuilder.CreateTable(
-                name: "NoteUsers",
+                name: "SyncQueue",
+                columns: table => new
+                {
+                    IdSync = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    IdNote = table.Column<int>(type: "INTEGER", nullable: false),
+                    IdUser = table.Column<int>(type: "INTEGER", nullable: false),
+                    Operation = table.Column<string>(type: "TEXT", nullable: false),
+                    ContentChanges = table.Column<string>(type: "TEXT", nullable: false),
+                    LastUpdate = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SyncQueue", x => x.IdSync);
+                    table.ForeignKey(
+                        name: "FK_SyncQueue_Note_IdNote",
+                        column: x => x.IdNote,
+                        principalTable: "Note",
+                        principalColumn: "IdNote",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Note_User",
                 columns: table => new
                 {
                     IdUser = table.Column<int>(type: "INTEGER", nullable: false),
@@ -52,24 +76,29 @@ namespace DatabaseLibrary.Migrations.Client
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_NoteUsers", x => new { x.IdUser, x.IdNote });
+                    table.PrimaryKey("PK_Note_User", x => new { x.IdUser, x.IdNote });
                     table.ForeignKey(
-                        name: "FK_NoteUsers_Notes_IdNote",
+                        name: "FK_Note_User_Note_IdNote",
                         column: x => x.IdNote,
-                        principalTable: "Notes",
+                        principalTable: "Note",
                         principalColumn: "IdNote",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_NoteUsers_Users_IdUser",
+                        name: "FK_Note_User_User_IdUser",
                         column: x => x.IdUser,
-                        principalTable: "Users",
+                        principalTable: "User",
                         principalColumn: "IdUser",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_NoteUsers_IdNote",
-                table: "NoteUsers",
+                name: "IX_Note_User_IdNote",
+                table: "Note_User",
+                column: "IdNote");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SyncQueue_IdNote",
+                table: "SyncQueue",
                 column: "IdNote");
         }
 
@@ -77,13 +106,16 @@ namespace DatabaseLibrary.Migrations.Client
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "NoteUsers");
+                name: "Note_User");
 
             migrationBuilder.DropTable(
-                name: "Notes");
+                name: "SyncQueue");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "User");
+
+            migrationBuilder.DropTable(
+                name: "Note");
         }
     }
 }

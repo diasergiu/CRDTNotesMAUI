@@ -1,12 +1,13 @@
-﻿using System;
+﻿using DatabaseLibrary.Entities;
+using DatabaseLibrary.Entities.Client;
+using MAUIClientUI.Repositories;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using DatabaseLibrary.Entities;
-using DatabaseLibrary.Entities.Client;
-using Microsoft.EntityFrameworkCore;
 
 namespace MAUIClientUI.MVVM
 {
@@ -38,6 +39,17 @@ namespace MAUIClientUI.MVVM
                 ListOfNotes.Add(note);
             }
         }
+
+        // Add overload for NoteRepository
+        //public async Task LoadNotesAsync(NoteRepository noteRepository, UserClient user)
+        //{
+        //    var notes = noteRepository.getAllChanges(user);
+        //    ListOfNotes.Clear();
+        //    foreach (var note in notes)
+        //    {
+        //        ListOfNotes.Add(note);
+        //    }
+        //}
 
         public event PropertyChangedEventHandler? PropertyChanged;
 

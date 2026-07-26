@@ -1,6 +1,7 @@
 using DatabaseLibrary.Entities;
 using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.Entities.Server;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -21,7 +22,8 @@ namespace MAUIClientUI.Repositories
                 new List<SyncQueueClient>(); // this line if because the method needs to return a list, but if the query fails, it will return an empty list instead of null
             try
             {
-                changesMade = _dbContextUser.SyncQueues.Where(n => n.IdUser == user.IdUser).ToList();
+                //changesMade = _dbContextUser.SyncQueues.Where(n => n.UserDevice.IdUser == user.IdUser).ToList();
+                changesMade = _dbContextUser.SyncQueues.ToList(); // get all changes now
             }
             catch (Exception ex)
             {
@@ -33,6 +35,7 @@ namespace MAUIClientUI.Repositories
         // kind of duplicated but i might need to use the device ID
         public void UpdateListNotes(List<ISyncQueue> flaggedNotes)
         {
+            if (flaggedNotes == null) return;
             foreach (SyncQueueClient queue in flaggedNotes)
             {
                 if (queue.Operation == "Update")
@@ -73,5 +76,31 @@ namespace MAUIClientUI.Repositories
                 _dbContextUser.SaveChangesAsync();
             }
         }
+
+        public void SaveNewUser(UserClient newUser)
+        {
+            _dbContextUser.Users.Add(newUser);
+        }
+
+
+        public void SaveChangesNotes(NoteClient newNote, SyncQueueClient changesMade, bool _isNewNote)
+        {
+            if (_isNewNote)
+            {
+                changesMade.Operation = "Create";
+                _dbContextUser.Notes.Add(newNote);
+            }
+            else
+            {
+                changesMade.Operation = "Update";
+                _dbContextUser.Notes.Update(newNote);
+
+            }
+            // i need to save the user id to the sync queue
+            changesMade.IdNote = newNote.IdNote;
+            _dbContextUser.SyncQueues.Add(changesMade);
+            _dbContextUser.SaveChangesAsync();
+        }
+        
     }
 }

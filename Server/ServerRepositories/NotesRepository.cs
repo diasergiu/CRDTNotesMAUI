@@ -1,10 +1,12 @@
 using DatabaseLibrary.Entities;
 using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.Entities.Server;
+using DatabaseLibrary.RequestBody.EntityMappers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
@@ -80,6 +82,18 @@ namespace Server.ServeRepositories
                 .ToListAsync();
             return notesToUpdate;
         }
+        public async Task<List<NoteServer>> GetAllNotesFromUser(int IdUser)
+        {
+            var notes = await _dbContextServer.Notes
+                .Join(_dbContextServer.Note_Users, 
+                    n => n.IdNote, 
+                    nu => nu.IdNote, (n, nu) => new { Note = n, NoteUser = nu }
+                 )
+                .Where(nu => nu.NoteUser.IdUser == IdUser)
+                .Select(nu => nu.Note)
+                .ToListAsync();
+            return notes;
+        }
 
 
         //public async Task saveOrUpdateNewNote(UserServer user, Note note)
@@ -106,42 +120,79 @@ namespace Server.ServeRepositories
         {
             foreach (SyncQueueServer queue in changesMade)
             {
-                if (queue.Operation == "Update")
+                SyncData(queue);
+            }
+            //await _dbContextServer.SaveChangesAsync();
+        }
+    
+
+    public async Task SyncData(SyncQueueServer changesMade)
+        {
+            if (changesMade.Operation == "Update")
+            {
+                NoteServer existingNote = _dbContextServer.Notes.FirstOrDefault(n => n.IdNote == changesMade.IdNote);
+                if (existingNote != null)
                 {
-                    NoteServer existingNote = _dbContextServer.Notes.FirstOrDefault(n => n.IdNote == queue.IdNote);
-                    if (existingNote != null)
-                    {
-                        existingNote.Content = queue.ContentChanges;
-                        existingNote.LastUpdate = queue.LastUpdate;
-                    }
-                }
-                else if (queue.Operation == "Delete")
-                {
-                    NoteServer existingNote = _dbContextServer.Notes.FirstOrDefault(n => n.IdNote == queue.IdNote);
-                    if (existingNote != null)
-                    {
-                        _dbContextServer.Notes.Remove(existingNote);
-                    }
-                }
-                else if(queue.Operation == "Create")
-                {
-                    NoteServer newNote = new NoteServer
-                    {
-                        IdNote = queue.IdNote,
-                        Content = queue.ContentChanges,
-                        LastUpdate = queue.LastUpdate
-                    };
-                    _dbContextServer.Notes.Add(newNote);
-                    Note_UserServer newConnection = new Note_UserServer
-                    {
-                        IdNote = queue.IdNote,
-                        IdUser = queue.IdUser
-                    };
-                    _dbContextServer.Note_Users.Add(newConnection);
-                    
+                    existingNote.Content = changesMade.ContentChanges;
+                    existingNote.LastUpdate = changesMade.LastUpdate;
                 }
             }
+            else if (changesMade.Operation == "Delete")
+            {
+                NoteServer existingNote = _dbContextServer.Notes.FirstOrDefault(n => n.IdNote == changesMade.IdNote);
+                if (existingNote != null)
+                {
+                    _dbContextServer.Notes.Remove(existingNote);
+                }
+            }
+            else if (changesMade.Operation == "Create")
+            {
+                //CreateNote(changesMade);
+
+            }
+            await _dbContextServer.SaveChangesAsync(); // Now we make a save at every 
+        }
+
+        public List<SyncQueueServer> GetChangesFromNote(int idNote)
+        {
+            return _dbContextServer.Sync_Queues.Where(n => n.IdNote == idNote).ToList();
+        }
+
+
+
+        public async Task<NoteServer> CreateNote(NoteClient note, int idUser) 
+        {
+            //NoteServer newNote = new NoteServer
+            //{
+            //    Content = changesMade.ContentChanges,
+            //    LastUpdate = changesMade.LastUpdate
+            //};
+            //_dbContextServer.Notes.Add(newNote);
+            //Note_UserServer newConnection = new Note_UserServer
+            //{
+            //    IdNote = changesMade.IdNote,
+            //    IdUser = changesMade.IdUser
+            //};
+            //_dbContextServer.Note_Users.Add(newConnection);
+            
+            NoteServer newNote = EntityMapper.MapNoteClientToNoteServer(note);
+            _dbContextServer.Notes.Add(newNote);
             await _dbContextServer.SaveChangesAsync();
+
+            Note_UserServer newConnection = new Note_UserServer()
+            {
+                IdNote = newNote.IdNote,
+                IdUser = idUser
+            };
+            _dbContextServer.Note_Users.Add(newConnection);
+            await _dbContextServer.SaveChangesAsync();
+            return newNote;
+        }
+
+ 
+        public async Task UpdateChanges(SyncQueueServer changesMade)
+        {
+            SyncData(changesMade);
         }
     }
 }

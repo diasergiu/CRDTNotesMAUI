@@ -6,7 +6,7 @@ using System.Text;
 
 namespace DatabaseLibrary.Entities.Server
 {
-    [Table("Note")]
+    [Table("Notes")]
     public class NoteServer : INote
     {
         [Key]

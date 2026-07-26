@@ -148,7 +148,7 @@ namespace Server.Controllers
                 return Ok(new { 
                     success = true, 
                     message = "Changes synced successfully.",
-                    data = syncChanges    // i dont know if it should name things like this
+                    data = syncChanges  
                 });
             }
             catch (Exception ex)
