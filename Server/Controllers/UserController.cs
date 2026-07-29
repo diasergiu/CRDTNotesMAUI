@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using DatabaseLibrary.RequestBody;
 using DatabaseLibrary.Entities.Server;
 using DatabaseLibrary.RequestBody.EntityMappers;
+using DatabaseLibrary.ResponsBody;
 
 namespace Server.Controllers
 {
@@ -13,7 +14,7 @@ namespace Server.Controllers
     public class UserController : Controller
     {
 
-        private DbContextServer _context;
+        private DbContextServer _context; // make a repository for user later
         private NotesRepository _notesRepository;
 
         public UserController(DbContextServer context)
@@ -33,7 +34,7 @@ namespace Server.Controllers
                 return Ok(new
                 {
                     success = true,
-                    user = user,
+                    IdUser = user.IdUser,
                 });
             }
             else
@@ -155,6 +156,13 @@ namespace Server.Controllers
             {
                 return StatusCode(500, new { success = false, message = $"Error syncing changes: {ex.Message}" });
             }
+        }
+
+        [HttpDelete()]
+        public async Task DeleteUserById(int idUser)
+        {
+            _context.Users.Remove(new UserServer { IdUser = idUser });
+            await _context.SaveChangesAsync();
         }
 
         public class RegisterRequest

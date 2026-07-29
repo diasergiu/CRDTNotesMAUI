@@ -1,27 +1,29 @@
-﻿namespace DatabaseLibrary.WrapperClasses
+﻿using Microsoft.EntityFrameworkCore.Query.Internal;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace DatabaseLibrary.WrapperClasses
 {
-    /// <summary>
-    /// Represents the result of an API operation
-    /// </summary>
-    public class ApiResult<T>
+    public class ApiResult
     {
         public bool IsSuccess { get; set; }
-        public T Data { get; set; }
         public string ErrorMessage { get; set; }
         public ApiErrorType ErrorType { get; set; }
 
-        public static ApiResult<T> Success(T data)
+        public static ApiResult Success()
         {
-            return new ApiResult<T>
+            return new ApiResult
             {
                 IsSuccess = true,
-                Data = data
+                ErrorMessage = null,
+                ErrorType = ApiErrorType.Unknown
             };
         }
 
-        public static ApiResult<T> Failure(string errorMessage, ApiErrorType errorType = ApiErrorType.Unknown)
+        public static ApiResult Failure(string errorMessage, ApiErrorType errorType = ApiErrorType.Unknown)
         {
-            return new ApiResult<T>
+            return new ApiResult
             {
                 IsSuccess = false,
                 ErrorMessage = errorMessage,
@@ -29,7 +31,7 @@
             };
         }
     }
-
+    
     public enum ApiErrorType
     {
         Unknown,

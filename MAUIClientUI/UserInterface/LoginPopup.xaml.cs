@@ -12,15 +12,17 @@ namespace MAUIClientUI.UserInterface;
 
 public partial class LoginPopup : ContentPage
 {
-    //private LoginConnectionServices loginServices; // might delete this
-    private ClientNoteServices noteServices;
-    private NoteRepository noteRepository;
+    private LoginServices _loginServices; // might delete this
+    //private ClientServices _clientServices;
+    private NoteServices _noteServices;
+    private NoteRepository _noteRepository;
 
     public LoginPopup()
     {
         InitializeComponent();
-        noteRepository = IPlatformApplication.Current.Services.GetService<NoteRepository>(); // should DbContext be singleton
-        noteServices = new ClientNoteServices("/api/user");
+        _noteRepository = IPlatformApplication.Current.Services.GetService<NoteRepository>(); // should DbContext be singleton
+        _loginServices = new LoginServices("/api/user");
+        _noteServices = new NoteServices("/api/notes");
     }
 
     private async void OnLoginSubmitClicked(object sender, EventArgs e)
@@ -43,29 +45,39 @@ public partial class LoginPopup : ContentPage
         
         SetLoadingState(false);
         // Login to the server
-        // lets pretend this korks
-        var result = noteServices.Login(username, password);
-
-        // Show loading state
+        var result = await _loginServices.Login(username, password);
         SetLoadingState(true);
-
-        // Call the service - NO TRY/CATCH needed!
-
-
 
         if (result.IsSuccess)
         {
-     //       UserDevice.SaveLastUserToFile(result.Data);
+            /*
+             * part with SyncQueue redo later 
+             */
+
+            //       UserDevice.SaveLastUserToFile(result.Data);
             // sync the notes with the server
-            List<SyncQueueClient> changedNotes = noteRepository.getAllChanges(result.Data);
-            var getServerChanges = await noteServices.SendAndReceiveNoteUpdates(
-                changedNotes,
-                result.Data
-            );
-            
+            //List<SyncQueueClient> changedNotes = _noteRepository.getAllChanges(result.Data);
+
+
+            //var getServerChanges = await _noteServices.SendAndReceiveNoteUpdates(
+            //    changedNotes,
+            //    result.Data
+            //);
+
             // update notes based on changes on the server
-            noteRepository.UpdateListNotes(getServerChanges.Data);
+
+            //_noteRepository.UpdateListNotes(getServerChanges.Data);
             // Login successful - close the popup
+
+            // just take notes from server
+
+            var notesResult = await _noteServices.GetAllNotesFromUser(result.Data.IdUser);
+            if (notesResult.IsSuccess)
+            {
+                // Update the local repository with the notes from the server
+                _noteRepository.UpdateListNotes(notesResult.Data);
+            }
+
             ShowStatus("Login successful!", false);
             await Task.Delay(500); // Brief delay to show success message
             await Navigation.PopModalAsync();

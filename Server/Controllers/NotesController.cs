@@ -51,44 +51,58 @@ namespace Server.Controllers
 
         }
 
-        [HttpGet] // iActionResult can sent json back to the client (look more into this)
-        public async Task<IActionResult> GetAllNotesFromUser()
+        [HttpGet("GetAllNotesFromUser")] // iActionResult can sent json back to the client (look more into this)
+        public async Task<IActionResult> GetAllNotesFromUser(int IdUser)
         {
-            int idUser = -1;
-
             try
             {
-                if (Request.Headers.TryGetValue("X-User-Id", out var idUserHeader))
+                List<NoteServer> notes = await _notesRepository.GetAllNotesFromUser(IdUser);
+                List<NoteClient> toSend = new List<NoteClient>();
+                foreach(NoteServer note in notes)
                 {
-                    int.TryParse(idUserHeader, out idUser);
+                    toSend.Add(EntityMapper.MapNoteServerToNoteClient(note));
                 }
-
-                if (idUser == -1)
-                {
-                    return Unauthorized(new { success = false, message = "Missing user ID" });
-                }
-
-                List<NoteServer> notes = await _notesRepository.GetAllNotesFromUser(idUser);
-                return Ok(new
-                {
-                    success = true,
-                    message = "Changes synced successfully.",
-                    data = notes
-                });
+                return Ok(new { success = true, data = toSend });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { success = false, message = $"Error syncing changes: {ex.Message}" });
             }
 
+            //try
+            //{
+            //    if (Request.Headers.TryGetValue("X-User-Id", out var idUserHeader))
+            //    {
+            //        int.TryParse(idUserHeader, out idUser);
+            //    }
+
+            //    if (idUser == -1)
+            //    {
+            //        return Unauthorized(new { success = false, message = "Missing user ID" });
+            //    }
+
+            //    List<NoteServer> notes = await _notesRepository.GetAllNotesFromUser(idUser);
+            //    return Ok(new
+            //    {
+            //        success = true,
+            //        message = "Changes synced successfully.",
+            //        data = notes
+            //    });
+            //}
+            //catch (Exception ex)
+            //{
+            //    return StatusCode(500, new { success = false, message = $"Error syncing changes: {ex.Message}" });
+            //}
+
         }
 
         //// PUT /api/notes/{id}
-        //[HttpPut("{id}")]
-        //public async Task UpdateNotes([FromBody] NoteClient Note)
-        //{
-        //    await _notesRepository.UpdateChanges(changesMade);
-        //}
+        [HttpPut("{id}")]
+        public async Task UpdateNotes(int noteId, [FromBody] NoteServer note)
+        {
+            await _notesRepository.UpdateChanges(note);
+
+        }
 
         [HttpPost]
         public async Task<IActionResult> CreateNote([FromBody] NoteClient changesMade)

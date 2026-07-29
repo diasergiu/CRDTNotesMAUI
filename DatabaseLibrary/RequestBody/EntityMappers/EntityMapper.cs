@@ -28,6 +28,7 @@ namespace DatabaseLibrary.RequestBody.EntityMappers
             {
                 IdNote = noteServer.IdNote,
                 Title = noteServer.Title,
+                CreationDate = noteServer.CreationDate,
                 Content = noteServer.Content,
                 LastUpdate = noteServer.LastUpdate,
                 DirtyFlagChangesMade = noteServer.DirtyFlagChangesMade,

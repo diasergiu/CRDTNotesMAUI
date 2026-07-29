@@ -31,6 +31,45 @@ namespace MAUIClientUI.Repositories
             }
             return changesMade;
         }
+
+        public void UpdateListNotes(List<NoteClient> noteClients)
+        {
+            if (noteClients == null || noteClients.Count == 0)
+                return;
+
+            // Get all existing note IDs from the database
+            var existingNoteIds = _dbContextUser.Notes
+                .AsNoTracking()  // Add this to prevent tracking
+                .Select(n => n.IdNote)
+                .ToList();
+
+            // Separate notes into new and existing_
+            var notesToAdd = noteClients
+                .Where(n => !existingNoteIds.Contains(n.IdNote))
+                .ToList();
+
+            var notesToUpdate = noteClients
+                .Where(n => existingNoteIds.Contains(n.IdNote))
+                .ToList();
+
+            // Add new notes
+            if (notesToAdd.Count > 0)
+            {
+                _dbContextUser.Notes.AddRange(notesToAdd);
+            }
+
+            // Update existing notes
+            if (notesToUpdate.Count > 0)
+            {
+                _dbContextUser.Notes.UpdateRange(notesToUpdate);
+            }
+
+            // Save all changes at once
+            if (notesToAdd.Count > 0 || notesToUpdate.Count > 0)
+            {
+                _dbContextUser.SaveChanges();
+            }
+        }
         //untested if it saves the changes to the database
         // kind of duplicated but i might need to use the device ID
         public void UpdateListNotes(List<ISyncQueue> flaggedNotes)
@@ -47,32 +86,6 @@ namespace MAUIClientUI.Repositories
                         existingNote.LastUpdate = queue.LastUpdate;
                     }
                 }
-                //else if (queue.Operation == "Delete")
-                //{
-                //    NoteServer existingNote = _dbContextUser.Notes.FirstOrDefault(n => n.IdNote == queue.IdNote);
-                //    if (existingNote != null)
-                //    {
-                //        _dbContextUser.Notes.Remove(existingNote);
-                //    }
-                //}
-                //    else if (queue.Operation == "Create")
-                //    {
-                //        NoteServer newNote = new NoteServer
-                //        {
-                //            IdNote = queue.IdNote,
-                //            Content = queue.ContentChanges,
-                //            LastUpdate = queue.LastUpdate
-                //        };
-                //        _dbContextUser.Notes.Add(newNote);
-                //        Note_UserServer newConnection = new Note_UserServer
-                //        {
-                //            IdNote = queue.IdNote,
-                //            IdUser = queue.IdUser
-                //        };
-                //        _dbContextUser.Note_Users.Add(newConnection);
-
-                //    }
-                //}
                 _dbContextUser.SaveChangesAsync();
             }
         }
@@ -82,25 +95,18 @@ namespace MAUIClientUI.Repositories
             _dbContextUser.Users.Add(newUser);
         }
 
-
-        public void SaveChangesNotes(NoteClient newNote, SyncQueueClient changesMade, bool _isNewNote)
+        public void updateNote(NoteClient note) 
         {
-            if (_isNewNote)
-            {
-                changesMade.Operation = "Create";
-                _dbContextUser.Notes.Add(newNote);
-            }
-            else
-            {
-                changesMade.Operation = "Update";
-                _dbContextUser.Notes.Update(newNote);
+            _dbContextUser.Notes.Update(note);
+            _dbContextUser.SaveChanges();
 
-            }
-            // i need to save the user id to the sync queue
-            changesMade.IdNote = newNote.IdNote;
-            _dbContextUser.SyncQueues.Add(changesMade);
-            _dbContextUser.SaveChangesAsync();
+
         }
-        
+        public void createNote(NoteClient note)
+        {
+            _dbContextUser.Notes.Add(note);
+            _dbContextUser.SaveChanges();
+        }
+
     }
 }

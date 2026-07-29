@@ -2,6 +2,7 @@
 
 namespace MAUIClientUI.Services
 {
+    // (s)not a service not one that communicates with the server
     public class DeviceIdentityService
     {
         private const string DeviceIdKey = "device_id";

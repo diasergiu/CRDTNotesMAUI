@@ -30,7 +30,7 @@ namespace MAUIClientUI
                     return dbServices.GetContext();
                 })
                 .AddScoped<NoteRepository>()
-                .AddScoped<ClientNoteServices>();
+                .AddScoped<ClientServices>();
 #if DEBUG
             builder.Logging.AddDebug();
 #endif

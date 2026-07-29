@@ -158,8 +158,6 @@ namespace Server.ServeRepositories
             return _dbContextServer.Sync_Queues.Where(n => n.IdNote == idNote).ToList();
         }
 
-
-
         public async Task<NoteServer> CreateNote(NoteClient note, int idUser) 
         {
             //NoteServer newNote = new NoteServer
@@ -189,10 +187,9 @@ namespace Server.ServeRepositories
             return newNote;
         }
 
- 
-        public async Task UpdateChanges(SyncQueueServer changesMade)
+        public async Task UpdateChanges(NoteServer note)
         {
-            SyncData(changesMade);
+            _dbContextServer.Notes.Update(note);
         }
     }
 }

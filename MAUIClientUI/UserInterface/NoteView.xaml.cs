@@ -13,9 +13,9 @@ public partial class NoteView : ContentPage
 	private NoteClient _currentNote;
 	private readonly IDatabaseServices _databaseService;
 	private readonly NoteRepository _noteRepository;
-	private readonly ClientNoteServices _clientNoteServices;
-	private bool _isNewNote;
-	private int _IdUser;
+	//private readonly ClientServices _clientNoteServices;
+	private readonly NoteServices _noteServices;
+    private bool _isNewNote;
 
 	public NoteView(NoteClient note, bool isNewNote = false)
 	{
@@ -24,7 +24,7 @@ public partial class NoteView : ContentPage
 		_isNewNote = isNewNote;
 		_databaseService = IPlatformApplication.Current.Services.GetService<IDatabaseServices>();
 		_noteRepository = IPlatformApplication.Current.Services.GetService<NoteRepository>();
-		_clientNoteServices = new ClientNoteServices("/api/notes/"); // should split clientNoteServices into multiple classes
+		_noteServices = new NoteServices("/api/notes"); // should split clientNoteServices into multiple classes
         LoadNoteData();
 	}
 
@@ -55,7 +55,7 @@ public partial class NoteView : ContentPage
 			await DisplayAlert("Validation Error", "Please enter a title for the note.", "OK");
 			return;
 		}
-        SyncQueueClient changesMade = new SyncQueueClient();
+        //SyncQueueClient changesMade = new SyncQueueClient();
         if (_currentNote != null)
 		{
 			_currentNote.Title = TitleEntry.Text;
@@ -67,15 +67,15 @@ public partial class NoteView : ContentPage
 			_currentNote.DirtyFlagChangesMade = true;
 
             // save Changes to SyncQueueClient
-            changesMade.Note = _currentNote;
-			changesMade.ContentChanges = ContentEditor.Text ?? "";
-			changesMade.LastUpdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-			changesMade.IdUser = UserDevice.LocalUser;
+   //         changesMade.Note = _currentNote;
+			//changesMade.ContentChanges = ContentEditor.Text ?? "";
+			//changesMade.LastUpdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+			//changesMade.IdUser = UserDevice.LocalUser;
             
 			if (_isNewNote)
             {
                 //_clientNoteServices.SaveChangesIfOnline(changesMade, DeviceIdentityService.GetDeviceId());
-				var createResult = await _clientNoteServices.CreateNewNote(_currentNote);
+				var createResult = await _noteServices.CreateNewNote(_currentNote);
 				if (createResult.IsSuccess)
 				{
 					_currentNote.IdNote = createResult.Data;
@@ -85,12 +85,20 @@ public partial class NoteView : ContentPage
 					await DisplayAlert("Error", createResult.ErrorMessage, "OK");
 					return;
 				}
+				_noteRepository.createNote(_currentNote);
             }
             else
             {
-                _clientNoteServices.UpdateChangtes(changesMade);
+				 var createResult = await _noteServices.UpdateNote(_currentNote);
+				if (!createResult.IsSuccess)
+				{
+                    await DisplayAlert("Error", createResult.ErrorMessage, "OK");
+                    return;
+
+                }
+				_noteRepository.updateNote(_currentNote);
             }
-            _noteRepository.SaveChangesNotes(_currentNote, changesMade, _isNewNote);
+
 			
 
 

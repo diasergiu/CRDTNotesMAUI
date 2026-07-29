@@ -11,8 +11,9 @@ namespace DatabaseLibrary.WrapperClasses
     {
         //public static string PathToFile = "LastUser.txt"; // not implemented yet
         //public static UserClient UserClient { get; set; }
-        //public static void SaveLastUserToFile(UserClient userClient) { 
-        //    using(StreamWriter writer = new StreamWriter(PathToFile))
+        //public static void SaveLastUserToFile(UserClient userClient)
+        //{
+        //    using (StreamWriter writer = new StreamWriter(PathToFile))
         //    {
         //        StringBuilder builder = new StringBuilder();
         //        builder.Append(userClient.IdUser).Append(",")
@@ -61,6 +62,33 @@ namespace DatabaseLibrary.WrapperClasses
         //        }
         //    }
         //}
+
+        public static void saveIdUsertoFile(int userId)
+        {
+            string path = "LastUser.txt";
+            using (StreamWriter writer = new StreamWriter(path));
+            using( StreamWriter writer = new StreamWriter(path))
+            {
+                writer.Write(userId.ToString());
+            }
+        }
+
+        public static int readIdUserFromFile()
+        {
+            string path = "LastUser.txt"; // where the file is located ??
+            if (File.Exists(path))
+            {
+                using (StreamReader reader = new StreamReader(path))
+                {
+                    string content = reader.ReadToEnd();
+                    if (int.TryParse(content, out int userId))
+                    {
+                        return userId;
+                    }
+                }
+            }
+            return -1; // Return -1 if the file does not exist or the content is invalid
+        }
 
         public static int LocalUser { get; set; }
 

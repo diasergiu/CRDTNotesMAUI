@@ -25,5 +25,7 @@ XAML
 Entity Framework
 Web API 
 
+to start the server cd C:\Users\diase\source\repos\CRDTNotesMAUI\Server
+   dotnet run
 
 http://localhost:5266/WeatherForecast to test if server is open
