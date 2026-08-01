@@ -23,7 +23,7 @@ namespace MAUIClientUI.Test.ServiceTest
             var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
             var expectedUser = new UserClient
             {
-                IdUser = 1,
+                IdUser = Guid.NewGuid(),
                 Name = "Test User",
                 Username = "testuser",
                 Password = "hashedpassword"
@@ -215,7 +215,7 @@ namespace MAUIClientUI.Test.ServiceTest
             // Arrange
             var expectedUser = new UserClient
             {
-                IdUser = 1,
+                IdUser = Guid.NewGuid(),
                 Name = "Test User",
                 Username = "testuser",
                 Password = "hashedpassword"
@@ -401,12 +401,12 @@ namespace MAUIClientUI.Test.ServiceTest
         /// Helper method to create a LoginConnectionServices instance with a mocked HttpClient.
         /// Since ServicesClient creates its own HttpClient, we need to use reflection to inject our mock.
         /// </summary>
-        private LoginServices CreateLoginServiceWithMockedHttpClient(HttpClient mockHttpClient)
+        private UserServices CreateLoginServiceWithMockedHttpClient(HttpClient mockHttpClient)
         {
-            var service = new LoginServices("/api/user");
+            var service = new UserServices("/api/user");
 
             // Use reflection to set the mocked HttpClient
-            var httpClientField = typeof(LoginServices)
+            var httpClientField = typeof(UserServices)
                 .BaseType
                 ?.GetField("_httpClient", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 

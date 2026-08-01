@@ -28,7 +28,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
         private const string TEST_USER_NAME = "E2E Test User";
 
         private string _uniqueTestUsername;
-        private LoginServices _userService;
+        private UserServices _userService;
         private readonly HttpClient _httpClient;
 
         public EndToEndLoginServicesTest()
@@ -40,7 +40,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
 
             // Generate unique username to avoid conflicts
             _uniqueTestUsername = $"{TEST_USERNAME_PREFIX}{Guid.NewGuid().ToString().Substring(0, 8)}";
-            _userService = new LoginServices("/api/user");
+            _userService = new UserServices("/api/user");
         }
 
         public async Task InitializeAsync()
@@ -92,7 +92,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
             Assert.NotNull(result.Data);
             Assert.Equal(registrationData.Name, result.Data.Name);
             Assert.Equal(registrationData.Username, result.Data.Username);
-            Assert.True(result.Data.IdUser > 0, "User should have been assigned an ID");
+            Assert.NotEqual(Guid.Empty, result.Data.IdUser);
         }
 
         [Fact]
@@ -209,7 +209,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
             Assert.True(registerResult.IsSuccess, $"Registration failed: {registerResult.ErrorMessage}");
             Assert.NotNull(registerResult.Data);
             var userId = registerResult.Data.IdUser;
-            Assert.True(userId > 0, "User ID should be positive");
+            Assert.NotEqual(Guid.Empty, userId);
 
             // Act - Step 2: Login with newly created credentials
             var loginResult = await _userService.Login(testUsername, testPassword);
@@ -217,7 +217,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
             // Assert - Login
             Assert.True(loginResult.IsSuccess, $"Login failed: {loginResult.ErrorMessage}");
             Assert.NotNull(loginResult.Data);
-            Assert.IsType<int>(loginResult.Data);
+            Assert.IsType<Guid>(loginResult.Data);
         }
 
         [Fact]
@@ -368,9 +368,9 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
         /// <summary>
         /// Helper to inject real HttpClient into the service for actual server calls
         /// </summary>
-        private void InjectHttpClient(LoginServices service, HttpClient httpClient)
+        private void InjectHttpClient(UserServices service, HttpClient httpClient)
         {
-            var httpClientField = typeof(LoginServices)
+            var httpClientField = typeof(UserServices)
                 .BaseType
                 ?.GetField("_httpClient", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 

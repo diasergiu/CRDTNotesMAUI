@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace DatabaseLibrary.Migrations.DbContextServerMigrations
+namespace DatabaseLibrary.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreation : Migration
+    public partial class nopassword : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -14,9 +15,7 @@ namespace DatabaseLibrary.Migrations.DbContextServerMigrations
                 name: "Devices",
                 columns: table => new
                 {
-                    IdDevice = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    IdUser = table.Column<int>(type: "INTEGER", nullable: false)
+                    IdDevice = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -27,14 +26,11 @@ namespace DatabaseLibrary.Migrations.DbContextServerMigrations
                 name: "Notes",
                 columns: table => new
                 {
-                    IdNote = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                    IdNote = table.Column<Guid>(type: "TEXT", nullable: false),
                     Title = table.Column<string>(type: "TEXT", nullable: false),
                     Content = table.Column<string>(type: "TEXT", nullable: false),
                     CreationDate = table.Column<string>(type: "TEXT", nullable: false, defaultValueSql: "datetime('now')"),
                     LastUpdate = table.Column<string>(type: "TEXT", nullable: false, defaultValueSql: "datetime('now')"),
-                    HasPassword = table.Column<bool>(type: "INTEGER", nullable: false),
-                    PasswordNote = table.Column<string>(type: "TEXT", nullable: false),
                     DirtyFlagChangesMade = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
@@ -46,8 +42,7 @@ namespace DatabaseLibrary.Migrations.DbContextServerMigrations
                 name: "User",
                 columns: table => new
                 {
-                    IdUser = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                    IdUser = table.Column<Guid>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Username = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
                     Password = table.Column<string>(type: "TEXT", nullable: false)
@@ -61,8 +56,8 @@ namespace DatabaseLibrary.Migrations.DbContextServerMigrations
                 name: "Note_User",
                 columns: table => new
                 {
-                    IdUser = table.Column<int>(type: "INTEGER", nullable: false),
-                    IdNote = table.Column<int>(type: "INTEGER", nullable: false)
+                    IdUser = table.Column<Guid>(type: "TEXT", nullable: false),
+                    IdNote = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -87,9 +82,9 @@ namespace DatabaseLibrary.Migrations.DbContextServerMigrations
                 {
                     IdSync = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    IdNote = table.Column<int>(type: "INTEGER", nullable: false),
-                    IdDevice = table.Column<int>(type: "INTEGER", nullable: false),
-                    IdUser = table.Column<int>(type: "INTEGER", nullable: false),
+                    IdNote = table.Column<Guid>(type: "TEXT", nullable: false),
+                    IdDevice = table.Column<Guid>(type: "TEXT", nullable: false),
+                    IdUser = table.Column<Guid>(type: "TEXT", nullable: false),
                     Operation = table.Column<string>(type: "TEXT", nullable: false),
                     ContentChanges = table.Column<string>(type: "TEXT", nullable: false),
                     LastUpdate = table.Column<string>(type: "TEXT", nullable: false)
@@ -121,8 +116,8 @@ namespace DatabaseLibrary.Migrations.DbContextServerMigrations
                 name: "User_Devices",
                 columns: table => new
                 {
-                    IdUser = table.Column<int>(type: "INTEGER", nullable: false),
-                    IdDevice = table.Column<int>(type: "INTEGER", nullable: false)
+                    IdUser = table.Column<Guid>(type: "TEXT", nullable: false),
+                    IdDevice = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {

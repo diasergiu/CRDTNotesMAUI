@@ -10,7 +10,7 @@ namespace DatabaseLibrary.Entities.Client
     public class UserClient : IUser
     {
         [Key]
-        public int IdUser { get; set; }
+        public Guid IdUser { get; set; }
         public string Name { get; set; }
         [Required]
         [StringLength(50)]

@@ -10,8 +10,8 @@ namespace DatabaseLibrary.ResponsBody
     {
         public string? message { get; set; }
         public bool? success { get; set; }
-        public int IdUser { get; set; }
-        public List<ISyncQueue> ChangesToMake { get; set; }
+        public Guid IdUser { get; set; }
 
+        public List<ISyncQueue> ChangesToMake { get; set; }
     }
 }

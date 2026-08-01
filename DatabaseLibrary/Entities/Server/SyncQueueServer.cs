@@ -12,11 +12,11 @@ namespace DatabaseLibrary.Entities.Server
         [Key]
         public int IdSync { get; set; }
         [ForeignKey("Note")]
-        public int IdNote { get; set; }
+        public Guid IdNote { get; set; }
         [ForeignKey("Device")]
-        public int IdDevice { get; set; }
+        public Guid IdDevice { get; set; }
         [ForeignKey("User")]
-        public int IdUser { get; set; }
+        public Guid IdUser { get; set; }
         public string Operation { get; set; }
         public string ContentChanges { get; set; }
         public string LastUpdate { get; set; }

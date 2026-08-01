@@ -14,11 +14,11 @@ namespace DatabaseLibrary.Entities.Server
         //[Key]
         //[Column(Order = 0)]
         //[ForeignKey("User")]
-        public int IdUser { get; set; }
+        public Guid IdUser { get; set; }
         //[Key]
         //[Column(Order = 1)]
         //[ForeignKey("Note")]
-        public int IdNote { get; set; }
+        public Guid IdNote { get; set; }
         public UserServer? User { get; set; }
         public NoteServer? Note { get; set; }
     }

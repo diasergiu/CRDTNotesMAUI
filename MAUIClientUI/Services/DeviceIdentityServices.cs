@@ -5,41 +5,49 @@ namespace MAUIClientUI.Services
     // (s)not a service not one that communicates with the server
     public class DeviceIdentityService
     {
-        private const string DeviceIdKey = "device_id";
+        private static string DeviceIdKey = "device_id";
 
         /// <summary>
         /// Get or create a unique device ID for this client
         /// </summary>
         /// // this should change to string and the Id device should be string
-        public static int GetDeviceId()
+        public static Guid GetDeviceId()
         {
-            var deviceId = Preferences.Get(DeviceIdKey, string.Empty);
+            string deviceIdString = Preferences.Get(DeviceIdKey, string.Empty);
+            Guid deviceId = Guid.Empty;
 
-            if (string.IsNullOrEmpty(deviceId))
+            if (string.IsNullOrEmpty(deviceIdString))
             {
                 // Generate new device ID on first run
-                deviceId = Guid.NewGuid().ToString();
-                Preferences.Set(DeviceIdKey, deviceId);
+                deviceId = Guid.NewGuid();     
+                Preferences.Set(DeviceIdKey, deviceId.ToString());
             }
-
-            //return int.Parse(deviceId);
-            return 1;
+            else
+            {
+                Guid.TryParse(deviceIdString, out deviceId);
+            }
+            return deviceId;
         }
 
         /// <summary>
         /// Get current user ID from login session
         /// </summary>
-        public static int GetCurrentUserId()
+        public static Guid GetCurrentUserId()
         {
-            return Preferences.Get("user_id", -1);
+            string userIdString = Preferences.Get("user_id", string.Empty);
+            if (Guid.TryParse(userIdString, out Guid userId))
+            {
+                return userId;
+            }
+            return Guid.Empty;
         }
 
         /// <summary>
         /// Store user ID after login
         /// </summary>
-        public static void SetCurrentUserId(int userId)
+        public static void SetCurrentUserId(Guid userId)
         {
-            Preferences.Set("user_id", userId);
+            Preferences.Set("user_id", userId.ToString());
         }
 
         /// <summary>

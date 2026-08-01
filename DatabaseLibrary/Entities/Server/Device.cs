@@ -9,9 +9,7 @@ namespace DatabaseLibrary.Entities.Server
     public class Device
     {
         [Key]
-        public int IdDevice { get; set; }
-        [ForeignKey("User")]
-        public int IdUser { get; set; }
+        public Guid IdDevice { get; set; }
 
         public List<User_Device>? UserDevices { get; set; }
     }

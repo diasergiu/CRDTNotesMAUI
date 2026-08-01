@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 using DatabaseLibrary.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace DatabaseLibrary.Entities.Client
 {
@@ -13,13 +14,13 @@ namespace DatabaseLibrary.Entities.Client
         //[ForeignKey("User")]
         //public int IdOwner { get; set; }
         [Key]
-        public int IdNote { get; set; }
+        public Guid IdNote { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
         public string CreationDate { get; set; }
         public string LastUpdate { get; set; }
-        public bool HasPassword { get; set; }
-        public string PasswordNote { get; set; }
+
+        public int version { get; set; }
         public bool DirtyFlagChangesMade { get; set; }
         public List<Note_UserClient>? NoteUser { get; set; }
     }

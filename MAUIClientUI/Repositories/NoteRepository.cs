@@ -16,6 +16,12 @@ namespace MAUIClientUI.Repositories
             _dbContextUser = dbContextUser;
         }
 
+        public List<NoteClient> GetNoteFromUser(Guid idUser)
+        {
+            //return _dbContextUser.Notes.Where(n => n.NoteUser.Any(nu => nu.IdUser == idUser)).ToList();
+            return _dbContextUser.Notes.ToList();
+        }
+
         public List<SyncQueueClient> getAllChanges(UserClient user)
         {
             List<SyncQueueClient> changesMade =
@@ -36,6 +42,8 @@ namespace MAUIClientUI.Repositories
         {
             if (noteClients == null || noteClients.Count == 0)
                 return;
+
+            _dbContextUser.ChangeTracker.Clear();
 
             // Get all existing note IDs from the database
             var existingNoteIds = _dbContextUser.Notes
@@ -97,6 +105,7 @@ namespace MAUIClientUI.Repositories
 
         public void updateNote(NoteClient note) 
         {
+            _dbContextUser.ChangeTracker.Clear();
             _dbContextUser.Notes.Update(note);
             _dbContextUser.SaveChanges();
 
@@ -104,7 +113,15 @@ namespace MAUIClientUI.Repositories
         }
         public void createNote(NoteClient note)
         {
+            _dbContextUser.ChangeTracker.Clear();
             _dbContextUser.Notes.Add(note);
+            _dbContextUser.SaveChanges();
+        }
+
+        public void deleteNote(NoteClient note)
+        {
+            _dbContextUser.ChangeTracker.Clear();
+            _dbContextUser.Notes.Remove(note);
             _dbContextUser.SaveChanges();
         }
 

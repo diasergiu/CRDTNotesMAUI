@@ -40,7 +40,7 @@ namespace Server.Controllers
             else
             {
                 // Authentication failed, return error as JSON
-                return Ok(new
+                return Unauthorized(new
                 {
                     success = false,
                     message = "Invalid username or password."
@@ -159,7 +159,7 @@ namespace Server.Controllers
         }
 
         [HttpDelete()]
-        public async Task DeleteUserById(int idUser)
+        public async Task DeleteUserById(Guid idUser)
         {
             _context.Users.Remove(new UserServer { IdUser = idUser });
             await _context.SaveChangesAsync();

@@ -1,0 +1,43 @@
+﻿using DatabaseLibrary.Entities;
+using DatabaseLibrary.Entities.Client;
+using DatabaseLibrary.RequestBody.EntityMappers;
+using DatabaseLibrary.WrapperClasses;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace MAUIClientUI.Services
+{
+    public class DummyNoteServices : INoteServices
+    {
+        public async Task<ApiResultData<List<ISyncQueue>>> SendAndReceiveNoteUpdates(List<SyncQueueClient> listChanges, UserClient user)
+        {
+            return ApiResultData<List<ISyncQueue>>.Success(new List<ISyncQueue>());
+        }
+
+        public async Task<ApiResult> SendChangesToServer(List<NoteClient> noteClient)
+        {
+            return ApiResult.Success();
+        }
+
+        public async Task<ApiResultData<List<NoteClient>>> GetAllNotesFromUser(Guid IdUser)
+        {
+            return ApiResultData<List<NoteClient>>.Success(new List<NoteClient>());
+        }
+
+        public async Task<ApiResult> CreateNewNote(NoteClient currentNote)
+        {
+            return ApiResult.Success();
+        }
+
+        public async Task<NoteConflictResult> UpdateNote(NoteClient updatedNote)
+        {
+            return NoteConflictResult.Success(EntityMapper.MapNoteClientToNoteServer(updatedNote));
+        }
+
+        public async Task<ApiResult> DeleteNote(Guid noteId)
+        {
+            return ApiResult.Success();
+        }
+    }
+}

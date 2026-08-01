@@ -1,28 +1,32 @@
-using MAUIClientUI.Services;
-using MAUIClientUI.Repositories;
 using DatabaseLibrary.Entities;
+using DatabaseLibrary.Entities.Client;
+using DatabaseLibrary.WrapperClasses;
+using MAUIClientUI.Repositories;
+using MAUIClientUI.Services;
+using SlackAPI;
 using System;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-using DatabaseLibrary.Entities.Client;
-using DatabaseLibrary.WrapperClasses;
 
 namespace MAUIClientUI.UserInterface;
 
 public partial class LoginPopup : ContentPage
 {
-    private LoginServices _loginServices; // might delete this
+    private UserServices _loginServices; // might delete this
     //private ClientServices _clientServices;
     private NoteServices _noteServices;
     private NoteRepository _noteRepository;
+    private readonly IAuthenticationService _authService;
 
     public LoginPopup()
     {
         InitializeComponent();
         _noteRepository = IPlatformApplication.Current.Services.GetService<NoteRepository>(); // should DbContext be singleton
-        _loginServices = new LoginServices("/api/user");
+        _authService = IPlatformApplication.Current.Services.GetService<IAuthenticationService>();
+        _loginServices = new UserServices("/api/user");
         _noteServices = new NoteServices("/api/notes");
+
     }
 
     private async void OnLoginSubmitClicked(object sender, EventArgs e)
@@ -67,18 +71,14 @@ public partial class LoginPopup : ContentPage
             // update notes based on changes on the server
 
             //_noteRepository.UpdateListNotes(getServerChanges.Data);
+            _authService.OnLoginSuccess(result.Data.IdUser);
+
             // Login successful - close the popup
 
-            // just take notes from server
 
-            var notesResult = await _noteServices.GetAllNotesFromUser(result.Data.IdUser);
-            if (notesResult.IsSuccess)
-            {
-                // Update the local repository with the notes from the server
-                _noteRepository.UpdateListNotes(notesResult.Data);
-            }
 
             ShowStatus("Login successful!", false);
+            
             await Task.Delay(500); // Brief delay to show success message
             await Navigation.PopModalAsync();
         }

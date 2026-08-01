@@ -63,7 +63,7 @@ namespace DatabaseLibrary.WrapperClasses
         //    }
         //}
 
-        public static void saveIdUsertoFile(int userId)
+        public static void saveIdUsertoFile(Guid userId)
         {
             string path = "LastUser.txt";
             using (StreamWriter writer = new StreamWriter(path));
@@ -73,7 +73,7 @@ namespace DatabaseLibrary.WrapperClasses
             }
         }
 
-        public static int readIdUserFromFile()
+        public static Guid readIdUserFromFile()
         {
             string path = "LastUser.txt"; // where the file is located ??
             if (File.Exists(path))
@@ -81,21 +81,26 @@ namespace DatabaseLibrary.WrapperClasses
                 using (StreamReader reader = new StreamReader(path))
                 {
                     string content = reader.ReadToEnd();
-                    if (int.TryParse(content, out int userId))
+                    if (Guid.TryParse(content, out Guid userId))
                     {
                         return userId;
                     }
                 }
             }
-            return -1; // Return -1 if the file does not exist or the content is invalid
+            return Guid.Empty; // Return Guid.Empty if the file does not exist or the content is invalid
         }
 
-        public static int LocalUser { get; set; }
+        public static Guid LocalUser { get; set; }
 
-        public static int localUser(int user)
+        public static Guid localUser(Guid user)
         {
             LocalUser = user;
             return LocalUser;
+        }
+
+        public static void logout()
+        {
+            LocalUser = Guid.Empty;
         }
     }
 }

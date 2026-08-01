@@ -87,7 +87,7 @@ public partial class Program
         });
 
         // Get user by ID
-        app.MapGet("/api/users/{id}", async (int id, DbContextServer db) =>
+        app.MapGet("/api/users/{id}", async (Guid id, DbContextServer db) =>
         {
             var user = await db.Users.FindAsync(id);
             return user is not null ? Results.Ok(user) : Results.NotFound();

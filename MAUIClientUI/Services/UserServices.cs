@@ -11,11 +11,11 @@ using System.Text;
 namespace MAUIClientUI.Services
 {
 
-    public class LoginServices : ServicesClient
+    public class UserServices : ServicesClient
     {
         private readonly ClientServices _noteServices;
 
-        public LoginServices(string baseUrl) : base(baseUrl) { }
+        public UserServices(string baseUrl) : base(baseUrl) { }
 
 
         // old function that returned a list of ISyncQueue, Synqing data is dose outsite of login now

@@ -6,7 +6,7 @@ namespace DatabaseLibrary.Entities
 {
     public interface INote_User
     {
-        public int IdNote { get; set; }
-        public int IdUser { get; set; }
+        public Guid IdNote { get; set; }
+        public Guid IdUser { get; set; }
     }
 }

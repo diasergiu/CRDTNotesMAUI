@@ -6,19 +6,56 @@ using DatabaseLibrary.RequestBody.EntityMappers;
 using DatabaseLibrary.ResponsBody;
 using DatabaseLibrary.WrapperClasses;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.Net.Http.Json;
 using System.Text;
 
 namespace MAUIClientUI.Services
 {
-    public class NoteServices : ServicesClient
+    public class NoteServices : ServicesClient, INoteServices
     {
         public NoteServices(string URLModifier) : base(URLModifier)
         {
             //_baseURL = 
 
+        }
+
+        public async Task<ApiResult> SendChangesToServer(List<NoteClient> noteClient)
+        {
+            try
+            {
+                var request = new HttpRequestMessage(HttpMethod.Post, $"{_baseURL}/SendChangesToServer");
+                request.Headers.Add("X-User-Id", UserDevice.LocalUser.ToString());  // ← Add header
+
+                var json = JsonConvert.SerializeObject(noteClient);
+                request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.SendAsync(request);
+                if (response.IsSuccessStatusCode)
+                {
+                    return ApiResult.Success();
+                }
+                else
+                {
+                    string errorContent = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Server returned error: {response.StatusCode} - {errorContent}");
+                    return ApiResult.Failure($"Server returned error: {response.StatusCode}", ApiErrorType.ServerError);
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"HTTP Error sending notes to server: {ex.Message}");
+                return ApiResult.Failure($"Connection error: {ex.Message}", ApiErrorType.ConnectionError);
+            }
+            catch (TaskCanceledException)
+            {
+                Console.WriteLine("Request timeout");
+                return ApiResult.Failure("Request timeout. The server is not responding.", ApiErrorType.Timeout);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error sending notes to server: {ex.Message}");
+                return ApiResult.Failure($"Error sending notes to server: {ex.Message}", ApiErrorType.Unknown);
+            }
         }
 
         public async Task<ApiResultData<List<ISyncQueue>>> SendAndReceiveNoteUpdates(List<SyncQueueClient> listChanges, UserClient user)
@@ -77,7 +114,7 @@ namespace MAUIClientUI.Services
             }
         }
 
-        public async void SaveChangesIfOnline(SyncQueueClient changesMade, int DeviceId)
+        public async void SaveChangesIfOnline(SyncQueueClient changesMade, Guid DeviceId)
         {
 
             string url = _baseURL + "SaveOrUpdateNote";
@@ -91,7 +128,7 @@ namespace MAUIClientUI.Services
             }
         }
 
-        public async Task<ApiResultData<List<NoteClient>>> GetAllNotesFromUser(int IdUser)
+        public async Task<ApiResultData<List<NoteClient>>> GetAllNotesFromUser(Guid IdUser)
         {
             try
             {
@@ -137,7 +174,7 @@ namespace MAUIClientUI.Services
             }
         }
 
-        public async Task<ApiResultData<SyncQueueClient>> getNoteChangesFromServer(int IdNote)
+        public async Task<ApiResultData<SyncQueueClient>> getNoteChangesFromServer(Guid IdNote)
         {
             try
             {
@@ -179,7 +216,7 @@ namespace MAUIClientUI.Services
             }
         }
 
-        public async Task<ApiResultData<int>> CreateNewNote(NoteClient currentNote)
+        public async Task<ApiResult> CreateNewNote(NoteClient currentNote)
         {
             try
             {
@@ -196,49 +233,15 @@ namespace MAUIClientUI.Services
                     var noteResponse = await response.Content.ReadFromJsonAsync<CreateNoteResponse>();
                     if (noteResponse?.success == true)
                     {
-                        return ApiResultData<int>.Success(noteResponse.data.id);
+                        return ApiResult.Success();
                     }
-                    return ApiResultData<int>.Failure("Server returned unexpected response.", ApiErrorType.ServerError);
+                    return ApiResult.Failure("Server returned unexpected response.", ApiErrorType.ServerError);
                 }
                 else
                 {
                     string errorContent = await response.Content.ReadAsStringAsync();
                     Console.WriteLine($"Server returned error: {response.StatusCode} - {errorContent}");
-                    return ApiResultData<int>.Failure($"Server returned error: {response.StatusCode}", ApiErrorType.ServerError);
-                }
-            }
-            catch (HttpRequestException ex)
-            {
-                return ApiResultData<int>.Failure($"Connection error: {ex.Message}", ApiErrorType.ConnectionError);
-            }
-            catch (TaskCanceledException)
-            {
-                return ApiResultData<int>.Failure("Request timeout. The server is not responding.", ApiErrorType.Timeout);
-            }
-            catch (Exception ex)
-            {
-                return ApiResultData<int>.Failure($"Error creating note: {ex.Message}", ApiErrorType.Unknown);
-            }
-        }
-
-        public async Task<ApiResult> UpdateNote(NoteClient updatedNote)
-        {
-            try
-            {
-                string url = $"{_baseURL}/{updatedNote.IdNote}";
-                var json = JsonConvert.SerializeObject(updatedNote);
-
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var response = await _httpClient.PutAsync(url, content);
-                if (response.IsSuccessStatusCode)
-                {
-                    return ApiResult.Success();
-                }
-                else
-                {
-                    string errorContent = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Failed to update note: {response.StatusCode} - {errorContent}");
-                    return ApiResult.Failure($"Failed to update note: {response.ReasonPhrase}", ApiErrorType.ServerError);
+                    return ApiResult.Failure($"Server returned error: {response.StatusCode}", ApiErrorType.ServerError);
                 }
             }
             catch (HttpRequestException ex)
@@ -255,6 +258,94 @@ namespace MAUIClientUI.Services
             }
         }
 
+        /// <summary>
+        /// Updates a note on server with optimistic concurrency control.
+        /// Handles 409 Conflict responses by parsing server's current note version.
+        /// </summary>
+        public async Task<NoteConflictResult> UpdateNote(NoteClient updatedNote)
+        {
+            try
+            {
+                string url = $"{_baseURL}/{updatedNote.IdNote}";
+                var json = JsonConvert.SerializeObject(updatedNote);
+
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await _httpClient.PutAsync(url, content);
+             
+                // Parse the conflict response to get server's current version
+                string responseContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Server response: {responseContent}");
+
+                // Try to deserialize the UpdateNoteWithVersionResult from server
+                var responseData = JsonConvert.DeserializeObject<NoteUpdateResponse>(responseContent);
+
+                if (response.IsSuccessStatusCode && responseData?.ServerNote != null)
+                {
+                    // Success - update went through
+                    if (responseData.IsSuccess)
+                    {
+                        return NoteConflictResult.Success(responseData.ServerNote);
+                    }
+                    else
+                    {
+                        return NoteConflictResult.Conflict(responseData.ServerNote, updatedNote.version);
+                    }
+                }
+
+                    // Other error status
+                    string errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Failed to update note: {response.StatusCode} - {errorContent}");
+                return NoteConflictResult.Error(
+                    $"Failed to update note: {response.ReasonPhrase}",
+                    ApiErrorType.ServerError);
+            }
+            catch (HttpRequestException ex)
+            {
+                return NoteConflictResult.Error($"Connection error: {ex.Message}", ApiErrorType.ConnectionError);
+            }
+            catch (TaskCanceledException)
+            {
+                return NoteConflictResult.Error(
+                    "Request timeout. The server is not responding.",
+                    ApiErrorType.Timeout);
+            }
+            catch (Exception ex)
+            {
+                return NoteConflictResult.Error($"Error updating note: {ex.Message}", ApiErrorType.Unknown);
+            }
+        }
+
+        public async Task<ApiResult> DeleteNote(Guid noteId)
+        {
+            try
+            {
+                string url = $"{_baseURL}/{noteId}";
+                var response = await _httpClient.DeleteAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    return ApiResult.Success();
+                }
+                else
+                {
+                    string errorContent = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Failed to delete note: {response.StatusCode} - {errorContent}");
+                    return ApiResult.Failure($"Failed to delete note: {response.ReasonPhrase}", ApiErrorType.ServerError);
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                return ApiResult.Failure($"Connection error: {ex.Message}", ApiErrorType.ConnectionError);
+            }
+            catch (TaskCanceledException)
+            {
+                return ApiResult.Failure("Request timeout. The server is not responding.", ApiErrorType.Timeout);
+            }
+            catch (Exception ex)
+            {
+                return ApiResult.Failure($"Error deleting note: {ex.Message}", ApiErrorType.Unknown);
+            }
+        }
+
         private class CreateNoteResponse
         {
             public bool success { get; set; }
@@ -263,7 +354,7 @@ namespace MAUIClientUI.Services
 
         private class CreateNoteData
         {
-            public int id { get; set; }
+            public Guid id { get; set; }
         }
 
         // Response wrapper for GetAllNotesFromUser endpoint
@@ -272,6 +363,21 @@ namespace MAUIClientUI.Services
         {
             public bool success { get; set; }
             public List<NoteClient> data { get; set; }
+        }
+
+        public class NoteUpdateResponse
+        {
+            [JsonProperty("isSuccess")]
+            public bool IsSuccess { get; set; }
+
+            [JsonProperty("message")]
+            public string Message { get; set; }
+
+            [JsonProperty("serverNote")]
+            public NoteServer ServerNote { get; set; }
+
+            [JsonProperty("conflictingServerNote")]
+            public NoteServer ConflictingServerNote { get; set; }
         }
     }
 }

@@ -1,12 +1,13 @@
 <Solution>
   <Folder Name="/Solution Items/">
+    <File Path="Makefile" />
     <File Path="QuestionsRequirements.txt" />
   </Folder>
+  <Project Path="DatabaseLibrary/DatabaseLibrary.csproj" />
   <Project Path="MAUIClientUI.Test/MAUIClientUI.Test.csproj" Id="80a36fc0-eb2a-4b13-a696-63dd1ab43a9c" />
   <Project Path="MAUIClientUI/MAUIClientUI.csproj">
     <Deploy Solution="Debug|*" />
   </Project>
-  <Project Path="DatabaseLibrary/DatabaseLibrary.csproj" />
   <Project Path="Server.Test/Server.Test.csproj" Id="a32492ad-8a06-4e0d-9ea4-09e6cbaa609f" />
   <Project Path="Server/Server.csproj" Id="3ed61fcf-1e36-4cb4-84da-574121dbb90b" />
 </Solution>

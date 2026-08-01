@@ -13,9 +13,9 @@ namespace DatabaseLibrary.Entities.Client
         [Key]
         public int IdSync { get; set; }
         [ForeignKey("Note")]
-        public int IdNote { get; set; }
+        public Guid IdNote { get; set; }
         //[ForeignKey("User")]
-        public int IdUser { get; set; }
+        public Guid IdUser { get; set; }
         public string Operation { get; set; }
         public string ContentChanges { get; set; }
         public string LastUpdate { get; set; }

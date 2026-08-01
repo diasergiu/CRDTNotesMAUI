@@ -29,12 +29,13 @@ namespace MAUIClientUI
                     var dbServices = sp.GetRequiredService<IDatabaseServices>();
                     return dbServices.GetContext();
                 })
+                .AddScoped<IAuthenticationService, AuthenticationService>()
                 .AddScoped<NoteRepository>()
                 .AddScoped<ClientServices>();
 #if DEBUG
             builder.Logging.AddDebug();
 #endif
-            GetLocalUserFromEnviVariable();
+           // GetLocalUserFromEnviVariable();
             var app = builder.Build();
 
             InitializeDatabase(app.Services, instanceId);
@@ -71,19 +72,19 @@ namespace MAUIClientUI
             }
         }
 
-        private static void GetLocalUserFromEnviVariable()
-        {
-            int user = 1;
-            var envId = Environment.GetEnvironmentVariable("INSTANCE_ID");
-            if (envId != null) { 
-                user = int.Parse(envId);
-            }
-            var args = Environment.GetCommandLineArgs();
-            if (args.Length > 2)
-                user = int.Parse(args[1]);
+        //private static void GetLocalUserFromEnviVariable()
+        //{
+        //    Guid user = Guid.NewGuid();
+        //    var envId = Environment.GetEnvironmentVariable("INSTANCE_ID");
+        //    if (envId != null) { 
+        //        Guid.TryParse(envId, out user);
+        //    }
+        //    var args = Environment.GetCommandLineArgs();
+        //    if (args.Length > 2)
+        //        Guid.TryParse(args[1], out user);
 
-            // defautl
-            UserDevice.localUser(user);
-        }
+        //    // defautl
+        //    UserDevice.localUser(user);
+        //}
     }
 }

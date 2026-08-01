@@ -8,7 +8,7 @@ namespace DatabaseLibrary.Entities
     // this is what AI sugested instead of inheritance
     public interface IUser
     {
-        public int IdUser { get; set; }
+        public Guid IdUser { get; set; }
         public string Name { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }

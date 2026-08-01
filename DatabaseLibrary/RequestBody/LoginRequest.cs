@@ -12,10 +12,10 @@ namespace DatabaseLibrary.RequestBody
         //public string Username { get; set; }
         //public string Password { get; set; }
         public UserClient user { get;set; }
-        public int IdDevice { get; set; }
+        public Guid IdDevice { get; set; }
         public List<SyncQueueClient> ChangesMade { get; set; } = new();
 
-        public LoginRequest(UserClient user, int deviceId, List<SyncQueueClient> changesMade)
+        public LoginRequest(UserClient user, Guid deviceId, List<SyncQueueClient> changesMade)
         {
             this.user = user;
             IdDevice = deviceId;

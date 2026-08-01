@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace DatabaseLibrary.Migrations
+namespace DatabaseLibrary.Migrations.DbContextClientMigrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -14,14 +15,11 @@ namespace DatabaseLibrary.Migrations
                 name: "Note",
                 columns: table => new
                 {
-                    IdNote = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                    IdNote = table.Column<Guid>(type: "TEXT", nullable: false),
                     Title = table.Column<string>(type: "TEXT", nullable: false),
                     Content = table.Column<string>(type: "TEXT", nullable: false),
                     CreationDate = table.Column<string>(type: "TEXT", nullable: false),
                     LastUpdate = table.Column<string>(type: "TEXT", nullable: false),
-                    HasPassword = table.Column<bool>(type: "INTEGER", nullable: false),
-                    PasswordNote = table.Column<string>(type: "TEXT", nullable: false),
                     DirtyFlagChangesMade = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
@@ -33,8 +31,7 @@ namespace DatabaseLibrary.Migrations
                 name: "User",
                 columns: table => new
                 {
-                    IdUser = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                    IdUser = table.Column<Guid>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Username = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
                     Password = table.Column<string>(type: "TEXT", nullable: false)
@@ -50,8 +47,8 @@ namespace DatabaseLibrary.Migrations
                 {
                     IdSync = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    IdNote = table.Column<int>(type: "INTEGER", nullable: false),
-                    IdUser = table.Column<int>(type: "INTEGER", nullable: false),
+                    IdNote = table.Column<Guid>(type: "TEXT", nullable: false),
+                    IdUser = table.Column<Guid>(type: "TEXT", nullable: false),
                     Operation = table.Column<string>(type: "TEXT", nullable: false),
                     ContentChanges = table.Column<string>(type: "TEXT", nullable: false),
                     LastUpdate = table.Column<string>(type: "TEXT", nullable: false)
@@ -71,8 +68,8 @@ namespace DatabaseLibrary.Migrations
                 name: "Note_User",
                 columns: table => new
                 {
-                    IdUser = table.Column<int>(type: "INTEGER", nullable: false),
-                    IdNote = table.Column<int>(type: "INTEGER", nullable: false)
+                    IdUser = table.Column<Guid>(type: "TEXT", nullable: false),
+                    IdNote = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {

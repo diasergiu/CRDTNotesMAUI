@@ -11,14 +11,14 @@ namespace MAUIClientUI.UserInterface;
 
 public partial class RegisterPopup : ContentPage
 {
-    private readonly LoginServices _registerServices;
+    private readonly UserServices _registerServices;
     private readonly NoteRepository _noteRepository;
 
     public RegisterPopup()
     {
         InitializeComponent();
         _noteRepository = IPlatformApplication.Current.Services.GetService<NoteRepository>();
-        _registerServices = new LoginServices("/api/user");
+        _registerServices = new UserServices("/api/user");
         
     }
 
@@ -115,7 +115,7 @@ public partial class RegisterPopup : ContentPage
 
     private class UserInfo
     {
-        public int IdUser { get; set; }
+        public Guid IdUser { get; set; }
         public string Name { get; set; }
         public string Username { get; set; }
     }

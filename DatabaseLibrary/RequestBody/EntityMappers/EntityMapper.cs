@@ -1,5 +1,6 @@
 ﻿using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.Entities.Server;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,15 +11,16 @@ namespace DatabaseLibrary.RequestBody.EntityMappers
     {
         public static NoteServer MapNoteClientToNoteServer(NoteClient noteClient)
         {
+
             return new NoteServer
             {
-                //IdNote = noteClient.IdNote,
+                IdNote = noteClient.IdNote,
                 Title = noteClient.Title,
                 Content = noteClient.Content,
                 LastUpdate = noteClient.LastUpdate,
-                DirtyFlagChangesMade = noteClient.DirtyFlagChangesMade,
-                HasPassword = noteClient.HasPassword,
-                PasswordNote = noteClient.PasswordNote
+                CreationDate = noteClient.CreationDate,
+                version = noteClient.version,
+                DirtyFlagChangesMade = noteClient.DirtyFlagChangesMade
             };
         }
 
@@ -26,14 +28,14 @@ namespace DatabaseLibrary.RequestBody.EntityMappers
         {
             return new NoteClient
             {
+                //IdNote = clientIdNote,
                 IdNote = noteServer.IdNote,
                 Title = noteServer.Title,
                 CreationDate = noteServer.CreationDate,
                 Content = noteServer.Content,
                 LastUpdate = noteServer.LastUpdate,
-                DirtyFlagChangesMade = noteServer.DirtyFlagChangesMade,
-                HasPassword = noteServer.HasPassword,
-                PasswordNote = noteServer.PasswordNote
+                version = noteServer.version,
+                DirtyFlagChangesMade = noteServer.DirtyFlagChangesMade
             };
         }
 
@@ -60,7 +62,7 @@ namespace DatabaseLibrary.RequestBody.EntityMappers
         }
 
 
-        public static SyncQueueServer MapSyncQueueClientToSyncQueueServer(SyncQueueClient syncQueueClient, int IdDevice)
+        public static SyncQueueServer MapSyncQueueClientToSyncQueueServer(SyncQueueClient syncQueueClient, Guid IdDevice)
         {
             return new SyncQueueServer
             {

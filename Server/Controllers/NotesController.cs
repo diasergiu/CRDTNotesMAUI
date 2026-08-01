@@ -2,6 +2,7 @@
 using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.Entities.Server;
 using DatabaseLibrary.RequestBody.EntityMappers;
+using DatabaseLibrary.WrapperClasses;
 using Microsoft.AspNetCore.Mvc;
 using Server.ServeRepositories;
 using System.Threading.Channels;
@@ -28,7 +29,7 @@ namespace Server.Controllers
         }
 
         [HttpGet("getNoteChangesFromServer")] // iActionResult can sent json back to the client (look more into this)
-        public async Task<IActionResult> getNoteChangesFromServer(int IdNote)
+        public async Task<IActionResult> getNoteChangesFromServer(Guid IdNote)
         {
             try
             {
@@ -52,7 +53,7 @@ namespace Server.Controllers
         }
 
         [HttpGet("GetAllNotesFromUser")] // iActionResult can sent json back to the client (look more into this)
-        public async Task<IActionResult> GetAllNotesFromUser(int IdUser)
+        public async Task<IActionResult> GetAllNotesFromUser(Guid IdUser)
         {
             try
             {
@@ -98,24 +99,24 @@ namespace Server.Controllers
 
         //// PUT /api/notes/{id}
         [HttpPut("{id}")]
-        public async Task UpdateNotes(int noteId, [FromBody] NoteServer note)
+        public async Task<UpdateNoteWithVersionResult> UpdateNotes(int noteId, [FromBody] NoteServer note)
         {
-            await _notesRepository.UpdateChanges(note);
+            return await _notesRepository.UpdateChanges(note);
 
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateNote([FromBody] NoteClient changesMade)
         {
-            int idUser = -1;
+            Guid idUser = Guid.Empty;
             try
             {
                 if (Request.Headers.TryGetValue("X-User-Id", out var idUserHeader))
                 {
-                    int.TryParse(idUserHeader, out idUser);
+                    Guid.TryParse(idUserHeader, out idUser);
                 }
 
-                if (idUser == -1)
+                if (idUser == Guid.Empty)
                 {
                     return Unauthorized(new { success = false, message = "Missing user ID" });
                 }
@@ -126,13 +127,75 @@ namespace Server.Controllers
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
             var newNote = await _notesRepository.CreateNote(changesMade, idUser);
-            return Ok(new { success = true, data = new { id = newNote.IdNote } });
-  
+            return Ok(new { success = true });
+
     }
 
-    private int getUserIdFromRequest()
+        [HttpPost("SendChangesToServer")]
+        public async Task<IActionResult> SendChangesToServer([FromBody] List<NoteClient> noteClient)
+        {
+            try
+            {
+                Guid idUser = Guid.Empty;
+
+                if (Request.Headers.TryGetValue("X-User-Id", out var idUserHeader))
+                {
+                    Guid.TryParse(idUserHeader, out idUser);
+                }
+
+                if (idUser == Guid.Empty)
+                {
+                    return Unauthorized(new { success = false, message = "Missing user ID" });
+                }
+
+                await _notesRepository.SaveAllChangesFromClient(ConvertListClientToServer(noteClient), idUser);
+                return Ok(new { success = true, message = "Changes synced successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = $"Error syncing changes: {ex.Message}" });
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteNote(Guid id)
+        {
+            try
+            {
+                Guid idUser = Guid.Empty;
+
+                if (Request.Headers.TryGetValue("X-User-Id", out var idUserHeader))
+                {
+                    Guid.TryParse(idUserHeader, out idUser);
+                }
+
+                if (idUser == Guid.Empty)
+                {
+                    return Unauthorized(new { success = false, message = "Missing user ID" });
+                }
+
+                await _notesRepository.DeleteNote(id, idUser);
+                return Ok(new { success = true, message = "Note deleted successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = $"Error deleting note: {ex.Message}" });
+            }
+        }
+
+        private int getUserIdFromRequest()
         {
             return 0;
+        }
+
+        private List<NoteServer> ConvertListClientToServer( List<NoteClient> list)
+        {
+            List<NoteServer> newList = new List<NoteServer>();
+            foreach(NoteClient note in list)
+            {
+                newList.Add(EntityMapper.MapNoteClientToNoteServer(note));
+            }
+            return newList;
         }
     }
 }
