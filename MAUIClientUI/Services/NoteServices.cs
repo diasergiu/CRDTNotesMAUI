@@ -58,83 +58,85 @@ namespace MAUIClientUI.Services
             }
         }
 
-        public async Task<ApiResultData<List<ISyncQueue>>> SendAndReceiveNoteUpdates(List<SyncQueueClient> listChanges, UserClient user)
-        {
-            try
-            {
-                // Construct relative URL with query parameters
-                string url = _baseURL + "/SyncChanges";
+        //public async Task<ApiResultData<List<ISyncQueue>>> SendAndReceiveNoteUpdates(List<SyncQueueClient> listChanges, UserClient user)
+        //{
+        //    try
+        //    {
+        //        // Construct relative URL with query parameters
+        //        string url = _baseURL + "/SyncChanges";
 
-                // Serialize notes to JSON and create content
-                var requestObject = new LoginRequest(user, DeviceIdentityService.GetDeviceId(), listChanges);
+        //        // Serialize notes to JSON and create content
+        //        var requestObject = new ```````Request(user, DeviceIdentityService.GetDeviceId(), listChanges);
 
-                var json = JsonConvert.SerializeObject(requestObject);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
+        //        var json = JsonConvert.SerializeObject(requestObject);
+        //        var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                // Send POST request with JSON body
-                var response = await _httpClient.PostAsync(url, content);
+        //        // Send POST request with JSON body
+        //        var response = await _httpClient.PostAsync(url, content);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    // Parse the LoginResponse from server
-                    var loginResponse = await response.Content.ReadFromJsonAsync<LoginRespons>();
-                    if (loginResponse?.success == true && loginResponse.ChangesToMake != null)
-                    {
-                        return ApiResultData<List<ISyncQueue>>.Success(loginResponse.ChangesToMake);
-                    }
-                    else
-                    {
-                        return ApiResultData<List<ISyncQueue>>.Failure(
-                            loginResponse?.message ?? "Login failed",
-                            ApiErrorType.ServerError
-                        );
-                    }
-                }
-                else
-                {
-                    string errorContent = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Server returned error: {response.StatusCode} - {errorContent}");
-                    return ApiResultData<List<ISyncQueue>>.Failure($"Server returned error: {response.StatusCode}", ApiErrorType.ServerError);
-                }
-            }
-            catch (HttpRequestException ex)
-            {
-                Console.WriteLine($"HTTP Error sending notes to server: {ex.Message}");
-                return ApiResultData<List<ISyncQueue>>.Failure($"Connection error: {ex.Message}", ApiErrorType.ConnectionError);
-            }
-            catch (TaskCanceledException)
-            {
-                Console.WriteLine("Request timeout");
-                return ApiResultData<List<ISyncQueue>>.Failure("Request timeout. The server is not responding.", ApiErrorType.Timeout);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error sending notes to server: {ex.Message}");
-                return ApiResultData<List<ISyncQueue>>.Failure($"Error sending notes to server: {ex.Message}", ApiErrorType.Unknown);
-            }
-        }
+        //        if (response.IsSuccessStatusCode)
+        //        {
+        //            // Parse the LoginResponse from server
+        //            var loginResponse = await response.Content.ReadFromJsonAsync<LoginRespons>();
+        //            if (loginResponse?.success == true && loginResponse.ChangesToMake != null)
+        //            {
+        //                return ApiResultData<List<ISyncQueue>>.Success(loginResponse.ChangesToMake);
+        //            }
+        //            else
+        //            {
+        //                return ApiResultData<List<ISyncQueue>>.Failure(
+        //                    loginResponse?.message ?? "Login failed",
+        //                    ApiErrorType.ServerError
+        //                );
+        //            }
+        //        }
+        //        else
+        //        {
+        //            string errorContent = await response.Content.ReadAsStringAsync();
+        //            Console.WriteLine($"Server returned error: {response.StatusCode} - {errorContent}");
+        //            return ApiResultData<List<ISyncQueue>>.Failure($"Server returned error: {response.StatusCode}", ApiErrorType.ServerError);
+        //        }
+        //    }
+        //    catch (HttpRequestException ex)
+        //    {
+        //        Console.WriteLine($"HTTP Error sending notes to server: {ex.Message}");
+        //        return ApiResultData<List<ISyncQueue>>.Failure($"Connection error: {ex.Message}", ApiErrorType.ConnectionError);
+        //    }
+        //    catch (TaskCanceledException)
+        //    {
+        //        Console.WriteLine("Request timeout");
+        //        return ApiResultData<List<ISyncQueue>>.Failure("Request timeout. The server is not responding.", ApiErrorType.Timeout);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine($"Error sending notes to server: {ex.Message}");
+        //        return ApiResultData<List<ISyncQueue>>.Failure($"Error sending notes to server: {ex.Message}", ApiErrorType.Unknown);
+        //    }
+        //}
 
-        public async void SaveChangesIfOnline(SyncQueueClient changesMade, Guid DeviceId)
-        {
+        //public async void SaveChangesIfOnline(SyncQueueClient changesMade, Guid DeviceId)
+        //{
 
-            string url = _baseURL + "SaveOrUpdateNote";
-            SyncQueueServer changesFromClient = EntityMapper.MapSyncQueueClientToSyncQueueServer(changesMade, DeviceId);
-            var json = JsonConvert.SerializeObject(changesFromClient);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync(url, content);
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new Exception("Failed to save to server" + response.ReasonPhrase);
-            }
-        }
+        //    string url = _baseURL + "SaveOrUpdateNote";
+        //    SyncQueueServer changesFromClient = EntityMapper.MapSyncQueueClientToSyncQueueServer(changesMade, DeviceId);
+        //    var json = JsonConvert.SerializeObject(changesFromClient);
+        //    var content = new StringContent(json, Encoding.UTF8, "application/json");
+        //    var response = await _httpClient.PostAsync(url, content);
+        //    if (!response.IsSuccessStatusCode)
+        //    {
+        //        throw new Exception("Failed to save to server" + response.ReasonPhrase);
+        //    }
+        //}
 
         public async Task<ApiResultData<List<NoteClient>>> GetAllNotesFromUser(Guid IdUser)
         {
             try
             {
                 // URL is correct - server has [Route("api/[controller]")] so full URL is /api/notes/GetAllNotesFromUser
-                string url = $"{_baseURL}/GetAllNotesFromUser?IdUser={IdUser}";
-                var response = await _httpClient.GetAsync(url);
+                var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseURL}/GetAllNotesFromUser");
+                request.Headers.Add("X-User-Id", UserDevice.LocalUser.ToString());  // ← Add header
+
+                var response = await _httpClient.SendAsync(request);
                 if (response.IsSuccessStatusCode)
                 {
                     // Server returns: { success: true, data: [...notes...] }
@@ -174,45 +176,77 @@ namespace MAUIClientUI.Services
             }
         }
 
-        public async Task<ApiResultData<SyncQueueClient>> getNoteChangesFromServer(Guid IdNote)
+        //public async Task<ApiResultData<SyncQueueClient>> getNoteChangesFromServer(Guid IdNote)
+        //{
+        //    try
+        //    {
+        //        string url = $"{_baseURL}/getServerChangesToNote?IdNode={IdNote}";
+        //        var response = await _httpClient.GetAsync(url);
+        //        if (response.IsSuccessStatusCode)
+        //        {
+        //            var changesFromServer = response.Content.ReadFromJsonAsync<SyncQueueServer>().Result;
+        //            if (changesFromServer != null)
+        //            {
+        //                var mappedChanges = EntityMapper.MapSyncQueueServerToSyncQueueClient(changesFromServer);
+        //                return ApiResultData<SyncQueueClient>.Success(mappedChanges);
+        //            }
+        //            else
+        //            {
+        //                return ApiResultData<SyncQueueClient>.Failure("No changes found for the note.", ApiErrorType.NotFound);
+        //            }
+
+        //        }
+        //        else
+        //        {
+        //            return ApiResultData<SyncQueueClient>.Failure($"Failed to retrieve changes: {response.ReasonPhrase}", ApiErrorType.ServerError);
+        //        }
+        //    }
+        //    catch (HttpRequestException ex)
+        //    {
+        //        Console.WriteLine($"HTTP Error sending notes to server: {ex.Message}");
+        //        return ApiResultData<SyncQueueClient>.Failure($"Connection error: {ex.Message}", ApiErrorType.ConnectionError);
+        //    }
+        //    catch (TaskCanceledException)
+        //    {
+        //        Console.WriteLine("Request timeout");
+        //        return ApiResultData<SyncQueueClient>.Failure("Request timeout. The server is not responding.", ApiErrorType.Timeout);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine($"Error during login: {ex.Message}");
+        //        return ApiResultData<SyncQueueClient>.Failure($"Error during login: {ex.Message}", ApiErrorType.Unknown);
+        //    }
+        //}
+        public async Task<ApiResultData<NoteClient>> GetNote(Guid noteId)
         {
             try
             {
-                string url = $"{_baseURL}/getServerChangesToNote?IdNode={IdNote}";
-                var response = await _httpClient.GetAsync(url);
+                var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseURL}/{noteId}");
+                request.Headers.Add("X-User-Id", UserDevice.LocalUser.ToString());  // ← Add header
+                var response = await _httpClient.SendAsync(request);
                 if (response.IsSuccessStatusCode)
                 {
-                    var changesFromServer = response.Content.ReadFromJsonAsync<SyncQueueServer>().Result;
-                    if (changesFromServer != null)
-                    {
-                        var mappedChanges = EntityMapper.MapSyncQueueServerToSyncQueueClient(changesFromServer);
-                        return ApiResultData<SyncQueueClient>.Success(mappedChanges);
-                    }
-                    else
-                    {
-                        return ApiResultData<SyncQueueClient>.Failure("No changes found for the note.", ApiErrorType.NotFound);
-                    }
-
+                    var note = await response.Content.ReadFromJsonAsync<NoteClient>();
+                    return ApiResultData<NoteClient>.Success(note);
                 }
                 else
                 {
-                    return ApiResultData<SyncQueueClient>.Failure($"Failed to retrieve changes: {response.ReasonPhrase}", ApiErrorType.ServerError);
+                    string errorContent = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Server returned error: {response.StatusCode} - {errorContent}");
+                    return ApiResultData<NoteClient>.Failure($"Server returned error: {response.StatusCode}", ApiErrorType.ServerError);
                 }
             }
             catch (HttpRequestException ex)
             {
-                Console.WriteLine($"HTTP Error sending notes to server: {ex.Message}");
-                return ApiResultData<SyncQueueClient>.Failure($"Connection error: {ex.Message}", ApiErrorType.ConnectionError);
+                return ApiResultData<NoteClient>.Failure($"Connection error: {ex.Message}", ApiErrorType.ConnectionError);
             }
             catch (TaskCanceledException)
             {
-                Console.WriteLine("Request timeout");
-                return ApiResultData<SyncQueueClient>.Failure("Request timeout. The server is not responding.", ApiErrorType.Timeout);
+                return ApiResultData<NoteClient>.Failure("Request timeout. The server is not responding.", ApiErrorType.Timeout);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error during login: {ex.Message}");
-                return ApiResultData<SyncQueueClient>.Failure($"Error during login: {ex.Message}", ApiErrorType.Unknown);
+                return ApiResultData<NoteClient>.Failure($"Error retrieving note: {ex.Message}", ApiErrorType.Unknown);
             }
         }
 
@@ -282,7 +316,7 @@ namespace MAUIClientUI.Services
                 if (response.IsSuccessStatusCode && responseData?.ServerNote != null)
                 {
                     // Success - update went through
-                    if (responseData.IsSuccess)
+                    if (!responseData.IsVersionConflict)
                     {
                         return NoteConflictResult.Success(responseData.ServerNote);
                     }
@@ -368,6 +402,7 @@ namespace MAUIClientUI.Services
         public class NoteUpdateResponse
         {
             [JsonProperty("isSuccess")]
+
             public bool IsSuccess { get; set; }
 
             [JsonProperty("message")]
@@ -376,8 +411,9 @@ namespace MAUIClientUI.Services
             [JsonProperty("serverNote")]
             public NoteServer ServerNote { get; set; }
 
-            [JsonProperty("conflictingServerNote")]
-            public NoteServer ConflictingServerNote { get; set; }
+            [JsonProperty("isVersionConflict")]
+            /// <summary>True if version mismatch (concurrency conflict)</summary>
+            public bool IsVersionConflict { get; set; }
         }
     }
 }

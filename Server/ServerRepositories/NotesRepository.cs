@@ -320,6 +320,17 @@ namespace Server.ServeRepositories
                 _dbContextServer.SaveChanges();
             }
         }
+
+
+        public async Task<NoteServer> GetNoteById(Guid IdNote, Guid idUser)
+        {
+            var noteAccess = _dbContextServer.Note_Users.FirstOrDefault(n => n.IdUser == idUser && n.IdNote == IdNote);
+            if(noteAccess != null)
+            {
+                return _dbContextServer.Notes.FirstOrDefault(n => n.IdNote == IdNote);
+            }
+            return null;
+        }
     }
 
     /// <summary>
@@ -360,7 +371,7 @@ namespace Server.ServeRepositories
         {
             return new UpdateNoteWithVersionResult
             {
-                IsSuccess = false,
+                IsSuccess = true,
                 Message = message,
                 ServerNote = currentServerNote,
                 IsVersionConflict = true,

@@ -54,23 +54,9 @@ public partial class LoginPopup : ContentPage
 
         if (result.IsSuccess)
         {
-            /*
-             * part with SyncQueue redo later 
-             */
-
-            //       UserDevice.SaveLastUserToFile(result.Data);
-            // sync the notes with the server
-            //List<SyncQueueClient> changedNotes = _noteRepository.getAllChanges(result.Data);
-
-
-            //var getServerChanges = await _noteServices.SendAndReceiveNoteUpdates(
-            //    changedNotes,
-            //    result.Data
-            //);
+         
 
             // update notes based on changes on the server
-
-            //_noteRepository.UpdateListNotes(getServerChanges.Data);
             _authService.OnLoginSuccess(result.Data.IdUser);
 
             // Login successful - close the popup

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <!-- Timeout for each test in milliseconds -->
+  <RunConfiguration>
+	<TestSessionTimeout>600000</TestSessionTimeout>
+	<MaxCpuCount>4</MaxCpuCount>
+  </RunConfiguration>
+
+  <!-- xUnit Configuration -->
+  <xUnit>
+	<!-- Number of threads to use for running tests -->
+	<MaxParallelThreads>1</MaxParallelThreads>
+	<!-- Run parallel tests only in separate collections -->
+	<ParallelizeAssembly>false</ParallelizeAssembly>
+	<!-- Don't run same assembly tests in parallel (required for E2E tests) -->
+	<ParallelizeTestCollections>false</ParallelizeTestCollections>
+  </xUnit>
+
+  <!-- Trace listener configuration -->
+  <LoggerRunSettings>
+	<Verbosity>Detailed</Verbosity>
+  </LoggerRunSettings>
+</RunSettings>

@@ -9,7 +9,7 @@ namespace MAUIClientUI.Services
 {
     public interface INoteServices
     {
-        Task<ApiResultData<List<ISyncQueue>>> SendAndReceiveNoteUpdates(List<SyncQueueClient> listChanges, UserClient user);
+       // Task<ApiResultData<List<ISyncQueue>>> SendAndReceiveNoteUpdates(List<SyncQueueClient> listChanges, UserClient user);
         Task<ApiResultData<List<NoteClient>>> GetAllNotesFromUser(Guid IdUser);
         Task<ApiResult> CreateNewNote(NoteClient currentNote);
         Task<NoteConflictResult> UpdateNote(NoteClient updatedNote);

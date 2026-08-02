@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "E2E Tests": {
+      "commandName": "Executable",
+      "executablePath": "dotnet",
+      "commandLineArgs": "test --configuration Debug --logger \"console;verbosity=detailed\" --filter \"FullyQualifiedName~EndToEnd\"",
+      "workingDirectory": ".",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "E2E_SERVER_URL": "http://localhost:5266"
+      }
+    },
+    "E2E Tests (Notes Only)": {
+      "commandName": "Executable",
+      "executablePath": "dotnet",
+      "commandLineArgs": "test --configuration Debug --logger \"console;verbosity=detailed\" --filter \"FullyQualifiedName~EndToEndNoteServicesTest\"",
+      "workingDirectory": ".",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "E2E_SERVER_URL": "http://localhost:5266"
+      }
+    },
+    "E2E Tests (Login Only)": {
+      "commandName": "Executable",
+      "executablePath": "dotnet",
+      "commandLineArgs": "test --configuration Debug --logger \"console;verbosity=detailed\" --filter \"FullyQualifiedName~EndToEndLoginServicesTest\"",
+      "workingDirectory": ".",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "E2E_SERVER_URL": "http://localhost:5266"
+      }
+    }
+  }
+}

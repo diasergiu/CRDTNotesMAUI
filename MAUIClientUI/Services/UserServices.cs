@@ -65,41 +65,41 @@ namespace MAUIClientUI.Services
 
         //}
 
-        public async Task<ApiResultData<LoginRespons>> Login(string username, string password)
+        public async Task<ApiResultData<UserClient>> Login(string username, string password)
         {
             try
             {
-                string url = $"{_baseURL}/login?username={username}&password={password}";
+                string url = $"{_baseURL}/login?username={Uri.EscapeDataString(username)}&password={Uri.EscapeDataString(password)}";
 
                 var response = _httpClient.GetAsync(url).Result;
                 if (response.IsSuccessStatusCode)
                 {
-                    var user = response.Content.ReadFromJsonAsync<LoginRespons>().Result;
+                    var user = response.Content.ReadFromJsonAsync<UserClient>().Result;
                     
                     // save user id to local memory, and to file in the future 
                     UserDevice.localUser(user.IdUser);
                     Console.WriteLine(UserDevice.LocalUser);
-                    return ApiResultData<LoginRespons>.Success(user);
+                    return ApiResultData<UserClient>.Success(user);
                 }
                 else
                 {
-                    return ApiResultData<LoginRespons>.Failure($"Login failed: {response.ReasonPhrase}", ApiErrorType.ServerError);
+                    return ApiResultData<UserClient>.Failure($"Login failed: {response.ReasonPhrase}", ApiErrorType.ServerError);
                 }
             }
             catch (HttpRequestException ex)
             {
                 Console.WriteLine($"HTTP Error sending notes to server: {ex.Message}");
-                return ApiResultData<LoginRespons>.Failure($"Connection error: {ex.Message}", ApiErrorType.ConnectionError);
+                return ApiResultData<UserClient>.Failure($"Connection error: {ex.Message}", ApiErrorType.ConnectionError);
             }
             catch (TaskCanceledException)
             {
                 Console.WriteLine("Request timeout");
-                return ApiResultData<LoginRespons>.Failure("Request timeout. The server is not responding.", ApiErrorType.Timeout);
+                return ApiResultData<UserClient>.Failure("Request timeout. The server is not responding.", ApiErrorType.Timeout);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error during login: {ex.Message}");
-                return ApiResultData<LoginRespons>.Failure($"Error during login: {ex.Message}", ApiErrorType.Unknown);
+                return ApiResultData<UserClient>.Failure($"Error during login: {ex.Message}", ApiErrorType.Unknown);
             }
         }
 
