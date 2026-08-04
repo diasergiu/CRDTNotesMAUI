@@ -11,7 +11,7 @@ namespace DatabaseLibrary.Migrations.DbContextClientMigrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<int>(
-                name: "version",
+                name: "Version",
                 table: "Note",
                 type: "INTEGER",
                 nullable: false,
@@ -22,7 +22,7 @@ namespace DatabaseLibrary.Migrations.DbContextClientMigrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "version",
+                name: "Version",
                 table: "Note");
         }
     }

@@ -1,9 +1,5 @@
-﻿using DatabaseLibrary.Entities;
-using DatabaseLibrary.Entities.Client;
+﻿using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.Entities.Server;
-using DatabaseLibrary.RequestBody;
-using DatabaseLibrary.RequestBody.EntityMappers;
-using DatabaseLibrary.ResponsBody;
 using DatabaseLibrary.WrapperClasses;
 using Newtonsoft.Json;
 using System.Net.Http.Json;
@@ -23,13 +19,7 @@ namespace MAUIClientUI.Services
         {
             try
             {
-                var request = new HttpRequestMessage(HttpMethod.Post, $"{_baseURL}/SendChangesToServer");
-                request.Headers.Add("X-User-Id", UserDevice.LocalUser.ToString());  // ← Add header
-
-                var json = JsonConvert.SerializeObject(noteClient);
-                request.Content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var response = await _httpClient.SendAsync(request);
+                var response = await SendRequest<List<NoteClient>>(HttpMethod.Post, $"{_baseURL}/SendChangesToServer", noteClient);
                 if (response.IsSuccessStatusCode)
                 {
                     return ApiResult.Success();
@@ -132,11 +122,7 @@ namespace MAUIClientUI.Services
         {
             try
             {
-                // URL is correct - server has [Route("api/[controller]")] so full URL is /api/notes/GetAllNotesFromUser
-                var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseURL}/GetAllNotesFromUser");
-                request.Headers.Add("X-User-Id", UserDevice.LocalUser.ToString());  // ← Add header
-
-                var response = await _httpClient.SendAsync(request);
+                var response = await SendRequest<Object>(HttpMethod.Get, $"{_baseURL}/GetAllNotesFromUser", null);
                 if (response.IsSuccessStatusCode)
                 {
                     // Server returns: { success: true, data: [...notes...] }
@@ -221,9 +207,7 @@ namespace MAUIClientUI.Services
         {
             try
             {
-                var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseURL}/{noteId}");
-                request.Headers.Add("X-User-Id", UserDevice.LocalUser.ToString());  // ← Add header
-                var response = await _httpClient.SendAsync(request);
+                var response = await SendRequest<Object>(HttpMethod.Get, $"_{_baseURL}/{noteId}", null);
                 if (response.IsSuccessStatusCode)
                 {
                     var note = await response.Content.ReadFromJsonAsync<NoteClient>();
@@ -254,13 +238,7 @@ namespace MAUIClientUI.Services
         {
             try
             {
-                var request = new HttpRequestMessage(HttpMethod.Post, $"{_baseURL}");
-                request.Headers.Add("X-User-Id", UserDevice.LocalUser.ToString());  // ← Add header
-
-                var json = JsonConvert.SerializeObject(currentNote);
-                request.Content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var response = await _httpClient.SendAsync(request);
+                var response = await SendRequest<NoteClient>(HttpMethod.Post, $"{_baseURL}", currentNote);                 
                 if (response.IsSuccessStatusCode)
                 {
                     // Server returns: { success: true, data: { id: int } }
@@ -300,11 +278,9 @@ namespace MAUIClientUI.Services
         {
             try
             {
+                
                 string url = $"{_baseURL}/{updatedNote.IdNote}";
-                var json = JsonConvert.SerializeObject(updatedNote);
-
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var response = await _httpClient.PutAsync(url, content);
+                var response = await SendRequest<NoteClient>(HttpMethod.Put, url, updatedNote);               
              
                 // Parse the conflict response to get server's current version
                 string responseContent = await response.Content.ReadAsStringAsync();
@@ -322,7 +298,7 @@ namespace MAUIClientUI.Services
                     }
                     else
                     {
-                        return NoteConflictResult.Conflict(responseData.ServerNote, updatedNote.version);
+                        return NoteConflictResult.Conflict(responseData.ServerNote, updatedNote.Version);
                     }
                 }
 
@@ -353,8 +329,8 @@ namespace MAUIClientUI.Services
         {
             try
             {
-                string url = $"{_baseURL}/{noteId}";
-                var response = await _httpClient.DeleteAsync(url);
+                var response = await SendRequest<object>(HttpMethod.Delete, $"{_baseURL}/{noteId}", null);
+                //var response = await _httpClient.DeleteAsync(url);
                 if (response.IsSuccessStatusCode)
                 {
                     return ApiResult.Success();
@@ -378,6 +354,22 @@ namespace MAUIClientUI.Services
             {
                 return ApiResult.Failure($"Error deleting note: {ex.Message}", ApiErrorType.Unknown);
             }
+        }
+
+        private HttpRequestMessage GetRequestWithHIdHeader(HttpMethod method ,string url) {
+            var request = new HttpRequestMessage(method, url);
+            request.Headers.Add("X-User-Id", UserDevice.LocalUser.ToString());
+            return request;
+        }
+        private async Task<HttpResponseMessage> SendRequest<T>(HttpMethod method, String url, T? data)
+        {
+            var request = GetRequestWithHIdHeader(method, url);
+            if (data != null)
+            {
+                var json = JsonConvert.SerializeObject(data);
+                request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+            }
+            return await _httpClient.SendAsync(request);
         }
 
         private class CreateNoteResponse

@@ -20,7 +20,7 @@ namespace DatabaseLibrary.Entities.Client
         public string CreationDate { get; set; }
         public string LastUpdate { get; set; }
 
-        public int version { get; set; }
+        public int Version { get; set; }
         public bool DirtyFlagChangesMade { get; set; }
         public List<Note_UserClient>? NoteUser { get; set; }
     }

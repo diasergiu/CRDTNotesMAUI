@@ -169,7 +169,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 CreationDate = DateTime.UtcNow.ToString("o"),
                 LastUpdate = DateTime.UtcNow.ToString("o"),
                 DirtyFlagChangesMade = true,
-                version = 1
+                Version = 1
             };
 
             var createResult = await _noteService.CreateNewNote(note);
@@ -184,14 +184,14 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 CreationDate = note.CreationDate,
                 LastUpdate = DateTime.UtcNow.ToString("o"),
                 DirtyFlagChangesMade = true,
-                version = 1
+                Version = 1
             };
 
             var user1Result = await _noteService.UpdateNote(user1Update);
             Assert.True(user1Result.IsSuccess, "User 1 update failed: " + user1Result.ErrorMessage);
 
             // Get the updated version from server response
-            var serverVersionAfterUser1 = user1Result.ServerNote.version;
+            var serverVersionAfterUser1 = user1Result.ServerNote.Version;
 
             // Act - User 2 updates the same note (simulating concurrent update)
             // User 2 doesn't know about User 1's update, so uses version 1, but server has a higher version now
@@ -203,7 +203,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 CreationDate = note.CreationDate,
                 LastUpdate = DateTime.UtcNow.AddMilliseconds(100).ToString("o"),
                 DirtyFlagChangesMade = true,
-                version = 1  // User 2 doesn't know server is at version 2 now
+                Version = 1  // User 2 doesn't know server is at version 2 now
             };
 
             var user2Result = await _noteService.UpdateNote(user2Update);
@@ -231,7 +231,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 CreationDate = DateTime.UtcNow.ToString("o"),
                 LastUpdate = DateTime.UtcNow.ToString("o"),
                 DirtyFlagChangesMade = true,
-                version = 0
+                Version = 0
             };
 
             var createResult = await _noteService.CreateNewNote(baseNote);
@@ -250,14 +250,14 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                     CreationDate = baseNote.CreationDate,
                     LastUpdate = DateTime.UtcNow.AddMilliseconds(i * 10).ToString("o"),
                     DirtyFlagChangesMade = true,
-                    version = nextVersion
+                    Version = nextVersion
                 };
 
                 var result = await _noteService.UpdateNote(updatedNote);
                 Assert.True(result.IsSuccess, $"Update {i} failed: {result.ErrorMessage}");
-                Assert.False(result.IsVersionConflict, $"Update {i} should not have version conflict");
+                Assert.False(result.IsVersionConflict, $"Update {i} should not have Version conflict");
 
-                currentVersion = result.ServerNote.version;
+                currentVersion = result.ServerNote.Version;
             }
 
             // Assert
@@ -294,7 +294,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 CreationDate = baseNote.CreationDate,
                 LastUpdate = DateTime.UtcNow.ToString("o"),
                 DirtyFlagChangesMade = true,
-                version = 1
+                Version = 1
             });
 
             var user2Task = _noteService.CreateNewNote(new NoteClient
@@ -305,7 +305,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 CreationDate = baseNote.CreationDate,
                 LastUpdate = DateTime.UtcNow.AddMilliseconds(5).ToString("o"),
                 DirtyFlagChangesMade = true,
-                version = 1
+                Version = 1
             });
 
             var user3Task = _noteService.CreateNewNote(new NoteClient
@@ -316,7 +316,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 CreationDate = baseNote.CreationDate,
                 LastUpdate = DateTime.UtcNow.AddMilliseconds(10).ToString("o"),
                 DirtyFlagChangesMade = true,
-                version = 1
+                Version = 1
             });
 
             var results = await Task.WhenAll(user1Task, user2Task, user3Task);
@@ -344,7 +344,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                     CreationDate = DateTime.UtcNow.ToString("o"),
                     LastUpdate = DateTime.UtcNow.ToString("o"),
                     DirtyFlagChangesMade = true,
-                    version = 1,
+                    Version = 1,
                 };
 
                 var user2Note = new NoteClient
@@ -355,7 +355,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                     CreationDate = DateTime.UtcNow.ToString("o"),
                     LastUpdate = DateTime.UtcNow.ToString("o"),
                     DirtyFlagChangesMade = true,
-                    version = 1
+                    Version = 1
                 };
 
                 var result1 = await _noteService.CreateNewNote(user1Note);
@@ -536,7 +536,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 CreationDate = DateTime.UtcNow.ToString("o"),
                 LastUpdate = DateTime.UtcNow.ToString("o"),
                 DirtyFlagChangesMade = true,
-                version = 0
+                Version = 0
             };
 
             var createResult = await _noteService.CreateNewNote(baseNote);
@@ -551,7 +551,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 CreationDate = baseNote.CreationDate,
                 LastUpdate = DateTime.UtcNow.ToString("o"),
                 DirtyFlagChangesMade = true,
-                version = 1
+                Version = 1
             };
 
             var device1UpdateTask = _noteService.CreateNewNote(device1Update);
@@ -566,7 +566,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 CreationDate = baseNote.CreationDate,
                 LastUpdate = DateTime.UtcNow.ToString("o"),
                 DirtyFlagChangesMade = true,
-                version = 1
+                Version = 1
             };
 
             var device2UpdateTask = _noteService.CreateNewNote(device2Update);
@@ -597,7 +597,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 CreationDate = DateTime.UtcNow.ToString("o"),
                 LastUpdate = DateTime.UtcNow.ToString("o"),
                 DirtyFlagChangesMade = false,
-                version = 0
+                Version = 0
             };
 
             var createResult = await _noteService.CreateNewNote(sharedNote);
@@ -614,7 +614,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                     CreationDate = sharedNote.CreationDate,
                     LastUpdate = DateTime.UtcNow.AddSeconds(-30).ToString("o"),
                     DirtyFlagChangesMade = true,
-                    version = 1
+                    Version = 1
                 },
                 new NoteClient
                 {
@@ -624,7 +624,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                     CreationDate = sharedNote.CreationDate,
                     LastUpdate = DateTime.UtcNow.AddSeconds(-20).ToString("o"),
                     DirtyFlagChangesMade = true,
-                    version = 2
+                    Version = 2
                 }
             };
 
@@ -637,7 +637,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 CreationDate = sharedNote.CreationDate,
                 LastUpdate = DateTime.UtcNow.AddSeconds(-10).ToString("o"),
                 DirtyFlagChangesMade = true,
-                version = 1
+                Version = 1
             };
 
             var device2Result = await _noteService.CreateNewNote(device2Update);
@@ -669,7 +669,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 CreationDate = DateTime.UtcNow.ToString("o"),
                 LastUpdate = DateTime.UtcNow.ToString("o"),
                 DirtyFlagChangesMade = true,
-                version = 1
+                Version = 1
             };
 
             var createResult = await _noteService.CreateNewNote(baseNote);
@@ -687,7 +687,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 CreationDate = baseNote.CreationDate,
                 LastUpdate = conflictTime.ToString("o"),
                 DirtyFlagChangesMade = true,
-                version = 1
+                Version = 1
             });
 
             var edit2 = await _noteService.UpdateNote(new NoteClient
@@ -698,7 +698,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 CreationDate = baseNote.CreationDate,
                 LastUpdate = conflictTime.AddMilliseconds(1).ToString("o"),
                 DirtyFlagChangesMade = true,
-                version = 2
+                Version = 2
             });
 
             // Assert - CRDT should handle both edits
@@ -726,7 +726,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 CreationDate = DateTime.UtcNow.ToString("o"),
                 LastUpdate = DateTime.UtcNow.ToString("o"),
                 DirtyFlagChangesMade = true,
-                version = 1
+                Version = 1
             };
 
             var createResult = await _noteService.CreateNewNote(baseNote);
@@ -741,7 +741,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 CreationDate = baseNote.CreationDate,
                 LastUpdate = DateTime.UtcNow.ToString("o"),
                 DirtyFlagChangesMade = true,
-                version = 1
+                Version = 1
             };
 
             var device2Edit = new NoteClient
@@ -752,7 +752,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 CreationDate = baseNote.CreationDate,
                 LastUpdate = DateTime.UtcNow.AddMilliseconds(50).ToString("o"),
                 DirtyFlagChangesMade = true,
-                version = 1
+                Version = 1
             };
 
             var results = await Task.WhenAll(
@@ -780,7 +780,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 CreationDate = DateTime.UtcNow.ToString("o"),
                 LastUpdate = DateTime.UtcNow.ToString("o"),
                 DirtyFlagChangesMade = true,
-                version = 0
+                Version = 0
             };
 
             var createResult = await _noteService.CreateNewNote(baseNote);
@@ -795,7 +795,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 CreationDate = baseNote.CreationDate,
                 LastUpdate = DateTime.UtcNow.ToString("o"),
                 DirtyFlagChangesMade = true,
-                version = 1
+                Version = 1
             });
 
             var device2Task = _noteService.CreateNewNote(new NoteClient
@@ -806,7 +806,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 CreationDate = baseNote.CreationDate,
                 LastUpdate = DateTime.UtcNow.AddMilliseconds(10).ToString("o"),
                 DirtyFlagChangesMade = true,
-                version = 1
+                Version = 1
             });
 
             var device3Task = _noteService.CreateNewNote(new NoteClient
@@ -817,7 +817,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 CreationDate = baseNote.CreationDate,
                 LastUpdate = DateTime.UtcNow.AddMilliseconds(20).ToString("o"),
                 DirtyFlagChangesMade = true,
-                version = 1
+                Version = 1
             });
 
             var results = await Task.WhenAll(device1Task, device2Task, device3Task);

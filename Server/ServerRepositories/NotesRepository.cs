@@ -5,8 +5,10 @@ using DatabaseLibrary.Migrations;
 using DatabaseLibrary.RequestBody.EntityMappers;
 using DatabaseLibrary.WrapperClasses;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.Internal;
+using Server.ServerHub;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,9 +19,11 @@ namespace Server.ServeRepositories
     public class NotesRepository
     {
         private DbContextServer _dbContextServer;
-        public NotesRepository(DbContextServer context)
+        private IHubContext<NotesHub> _notesHubContext;
+        public NotesRepository(DbContextServer context, IHubContext<NotesHub> notesHubContext)
         {
             _dbContextServer = context;
+            _notesHubContext = notesHubContext;
         }
 
         public async Task<UserServer> getUser(string username, string password)
@@ -196,7 +200,7 @@ namespace Server.ServeRepositories
         /// </summary>
         /// <param name="note">Note with updates and current version from client</param>
         /// <returns>Result with success/conflict status. On conflict, includes current server version</returns>
-        public async Task<UpdateNoteWithVersionResult> UpdateChanges(NoteServer note)
+        public async Task<UpdateNoteWithVersionResult> UpdateChanges(NoteServer note, Guid idUser)
         {
             try
             {
@@ -208,12 +212,12 @@ namespace Server.ServeRepositories
                     return UpdateNoteWithVersionResult.Error("Note not found");
 
                 // CONCURRENCY CHECK: Compare client version with server version
-                if (note.version != existingNote.version)
+                if (note.Version != existingNote.Version)
                 {
                     // Version mismatch - conflict detected
                     // Return server's current version for client to see the conflict
                     return UpdateNoteWithVersionResult.VersionConflict(
-                        $"Version conflict: Client sent v{note.version}, but server has v{existingNote.version}. " +
+                        $"Version conflict: Client sent v{note.Version}, but server has v{existingNote.Version}. " +
                         $"Note was modified by another user.",
                         existingNote);
                 }
@@ -222,7 +226,7 @@ namespace Server.ServeRepositories
                 existingNote.Title = note.Title;
                 existingNote.Content = note.Content;
                 existingNote.LastUpdate = note.LastUpdate;
-                existingNote.version++;  // Increment version for next update
+                existingNote.Version++;  // Increment version for next update
 
                 // Save changes within transaction
                 await using var transaction = await _dbContextServer.Database.BeginTransactionAsync();
@@ -230,6 +234,27 @@ namespace Server.ServeRepositories
                 {
                     _dbContextServer.SaveChanges();
                     await transaction.CommitAsync();
+
+                    // *** NEW: Notify all other users viewing this note ***
+                    if (_notesHubContext != null)
+                    {
+                        var groupName = $"note-{note.IdNote}";
+                        var senderConnectionId = NotesHub.GetConnectionId(idUser.ToString());
+
+                        var sendTask = senderConnectionId != null
+                            ? _notesHubContext.Clients.GroupExcept(groupName, senderConnectionId)
+                            : _notesHubContext.Clients.Group(groupName);
+
+                        await sendTask.SendAsync("NoteUpdated", new
+                        {
+                            noteId = existingNote.IdNote,
+                            title = existingNote.Title,
+                            content = existingNote.Content,
+                            lastUpdate = existingNote.LastUpdate,
+                            version = existingNote.Version,
+                            updatedAt = DateTime.UtcNow
+                        });
+                    }
 
                     return UpdateNoteWithVersionResult.Success(existingNote);
                 }
@@ -259,11 +284,15 @@ namespace Server.ServeRepositories
             // Delete the note-user relationship
             _dbContextServer.Note_Users.Remove(noteUser);
 
-            // Delete the note itself
-            var note = await _dbContextServer.Notes.FirstOrDefaultAsync(n => n.IdNote == noteId);
-            if (note != null)
+            // Delete the note itself if there are no users connected to note
+            List<Note_UserServer> remainingConnections = _dbContextServer.Note_Users.Where(n => n.IdNote == noteId).ToList();
+            if(remainingConnections.Count == 0)
             {
-                _dbContextServer.Notes.Remove(note);
+                var note = await _dbContextServer.Notes.FirstOrDefaultAsync(n => n.IdNote == noteId);
+                if (note != null)
+                {
+                    _dbContextServer.Notes.Remove(note);
+                }
             }
 
             await _dbContextServer.SaveChangesAsync();

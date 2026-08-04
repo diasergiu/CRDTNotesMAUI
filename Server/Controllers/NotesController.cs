@@ -4,7 +4,9 @@ using DatabaseLibrary.Entities.Server;
 using DatabaseLibrary.RequestBody.EntityMappers;
 using DatabaseLibrary.WrapperClasses;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Server.ServeRepositories;
+using Server.ServerHub;
 using System.Linq.Expressions;
 using System.Threading.Channels;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -20,10 +22,10 @@ namespace Server.Controllers
         private DbContextServer _context;
 
 
-        public NotesController(DbContextServer dbContextServer)
+        public NotesController(DbContextServer dbContextServer, NotesRepository notesRepository)
         {
             _context = dbContextServer;
-            _notesRepository = new NotesRepository(dbContextServer);
+            _notesRepository = notesRepository;
         }
         //[HttpPost("SaveOrUpdateNote")]
         //public async Task SaveOrUpdateNote([FromBody] SyncQueueServer changesMade)
@@ -84,8 +86,17 @@ namespace Server.Controllers
         [HttpPut("{id}")]
         public async Task<UpdateNoteWithVersionResult> UpdateNotes(int noteId, [FromBody] NoteServer note)
         {
-            
-            return await _notesRepository.UpdateChanges(note);
+            Guid idUser = GetUserIdFromRequest();
+            var validationError = ValidateUserId(idUser);
+            if (validationError != null)
+            {
+                //return validationError;
+                return UpdateNoteWithVersionResult.Error("error");
+            }
+            //var updateNoteWithVersionResult =
+                return await _notesRepository.UpdateChanges(note, idUser);
+            //return Ok(new { success = true, updateNoteWithVersionResult = updateNoteWithVersionResult }); // this needs to be tested
+
 
         }
 

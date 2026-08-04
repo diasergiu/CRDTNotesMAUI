@@ -17,10 +17,10 @@ namespace Server.Controllers
         private DbContextServer _context; // make a repository for user later
         private NotesRepository _notesRepository;
 
-        public UserController(DbContextServer context)
+        public UserController(DbContextServer context, NotesRepository notesRepository)
         {
             _context = context;
-            _notesRepository = new NotesRepository(context);
+            _notesRepository = notesRepository;
         }
 
         [HttpPost("login")]

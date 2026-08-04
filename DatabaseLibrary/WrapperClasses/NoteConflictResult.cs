@@ -55,12 +55,12 @@ namespace DatabaseLibrary.WrapperClasses
             return new NoteConflictResult
             {
                 IsSuccess = false,
-                ErrorMessage = $"Version conflict: Client sent v{clientVersion}, but server has v{serverNote.version}. " +
+                ErrorMessage = $"Version conflict: Client sent v{clientVersion}, but server has v{serverNote.Version}. " +
                                $"Note was modified by another user at {serverNote.LastUpdate}",
                 IsVersionConflict = true,
                 ServerNote = serverNote,
                 ClientVersionAttempted = clientVersion,
-                ServerVersionAtConflict = serverNote.version
+                ServerVersionAtConflict = serverNote.Version
             };
         }
 

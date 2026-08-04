@@ -42,7 +42,7 @@ namespace DatabaseLibrary.Migrations.DbContextClientMigrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("version")
+                    b.Property<int>("Version")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("IdNote");

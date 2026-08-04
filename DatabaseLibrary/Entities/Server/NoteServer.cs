@@ -17,7 +17,7 @@ namespace DatabaseLibrary.Entities.Server
         public string CreationDate { get; set; }
         public string LastUpdate { get; set; }
         public bool DirtyFlagChangesMade { get; set; }
-        public int version { get; set; }
+        public int Version { get; set; }
         public List<Note_UserServer>? NoteUser { get; set; }
     }
 }

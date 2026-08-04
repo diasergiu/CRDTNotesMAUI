@@ -14,8 +14,9 @@ public partial class NoteView : ContentPage
 	private NoteClient _currentNote;
 	private readonly IDatabaseServices _databaseService;
 	private readonly NoteRepository _noteRepository;
-	//private readonly ClientServices _clientNoteServices;
-	private readonly INoteServices _noteServices;
+    //private readonly ClientServices _clientNoteServices;
+    private readonly NotificationServices _notificationService;
+    private readonly INoteServices _noteServices;
     private bool _isNewNote;
 
 	public NoteView(NoteClient note, INoteServices noteService, bool isNewNote = false)
@@ -25,12 +26,91 @@ public partial class NoteView : ContentPage
 		_isNewNote = isNewNote;
 		_databaseService = IPlatformApplication.Current.Services.GetService<IDatabaseServices>();
 		_noteRepository = IPlatformApplication.Current.Services.GetService<NoteRepository>();
-		_noteServices = noteService;
+        _notificationService = IPlatformApplication.Current.Services.GetService<NotificationServices>();
+        _noteServices = noteService;
             //new NoteServices("/api/notes"); // should split clientNoteServices into multiple classes
         LoadNoteData();
 	}
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
 
-	private void LoadNoteData()
+        // Subscribe to real-time updates when page appears
+        if (_currentNote != null && !_isNewNote)
+        {
+            try
+            {
+                await _notificationService.SubscribeToNoteAsync(UserDevice.LocalUser, _currentNote.IdNote);
+
+                // Listen for updates from other users
+                _notificationService.NoteUpdated += OnRemoteNoteUpdated;
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Connection Warning", $"Could not connect to real-time notifications: {ex.Message}", "OK");
+            }
+        }
+    }
+
+    protected override async void OnDisappearing()
+    {
+        base.OnDisappearing();
+
+        // Unsubscribe when leaving the page
+        if (_currentNote != null && !_isNewNote)
+        {
+            try
+            {
+                await _notificationService.UnsubscribeFromNoteAsync(_currentNote.IdNote);
+                _notificationService.NoteUpdated -= OnRemoteNoteUpdated;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error unsubscribing: {ex.Message}");
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// Handles updates from other users editing the same note
+    /// </summary>
+    /// <summary>
+    /// Handles updates from other users editing the same note
+    /// </summary>
+    private async void OnRemoteNoteUpdated(object sender, NoteUpdateEventArgs e)
+    {
+        // Filter: only handle updates for the note currently being viewed
+        if (e.NoteId != _currentNote?.IdNote) return;
+
+        await MainThread.InvokeOnMainThreadAsync(async () =>
+        {
+            bool hasLocalChanges = TitleEntry.Text != _currentNote.Title
+                                || ContentEditor.Text != _currentNote.Content;
+
+            bool accept = true;
+            if (hasLocalChanges)
+            {
+                accept = await DisplayAlert(
+                    "Note Updated",
+                    "Another user changed this note. You have unsaved changes. Overwrite your changes with the latest version?",
+                    "Accept", "Keep Mine");
+            }
+
+            if (accept)
+            {
+                _currentNote.Title = e.Title;
+                _currentNote.Content = e.Content;
+                _currentNote.LastUpdate = e.LastUpdate.ToString("yyyy-MM-dd HH:mm:ss");
+                _currentNote.Version = e.Version;
+
+                TitleEntry.Text = e.Title;
+                ContentEditor.Text = e.Content;
+            }
+        });
+    }
+
+    private void LoadNoteData()
 	{
 		if (_currentNote != null && !_isNewNote)
 		{
@@ -74,7 +154,7 @@ public partial class NoteView : ContentPage
             
 			if (_isNewNote)
             {
-                _currentNote.version = 1;
+                _currentNote.Version = 1;
                 _noteRepository.createNote(_currentNote);
 
                 //_clientNoteServices.SaveChangesIfOnline(changesMade, DeviceIdentityService.GetDeviceId());
@@ -92,7 +172,7 @@ public partial class NoteView : ContentPage
 
 				if (updateResult.IsSuccess)
 				{
-					_currentNote.version = updateResult.ServerNote.version;
+					_currentNote.Version = updateResult.ServerNote.Version;
 				}
 				// CONFLICT DETECTED - Version mismatch
 				else if (updateResult.IsVersionConflict)
@@ -142,10 +222,10 @@ public partial class NoteView : ContentPage
 			$"Server Version (Current):\n" +
 			$"  Title: {serverNote.Title}\n" +
 			$"  Updated: {serverNote.LastUpdate}\n" +
-			$"  Version: {serverNote.version}\n\n" +
+			$"  Version: {serverNote.Version}\n\n" +
 			$"Your Version (Unsaved):\n" +
 			$"  Title: {TitleEntry.Text}\n" +
-			$"  Version: {_currentNote.version}";
+			$"  Version: {_currentNote.Version}";
 
 		// Show conflict dialog with three options
 		var action = await DisplayActionSheet(
@@ -170,7 +250,7 @@ public partial class NoteView : ContentPage
 			_currentNote.Title = serverNote.Title;
 			_currentNote.Content = serverNote.Content;
 			_currentNote.LastUpdate = serverNote.LastUpdate;
-			_currentNote.version = serverNote.version;
+			_currentNote.Version = serverNote.Version;
 
 			// Update UI to show server version
 			TitleEntry.Text = _currentNote.Title;
@@ -179,7 +259,7 @@ public partial class NoteView : ContentPage
 			// Save to local DB with server's version
 			_noteRepository.updateNote(_currentNote);
 
-			await DisplayAlert("Success", "Updated to server version. Note saved locally.", "OK");
+			await DisplayAlert("Success", "Updated to server Version. Note saved locally.", "OK");
 			await Navigation.PopAsync();
 		}
 		else if (action == "View Differences")
@@ -196,11 +276,11 @@ public partial class NoteView : ContentPage
 				$"Server has:\n" +
 				$"Title: {serverNote.Title}\n\n" +
 				$"Content:\n{serverNote.Content}\n\n" +
-				$"You can manually edit your version and try saving again.",
+				$"You can manually edit your Version and try saving again.",
 				"OK"
 			);
 			// Stay in editor, user can now edit manually
-			_currentNote.version = serverNote.version;  // Update version so retry works
+			_currentNote.Version = serverNote.Version;  // Update version so retry works
 		}
 	}
 
@@ -218,7 +298,7 @@ public partial class NoteView : ContentPage
 			$"────────────────────────────────────\n" +
 			$"Title:       {serverNote.Title}\n" +
 			$"Last Update: {serverNote.LastUpdate}\n" +
-			$"Version:     {serverNote.version}\n" +
+			$"Version:     {serverNote.Version}\n" +
 			$"Content Preview:\n" +
 			$"{(serverNote.Content?.Length > 100 ? serverNote.Content.Substring(0, 100) + "..." : serverNote.Content)}\n\n" +
 
@@ -226,7 +306,7 @@ public partial class NoteView : ContentPage
 			$"────────────────────────────────────\n" +
 			$"Title:       {TitleEntry.Text}\n" +
 			$"Last Update: {_currentNote.LastUpdate}\n" +
-			$"Version:     {_currentNote.version}\n" +
+			$"Version:     {_currentNote.Version}\n" +
 			$"Content Preview:\n" +
 			$"{(ContentEditor.Text?.Length > 100 ? ContentEditor.Text.Substring(0, 100) + "..." : ContentEditor.Text)}\n";
 
@@ -245,20 +325,20 @@ public partial class NoteView : ContentPage
 			_currentNote.Title = serverNote.Title;
 			_currentNote.Content = serverNote.Content;
 			_currentNote.LastUpdate = serverNote.LastUpdate;
-			_currentNote.version = serverNote.version;
+			_currentNote.Version = serverNote.Version;
 
 			TitleEntry.Text = _currentNote.Title;
 			ContentEditor.Text = _currentNote.Content;
 
 			_noteRepository.updateNote(_currentNote);
-			await DisplayAlert("Success", "Updated to server version. Note saved locally.", "OK");
+			await DisplayAlert("Success", "Updated to server Version. Note saved locally.", "OK");
 			await Navigation.PopAsync();
 		}
 		else if (action == "Keep My Changes")
 		{
 			// Let user keep editing and retry with server version number
-			_currentNote.version = serverNote.version;
-			await DisplayAlert("Info", "Updated to match server version. Try saving again.", "OK");
+			_currentNote.Version = serverNote.Version;
+			await DisplayAlert("Info", "Updated to match server Version. Try saving again.", "OK");
 		}
 	}
 

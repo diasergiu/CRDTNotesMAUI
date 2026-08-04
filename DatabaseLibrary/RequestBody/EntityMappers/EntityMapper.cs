@@ -19,7 +19,7 @@ namespace DatabaseLibrary.RequestBody.EntityMappers
                 Content = noteClient.Content,
                 LastUpdate = noteClient.LastUpdate,
                 CreationDate = noteClient.CreationDate,
-                version = noteClient.version,
+                Version = noteClient.Version,
                 DirtyFlagChangesMade = noteClient.DirtyFlagChangesMade
             };
         }
@@ -34,7 +34,7 @@ namespace DatabaseLibrary.RequestBody.EntityMappers
                 CreationDate = noteServer.CreationDate,
                 Content = noteServer.Content,
                 LastUpdate = noteServer.LastUpdate,
-                version = noteServer.version,
+                Version = noteServer.Version,
                 DirtyFlagChangesMade = noteServer.DirtyFlagChangesMade
             };
         }

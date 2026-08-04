@@ -1,5 +1,9 @@
 using DatabaseLibrary.Entities.Server;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Server.Controllers;
+using Server.ServeRepositories;
+using Server.ServerHub;
 
 public partial class Program
 {
@@ -12,6 +16,7 @@ public partial class Program
         builder.Services.AddOpenApi();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+        builder.Services.AddSignalR();
 
         // ====== CONFIGURE ENTITY FRAMEWORK CORE ======
 
@@ -25,6 +30,12 @@ public partial class Program
                    .EnableSensitiveDataLogging() // Only for development
                    .EnableDetailedErrors());      // Only for development
 
+        builder.Services.AddScoped(provider =>
+            new NotesRepository(
+        provider.GetRequiredService<DbContextServer>(),
+        provider.GetRequiredService<IHubContext<NotesHub>>()
+    )
+);
 
         // Optional: Add health checks
         //builder.Services.AddHealthChecks()
@@ -36,6 +47,8 @@ public partial class Program
         builder.WebHost.UseUrls("https://localhost:7282", "http://localhost:5266");
 
         var app = builder.Build();
+
+        app.MapHub<NotesHub>("/notesHub");
 
         // ====== INITIALIZE DATABASE ON STARTUP ======
         using (var scope = app.Services.CreateScope())
