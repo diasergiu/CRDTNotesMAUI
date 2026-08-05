@@ -17,11 +17,12 @@ public partial class NoteView : ContentPage
     //private readonly ClientServices _clientNoteServices;
     private readonly NotificationServices _notificationService;
     private readonly INoteServices _noteServices;
-    private bool _isNewNote;
+	private bool _isNewNote;
+	private CancellationTokenSource _autoSaveCts;
 
-	public NoteView(NoteClient note, INoteServices noteService, bool isNewNote = false)
-	{
-		InitializeComponent();
+    public NoteView(NoteClient note, INoteServices noteService, bool isNewNote = false)
+    {
+        InitializeComponent();
 		_currentNote = note;
 		_isNewNote = isNewNote;
 		_databaseService = IPlatformApplication.Current.Services.GetService<IDatabaseServices>();
@@ -122,6 +123,25 @@ public partial class NoteView : ContentPage
 	private void OnTitleTextChanged(object sender, TextChangedEventArgs e)
 	{
 		WarningIcon.IsVisible = string.IsNullOrWhiteSpace(e.NewTextValue);
+		TriggerAutoSave();
+	}
+
+	private void OnContentTextChanged(object sender, TextChangedEventArgs e)
+	{
+		TriggerAutoSave();
+	}
+
+	private void TriggerAutoSave()
+	{
+		_autoSaveCts?.Cancel();
+		_autoSaveCts = new CancellationTokenSource();
+		var token = _autoSaveCts.Token;
+
+		Task.Delay(800, token).ContinueWith(t =>
+		{
+			if (!t.IsCanceled)
+				MainThread.BeginInvokeOnMainThread(() => _ = PerformSaveAsync(silent: true));
+		}, TaskScheduler.Default);
 	}
 
 	private async void OnWarningIconTapped(object sender, EventArgs e)
@@ -131,76 +151,72 @@ public partial class NoteView : ContentPage
 
 	private async void OnSaveClicked(object sender, EventArgs e)
 	{
+		await PerformSaveAsync(silent: false);
+	}
+
+	private async Task PerformSaveAsync(bool silent)
+	{
 		if (string.IsNullOrWhiteSpace(TitleEntry.Text))
 		{
-			WarningIcon.IsVisible = true;
-			await DisplayAlert("Validation Error", "Please enter a title for the note.", "OK");
+			if (!silent)
+			{
+				WarningIcon.IsVisible = true;
+				await DisplayAlert("Validation Error", "Please enter a title for the note.", "OK");
+			}
 			return;
 		}
-        //SyncQueueClient changesMade = new SyncQueueClient();
-		if (_currentNote != null)
+
+		if (_currentNote == null) return;
+
+		_currentNote.Title = TitleEntry.Text;
+		_currentNote.Content = ContentEditor.Text ?? "";
+		_currentNote.CreationDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+		_currentNote.LastUpdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+		_currentNote.DirtyFlagChangesMade = true;
+
+		if (_isNewNote)
 		{
-			_currentNote.Title = TitleEntry.Text;
-			_currentNote.Content = ContentEditor.Text ?? "";
-			_currentNote.CreationDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-			_currentNote.LastUpdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");			
-			_currentNote.DirtyFlagChangesMade = true;			
+			_currentNote.Version = 1;
+			_noteRepository.createNote(_currentNote);
 
-            // save Changes to SyncQueueClient
-   //         changesMade.Note = _currentNote;
-			//changesMade.ContentChanges = ContentEditor.Text ?? "";
-			//changesMade.LastUpdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-			//changesMade.IdUser = UserDevice.LocalUser;
-            
-			if (_isNewNote)
-            {
-                _currentNote.Version = 1;
-                _noteRepository.createNote(_currentNote);
-
-                //_clientNoteServices.SaveChangesIfOnline(changesMade, DeviceIdentityService.GetDeviceId());
-                var createResult = await _noteServices.CreateNewNote(_currentNote);
-				if (!createResult.IsSuccess)
-				{
-					await DisplayAlert("Error", createResult.ErrorMessage, "OK");
-					return;
-				}
-            }
-			else
+			var createResult = await _noteServices.CreateNewNote(_currentNote);
+			if (!createResult.IsSuccess)
 			{
-				// Update existing note - CHECK FOR CONFLICTS
-				var updateResult = await _noteServices.UpdateNote(_currentNote);
+  				await DisplayAlert("Error", createResult.ErrorMessage, "OK");
+				return;
+			}
+			_isNewNote = false;
+		}
+		else
+		{
+			// Update existing note - CHECK FOR CONFLICTS
+			var updateResult = await _noteServices.UpdateNote(_currentNote);
 
-				if (updateResult.IsSuccess)
-				{
-					_currentNote.Version = updateResult.ServerNote.Version;
-				}
-				// CONFLICT DETECTED - Version mismatch
-				else if (updateResult.IsVersionConflict)
-				{
-					var serverNote = updateResult.ServerNote;
-
-					// Show conflict dialog with both versions
-					await ShowConflictDialog(serverNote);
-					return;  // ← DO NOT save locally, exit here
-				}
-
-				// Other errors (not conflict)
-				if (!updateResult.IsSuccess)
-				{
-					await DisplayAlert("Error", updateResult.ErrorMessage, "OK");
-					return;  // ← DO NOT save locally on error
-				}
-
-				// TRUE SUCCESS - Only save to local DB when server update succeeds
-				_noteRepository.updateNote(_currentNote);
+			if (updateResult.IsSuccess)
+			{
+				_currentNote.Version = updateResult.ServerNote.Version;
+			}
+			// CONFLICT DETECTED - Version mismatch
+			else if (updateResult.IsVersionConflict)
+			{
+				await ShowConflictDialog(updateResult.ServerNote);
+				return;  // ← DO NOT save locally, exit here
 			}
 
-			
+			// Other errors (not conflict)
+			if (!updateResult.IsSuccess)
+			{
+				if (!silent)
+					await DisplayAlert("Error", updateResult.ErrorMessage, "OK");
+				return;  // ← DO NOT save locally on error
+			}
 
-
-            await DisplayAlert("Success", "Note saved successfully!", "OK");
-			await Navigation.PopAsync();
+			// TRUE SUCCESS - Only save to local DB when server update succeeds
+			_noteRepository.updateNote(_currentNote);
 		}
+
+		if (!silent)
+			await DisplayAlert("Success", "Note saved successfully!", "OK");
 	}
 
 	private async void OnCancelClicked(object sender, EventArgs e)

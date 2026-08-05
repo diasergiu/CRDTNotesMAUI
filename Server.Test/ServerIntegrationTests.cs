@@ -48,7 +48,7 @@ namespace Server.Test
             var registerOkResult = registerResult as Microsoft.AspNetCore.Mvc.OkObjectResult;
             Assert.NotNull(registerOkResult);
 
-            var registeredUserId = ((dynamic)registerOkResult.Value).IdUser;
+            var registeredUserId = ((UserServer)((dynamic)registerOkResult.Value).user).IdUser;
             Assert.NotEqual(Guid.Empty, registeredUserId);
 
             // Act - Login with registered credentials

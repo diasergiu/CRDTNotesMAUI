@@ -95,6 +95,7 @@ namespace Server.Controllers
             // Create new user
             var newUser = new UserServer
             {
+
                 Name = request.Name ?? request.Username,
                 Username = request.Username,
                 Password = request.Password // TODO: Hash password in production!
@@ -112,9 +113,9 @@ namespace Server.Controllers
                     message = "Account created successfully.",
                     user = new
                     {
-                        idUser = newUser.IdUser,
-                        name = newUser.Name,
-                        username = newUser.Username
+                        IdUser = newUser.IdUser,
+                        Name = newUser.Name,
+                        Username = newUser.Username
                     }
                 });
             }
@@ -129,34 +130,34 @@ namespace Server.Controllers
         }
 
 
-        [HttpPost("SyncChanges")]
-        public async Task<IActionResult> SyncChanges([FromBody] LoginRequest loginBody)
-        {
-            try
-            {
-                UserServer user = EntityMapper.MapUserClientToUserServer(loginBody.user);
-                List<SyncQueueServer> syncChanges = new List<SyncQueueServer>();
-                foreach (var change in loginBody.ChangesMade)
-                {
-                    syncChanges.Add(EntityMapper.MapSyncQueueClientToSyncQueueServer(change, loginBody.IdDevice));
-                }
-                // save all changes done offline
-                await _notesRepository.SyncData(syncChanges);
+        //[HttpPost("SyncChanges")]
+        //public async Task<IActionResult> SyncChanges([FromBody] LoginRequest loginBody)
+        //{
+        //    try
+        //    {
+        //        UserServer user = EntityMapper.MapUserClientToUserServer(loginBody.user);
+        //        List<SyncQueueServer> syncChanges = new List<SyncQueueServer>();
+        //        foreach (var change in loginBody.ChangesMade)
+        //        {
+        //            syncChanges.Add(EntityMapper.MapSyncQueueClientToSyncQueueServer(change, loginBody.IdDevice));
+        //        }
+        //        // save all changes done offline
+        //        await _notesRepository.SyncData(syncChanges);
 
 
-                await _notesRepository.GetServerSyncChanges(loginBody.user, loginBody.IdDevice);
+        //        await _notesRepository.GetServerSyncChanges(loginBody.user, loginBody.IdDevice);
 
-                return Ok(new { 
-                    success = true, 
-                    message = "Changes synced successfully.",
-                    data = syncChanges  
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { success = false, message = $"Error syncing changes: {ex.Message}" });
-            }
-        }
+        //        return Ok(new { 
+        //            success = true, 
+        //            message = "Changes synced successfully.",
+        //            data = syncChanges  
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, new { success = false, message = $"Error syncing changes: {ex.Message}" });
+        //    }
+        //}
 
         [HttpDelete()]
         public async Task DeleteUserById(Guid idUser)

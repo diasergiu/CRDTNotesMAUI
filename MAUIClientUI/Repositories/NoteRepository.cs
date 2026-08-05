@@ -80,23 +80,23 @@ namespace MAUIClientUI.Repositories
         }
         //untested if it saves the changes to the database
         // kind of duplicated but i might need to use the device ID
-        public void UpdateListNotes(List<ISyncQueue> flaggedNotes)
-        {
-            if (flaggedNotes == null) return;
-            foreach (SyncQueueClient queue in flaggedNotes)
-            {
-                if (queue.Operation == "Update")
-                {
-                    NoteClient existingNote = _dbContextUser.Notes.FirstOrDefault(n => n.IdNote == queue.IdNote); // probably SyncData dosent needto have IdUser
-                    if (existingNote != null)
-                    {
-                        existingNote.Content = queue.ContentChanges;
-                        existingNote.LastUpdate = queue.LastUpdate;
-                    }
-                }
-                _dbContextUser.SaveChangesAsync();
-            }
-        }
+        //public void UpdateListNotes(List<ISyncQueue> flaggedNotes)
+        //{
+        //    if (flaggedNotes == null) return;
+        //    foreach (SyncQueueClient queue in flaggedNotes)
+        //    {
+        //        if (queue.Operation == "Update")
+        //        {
+        //            NoteClient existingNote = _dbContextUser.Notes.FirstOrDefault(n => n.IdNote == queue.IdNote); // probably SyncData dosent needto have IdUser
+        //            if (existingNote != null)
+        //            {
+        //                existingNote.Content = queue.ContentChanges;
+        //                existingNote.LastUpdate = queue.LastUpdate;
+        //            }
+        //        }
+        //        _dbContextUser.SaveChangesAsync();
+        //    }
+        //}
 
         public void SaveNewUser(UserClient newUser)
         {
