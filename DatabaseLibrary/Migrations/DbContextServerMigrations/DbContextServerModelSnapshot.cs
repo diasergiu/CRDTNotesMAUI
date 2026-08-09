@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace DatabaseLibrary.Migrations
+namespace DatabaseLibrary.Migrations.DbContextServerMigrations
 {
     [DbContext(typeof(DbContextServer))]
     partial class DbContextServerModelSnapshot : ModelSnapshot
@@ -16,6 +16,41 @@ namespace DatabaseLibrary.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.9");
+
+            modelBuilder.Entity("DatabaseLibrary.Entities.Server.CRDTCharacterServer", b =>
+                {
+                    b.Property<int>("IdCharacter")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("IdNote")
+                        .HasColumnType("TEXT");
+
+                    b.Property<char>("Character")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ClockDateTime")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("IdLeftCharacter")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("IdRightCharacter")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Opperation")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("Tombstone")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("IdCharacter", "IdNote");
+
+                    b.HasIndex("IdNote");
+
+                    b.ToTable("CRDTCharacters");
+                });
 
             modelBuilder.Entity("DatabaseLibrary.Entities.Server.Device", b =>
                 {
@@ -155,6 +190,17 @@ namespace DatabaseLibrary.Migrations
                     b.HasIndex("IdDevice");
 
                     b.ToTable("User_Devices");
+                });
+
+            modelBuilder.Entity("DatabaseLibrary.Entities.Server.CRDTCharacterServer", b =>
+                {
+                    b.HasOne("DatabaseLibrary.Entities.Server.NoteServer", "NoteServer")
+                        .WithMany()
+                        .HasForeignKey("IdNote")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("NoteServer");
                 });
 
             modelBuilder.Entity("DatabaseLibrary.Entities.Server.Note_UserServer", b =>

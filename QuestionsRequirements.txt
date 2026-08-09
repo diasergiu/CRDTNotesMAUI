@@ -37,3 +37,28 @@ start server:
 
 Note is created/update and then we log in
 We logg in than we create/update a note
+
+
+
+new entity:
+CRDTCharacted:
+	IdCharacter int;
+	IdLeft int
+	IdRight int
+	character Text;
+	toombstone boolean
+	opperation: (insert, delete)
+	clockDateTime DateTime
+
+
+Garbage Collection for CRDTEntity (used when all are at some point, Based on Note version)
+Gerbage collection for characters in toombstone state 
+
+Recreate Note in the UI from the CRDTCharacters tree in the database
+
+
+Delete SyncQueue
+On Key Stroke should not send to he server if user is not logged in
+Loggout functionality
+Ability to get access to a note created by another user (shared note)
+(probably) what Id dose note have when we are logged out, What IdNote should the CRDTCharacter have when saving changes

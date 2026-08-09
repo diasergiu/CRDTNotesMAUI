@@ -11,6 +11,7 @@ namespace DatabaseLibrary.Entities.Client
         public DbSet<Note_UserClient> NoteUsers { get; set; }
         public DbSet<UserClient> Users { get; set; }
         public DbSet<SyncQueueClient> SyncQueues { get; set; }
+        public DbSet<CRDTCharacterClient> CRDTCharacters { get; set; }
 
         public string DbPath { get; }
 

@@ -22,7 +22,8 @@
                     Grid.Column="0"
                     Placeholder="Enter note title..."
                     FontSize="16"
-                    TextChanged="OnTitleTextChanged" />
+                    TextChanged="OnTitleTextChanged" 
+                   />
                 <Label 
                     x:Name="WarningIcon"
                     Grid.Column="1"
@@ -49,7 +50,9 @@
                 MinimumHeightRequest="300"
                 AutoSize="TextChanges"
                 Margin="0,0,0,20"
-                TextChanged="OnContentTextChanged" />
+                HandlerChanged="OnEditorHandlerChanged"/>
+                <!--TextChanged="OnContentTextChanged"--> 
+                
 
             <Button 
                 x:Name="SaveButton"

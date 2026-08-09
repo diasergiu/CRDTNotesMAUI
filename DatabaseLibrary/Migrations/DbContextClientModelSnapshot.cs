@@ -17,6 +17,41 @@ namespace DatabaseLibrary.Migrations.DbContextClientMigrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.9");
 
+            modelBuilder.Entity("DatabaseLibrary.Entities.Client.CRDTCharacterClient", b =>
+                {
+                    b.Property<int>("IdCharacter")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("IdNote")
+                        .HasColumnType("TEXT");
+
+                    b.Property<char>("Character")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ClockDateTime")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("IdLeftCharacter")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("IdRightCharacter")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Opperation")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("Tombstone")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("IdCharacter", "IdNote");
+
+                    b.HasIndex("IdNote");
+
+                    b.ToTable("CRDTCharacters");
+                });
+
             modelBuilder.Entity("DatabaseLibrary.Entities.Client.NoteClient", b =>
                 {
                     b.Property<Guid>("IdNote")
@@ -118,6 +153,17 @@ namespace DatabaseLibrary.Migrations.DbContextClientMigrations
                     b.HasKey("IdUser");
 
                     b.ToTable("User");
+                });
+
+            modelBuilder.Entity("DatabaseLibrary.Entities.Client.CRDTCharacterClient", b =>
+                {
+                    b.HasOne("DatabaseLibrary.Entities.Client.NoteClient", "NoteClient")
+                        .WithMany()
+                        .HasForeignKey("IdNote")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("NoteClient");
                 });
 
             modelBuilder.Entity("DatabaseLibrary.Entities.Client.Note_UserClient", b =>

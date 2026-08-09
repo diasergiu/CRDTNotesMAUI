@@ -42,7 +42,7 @@ public partial class MainPageNotes : ContentPage
             await _viewModel.LoadNotesAsync(dbContext);
         }
     }
-
+    #region Just navigation to other elements
     private async void OnOpenNoteClicked(object sender, EventArgs e)
     {
         if (sender is Button button && button.CommandParameter is NoteClient note)
@@ -51,6 +51,18 @@ public partial class MainPageNotes : ContentPage
         }
     }
 
+    private async void OnGetAccessToNotesClicked(object? sender, EventArgs e)
+    {
+        await Navigation.PushModalAsync(new NoteConnectionPopup());
+    }
+
+
+    private async void OnLoginClicked(object sender, EventArgs e)
+    {
+        var loginPopup = new LoginPopup();
+        await Navigation.PushModalAsync(loginPopup);
+    }
+    #endregion
     private async void OnCreateNoteClicked(object sender, EventArgs e)
     {
         var newNote = new NoteClient
@@ -72,13 +84,6 @@ public partial class MainPageNotes : ContentPage
             await _viewModel.LoadNotesAsync(dbContext);
         }
     }
-
-    private async void OnLoginClicked(object sender, EventArgs e)
-    {
-        var loginPopup = new LoginPopup();
-        await Navigation.PushModalAsync(loginPopup);
-    }
-
     private async void OnSyncNotesClicked(object sender, EventArgs e)
     {
         if (!_isLoggedIn)
@@ -108,8 +113,9 @@ public partial class MainPageNotes : ContentPage
         _currentUserId = userId;
         _isLoggedIn = true;
 
-        // Enable the sync button
+        // Enable the sync and NoteAccess buttons
         SyncNotesButton.IsEnabled = true;
+        GetAccessToNotesButton.IsEnabled = true;
 
         var clientChanges = _noteRepository.GetNoteFromUser(userId);
         var result = _noteServices.SendChangesToServer(clientChanges);

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MAUIClientUI.UserInterface.NoteConnectionPopup"
+             Title="NoteConnectionPopup">
+
+
+    <Grid VerticalOptions="Center" HorizontalOptions="Center">
+        <Frame BackgroundColor="White"
+           CornerRadius="10"
+           Padding="30"
+           HasShadow="True"
+           WidthRequest="350"
+           MaximumWidthRequest="400">
+
+            <VerticalStackLayout>
+                <VerticalStackLayout>
+                    <Label  Text="IdNote to Connect" 
+                            FontSize="24"
+                            FontAttributes="Bold"
+                            HorizontalOptions="Center"
+                            TextColor="Black" />
+                    <Entry x:Name="IdNoteEntry"
+                           Placeholder="Enter IdNote"
+                           FontSize="16"
+                           BackgroundColor="#F5F5F5"
+                           TextColor="Black" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10,0,0">
+                        <Button Grid.Column="0"
+                                Text="Cancel"
+                                BackgroundColor="#9E9E9E"
+                                TextColor="White"
+                                CornerRadius="8"
+                                HeightRequest="50"
+                                Clicked="OnCancelClicked" />
+
+                        <Button Grid.Column="1"
+                                x:Name="AccessNoteButton"
+                                Text="Access Note"
+                                BackgroundColor="#4CAF50"
+                                TextColor="White"
+                                CornerRadius="8"
+                                HeightRequest="50"
+                                Clicked="OnAccessNoteClicked" />
+                    </Grid>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+
+        </Frame>
+
+    </Grid>
+</ContentPage>

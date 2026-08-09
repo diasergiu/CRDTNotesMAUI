@@ -91,6 +91,9 @@
 	  <MauiXaml Update="UserInterface\MainPageNotes.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="UserInterface\NoteConnectionPopup.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="UserInterface\NoteView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
