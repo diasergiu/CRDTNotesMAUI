@@ -22,6 +22,7 @@ public partial class NoteView : ContentPage
     private CRDTCharacterRepository _crdtCharactetrRepository;
     private NoteCursor _noteCursor;
     private int _lastCursorPosition = 0; // Track cursor position
+    private string _lastEditorText = ""; // Track previous editor text for character detection
 
     public NoteView(NoteClient note, INoteServices noteService, bool isNewNote = false)
     {
@@ -35,7 +36,8 @@ public partial class NoteView : ContentPage
         _noteServices = noteService;
         // Convert Guid to int for clientId (take first 4 bytes of Guid)
         //int clientId = BitConverter.ToInt32(UserDevice.LocalUser.ToByteArray(), 0);
-        _noteCursor = new NoteCursor(_crdtCharactetrRepository.GetCRDTCharacterFromNote(note.IdNote), DeviceIdentityService.GetCurrentUserId());
+        // we already load the CRDT data when we open the program. We should not need to make another 
+        _noteCursor = new NoteCursor(_currentNote.CRDTCharacter, DeviceIdentityService.GetCurrentUserId());
         //new NoteServices("/api/notes"); // should split clientNoteServices into multiple classes
         LoadNoteData();
     }
@@ -221,10 +223,6 @@ public partial class NoteView : ContentPage
 
         if (_currentNote == null) return;
 
-        CRDTCharacterClient changesMade = new CRDTCharacterClient();
-        changesMade.Character = TitleEntry.Text[2]; // not what we want 
-        changesMade.Opperation = "insert";
-
         _currentNote.Title = TitleEntry.Text;
         _currentNote.Content = ContentEditor.Text ?? "";
         _currentNote.CreationDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -287,6 +285,7 @@ public partial class NoteView : ContentPage
         {
             platformView.KeyDown += ContentEditor_KeyDown;
             platformView.KeyUp += ContentEditor_KeyUp;
+            platformView.TextChanging += ContentEditor_TextChanging;
         }
 #elif ANDROID
             var platformView = (Android.Widget.EditText)editor.Handler.PlatformView;
@@ -301,40 +300,73 @@ public partial class NoteView : ContentPage
 #if WINDOWS
     private void ContentEditor_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
     {
-    // Get the actual character
-    var key = e.Key.ToString();
-    int cursorPosition = GetEditorCursorPosition(ContentEditor);
-    // For character input, you might need to handle special cases
-    if (key.Length == 1 || key == "Space" )
-    {
-    if(key == "Space"){
-        key = " ";
-    }
-        GetCharacterFromInput(key[0]);
-        
-        var newCharacterId = _noteCursor.InsertCharacter(cursorPosition, key[0]);
-        newCharacterId.IdNote = _currentNote.IdNote; // not the best solution replace it later
-        _crdtCharactetrRepository.SaveNewCrdtCharacter(newCharacterId);
-        Debug.WriteLine($"Left And Right are: {newCharacterId}");
-        Debug.WriteLine($"Key Down: {key}");
-    }
-    else if(key == "Back"){
-        var leftCharacter =  _noteCursor.deleteCharacterToTheLeft(cursorPosition);
-        _crdtCharactetrRepository.UpdateCharacter(leftCharacter);
-    }
-    else
-    {
-        // Handle special keys (Enter, Shift, etc.)
-        Debug.WriteLine($"Special Key: {key}");
-    }
-    
+        // Only handle special keys here (backspace, delete, enter, etc.)
+        // Regular character input is handled by ContentEditor_TextComposition
+        int cursorPosition = GetEditorCursorPosition(ContentEditor);
 
- }
+        if (e.Key == Windows.System.VirtualKey.Back)
+        {
+            var leftCharacter = _noteCursor.deleteCharacterToTheLeft(cursorPosition + 1);
+            if (leftCharacter != null)
+            {
+                _crdtCharactetrRepository.UpdateCharacter(leftCharacter);
+            }
+            e.Handled = true;
+            Debug.WriteLine("Backspace pressed");
+        }
+        else if (e.Key == Windows.System.VirtualKey.Enter)
+        {
+            // Handle Enter key if needed
+            // For now, let the editor handle it normally
+            Debug.WriteLine("Enter pressed");
+        }
+    }
 
 private void ContentEditor_KeyUp(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
 {
 
     Debug.WriteLine($"Key Up: {e.Key.ToString()}");
+}
+
+private void ContentEditor_TextChanging(Microsoft.UI.Xaml.Controls.TextBox sender, Microsoft.UI.Xaml.Controls.TextBoxTextChangingEventArgs args)
+{
+    // TextChanging fires before the text is actually changed
+    // We need to get the actual character being added
+    string oldText = _lastEditorText ?? "";
+    string newText = sender.Text ?? "";
+
+    // Only process if exactly one character was added
+    if (newText.Length == oldText.Length + 1)
+    {
+        // Find which character was added
+        int insertPosition = -1;
+        for (int i = 0; i < oldText.Length; i++)
+        {
+            if (i >= newText.Length || oldText[i] != newText[i])
+            {
+                insertPosition = i;
+                break;
+            }
+        }
+
+        // If no difference found, character was added at the end
+        if (insertPosition == -1)
+        {
+            insertPosition = oldText.Length;
+        }
+
+        char typedCharacter = newText[insertPosition];
+        int cursorPosition = sender.SelectionStart;
+
+        GetCharacterFromInput(typedCharacter);
+
+        var newCharacterId = _noteCursor.InsertCharacter(cursorPosition - 1, typedCharacter);
+        newCharacterId.IdNote = _currentNote.IdNote;
+        _crdtCharactetrRepository.SaveNewCrdtCharacter(newCharacterId);
+        Debug.WriteLine($"Character Typed: {typedCharacter}");
+    }
+
+    _lastEditorText = newText;
 }
 #elif ANDROID
     private void ContentEditor_KeyPress(object sender, Android.Views.View.KeyEventArgs e)

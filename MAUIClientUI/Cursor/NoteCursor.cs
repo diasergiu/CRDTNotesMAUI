@@ -1,4 +1,5 @@
 ﻿using DatabaseLibrary.Entities.Client;
+using Microsoft.Maui.Layouts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,12 +28,16 @@ namespace MAUIClientUI.Cursor
 
         public NoteCursor(List<CRDTCharacterClient> listFromDataBase, Guid clientId)
         {
+           
             _idService = new LseqIdService(clientId);
 
             characterList = new Dictionary<decimal, CRDTCharacterClient>();
-            foreach(CRDTCharacterClient character in listFromDataBase)
+            if (listFromDataBase != null)
             {
-                characterList.Add(character.IdCharacter, character);
+                foreach (CRDTCharacterClient character in listFromDataBase)
+                {
+                    characterList.Add(character.IdCharacter, character);
+                }
             }
         }
 
@@ -45,30 +50,38 @@ namespace MAUIClientUI.Cursor
 
             // Generate unique ID using LSEQ with conflict resolution
             decimal newId = _idService.GenerateIdBetween(leftId, rightId, _clientId);
-
-            var newCharacter = new CRDTCharacterClient()
+            // if we insert a character in an Id belonginng to a deleted character
+            if (characterList.ContainsKey(newId))
             {
-                Character = character,
-                IdCharacter = newId,
-                IdLeftCharacter = leftId,
-                IdRightCharacter = rightId,
-                Tombstone = false,
-                ClientId = _clientId,
-                ClockDateTime = DateTime.UtcNow.ToString("O"),
-                Opperation = "insert"
-            };
-
-            characterList.Add(newId, newCharacter);
-            if (leftId.HasValue && characterList.ContainsKey(leftId.Value))
-            {
-                characterList[leftId.Value].IdRightCharacter = newCharacter.IdCharacter;
+                characterList[newId].Tombstone = false;
+                characterList[newId].Character = character;
             }
-            if (rightId.HasValue && characterList.ContainsKey(rightId.Value))
+            else
             {
-                characterList[rightId.Value].IdLeftCharacter = newCharacter.IdCharacter;
-            }
+                var newCharacter = new CRDTCharacterClient()
+                {
+                    Character = character,
+                    IdCharacter = newId,
+                    IdLeftCharacter = leftId,
+                    IdRightCharacter = rightId,
+                    Tombstone = false,
+                    ClientId = _clientId,
+                    ClockDateTime = DateTime.UtcNow.ToString("O"),
+                    Opperation = "insert"
+                };
 
-            return newCharacter;
+                characterList.Add(newId, newCharacter);
+              
+                if (leftId.HasValue && characterList.ContainsKey(leftId.Value))
+                {
+                    characterList[leftId.Value].IdRightCharacter = newCharacter.IdCharacter;
+                }
+                if (rightId.HasValue && characterList.ContainsKey(rightId.Value))
+                {
+                    characterList[rightId.Value].IdLeftCharacter = newCharacter.IdCharacter;
+                }
+            }
+            return characterList[newId];
         }
 
         /// <summary>
@@ -208,7 +221,7 @@ namespace MAUIClientUI.Cursor
         public CRDTCharacterClient deleteCharacterToTheLeft(int cursorPosition)
         {
             var (leftId, rightId) = GetAdjacentCharacterIds(cursorPosition);
-            characterList[(decimal)leftId].Tombstone = true;
+            characterList[(decimal)leftId].Tombstone = true; // dosent delete properly
             return characterList[(decimal)leftId];
         }
 
