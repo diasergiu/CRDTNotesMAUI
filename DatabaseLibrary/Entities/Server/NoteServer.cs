@@ -1,3 +1,4 @@
+using DatabaseLibrary.Entities.Client;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -19,5 +20,6 @@ namespace DatabaseLibrary.Entities.Server
         public bool DirtyFlagChangesMade { get; set; }
         public int Version { get; set; }
         public List<Note_UserServer>? NoteUser { get; set; }
+        public List<CRDTCharacterServer>? CRDTCharacter { get; set; }
     }
 }

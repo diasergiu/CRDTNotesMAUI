@@ -19,8 +19,8 @@ namespace DatabaseLibrary.Migrations.DbContextClientMigrations
 
             modelBuilder.Entity("DatabaseLibrary.Entities.Client.CRDTCharacterClient", b =>
                 {
-                    b.Property<int>("IdCharacter")
-                        .HasColumnType("INTEGER");
+                    b.Property<decimal>("IdCharacter")
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("IdNote")
                         .HasColumnType("TEXT");
@@ -28,15 +28,18 @@ namespace DatabaseLibrary.Migrations.DbContextClientMigrations
                     b.Property<char>("Character")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("ClientId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("ClockDateTime")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("IdLeftCharacter")
-                        .HasColumnType("INTEGER");
+                    b.Property<decimal?>("IdLeftCharacter")
+                        .HasColumnType("TEXT");
 
-                    b.Property<int?>("IdRightCharacter")
-                        .HasColumnType("INTEGER");
+                    b.Property<decimal?>("IdRightCharacter")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Opperation")
                         .IsRequired()

@@ -23,5 +23,6 @@ namespace DatabaseLibrary.Entities.Client
         public int Version { get; set; }
         public bool DirtyFlagChangesMade { get; set; }
         public List<Note_UserClient>? NoteUser { get; set; }
+        public List<CRDTCharacterClient>? CRDTCharacter { get; set; }
     }
 }

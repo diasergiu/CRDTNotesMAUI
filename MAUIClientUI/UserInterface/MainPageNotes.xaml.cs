@@ -65,6 +65,7 @@ public partial class MainPageNotes : ContentPage
     #endregion
     private async void OnCreateNoteClicked(object sender, EventArgs e)
     {
+
         var newNote = new NoteClient
         {
             Title = "",
@@ -72,6 +73,7 @@ public partial class MainPageNotes : ContentPage
             CreationDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
             LastUpdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
         };
+        _noteRepository.createNote(newNote);
         await Navigation.PushAsync(new NoteView(newNote, _noteServices, isNewNote: true));
     }
 

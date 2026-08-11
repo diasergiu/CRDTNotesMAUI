@@ -14,6 +14,7 @@ namespace MAUIClientUI.MVVM
     public class NotesViewModel : INotifyPropertyChanged
     {
         private ObservableCollection<NoteClient> _listOfNotes = new ObservableCollection<NoteClient>();
+        private ObservableCollection<CRDTCharacterClient> _notes = new ObservableCollection<CRDTCharacterClient>();
 
         public ObservableCollection<NoteClient> ListOfNotes
         {
@@ -28,11 +29,12 @@ namespace MAUIClientUI.MVVM
         public NotesViewModel()
         {
             ListOfNotes = new ObservableCollection<NoteClient>();
+            _notes = new ObservableCollection<CRDTCharacterClient>();
         }
 
         public async Task LoadNotesAsync(DbContextClient dbContext)
         {
-            var notes = await dbContext.Notes.ToListAsync();
+            var notes = await dbContext.Notes.Include(c => c.CRDTCharacter).ToListAsync();
             ListOfNotes.Clear();
             foreach (var note in notes)
             {

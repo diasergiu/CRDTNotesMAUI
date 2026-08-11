@@ -125,5 +125,10 @@ namespace MAUIClientUI.Repositories
             _dbContextUser.SaveChanges();
         }
 
+        public void textToCRDTCharacter(List<CRDTCharacterClient> characters)
+        {
+            _dbContextUser.CRDTCharacters.AddRange(characters);
+            _dbContextUser.SaveChanges();
+        }
     }
 }

@@ -32,6 +32,7 @@ namespace MAUIClientUI
                 })
                 .AddScoped<IAuthenticationService, AuthenticationService>()
                 .AddScoped<NoteRepository>()
+                .AddScoped<CRDTCharacterRepository>()
                 .AddScoped<ClientServices>();
 #if DEBUG
             builder.Logging.AddDebug();

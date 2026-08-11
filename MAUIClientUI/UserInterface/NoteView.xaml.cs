@@ -1,13 +1,10 @@
 using DatabaseLibrary.Entities;
 using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.Entities.Server;
-using DatabaseLibrary.Migrations.DbContextServerMigrations;
 using DatabaseLibrary.WrapperClasses;
 using MAUIClientUI.Cursor;
-using MAUIClientUI.MVVM;
 using MAUIClientUI.Repositories;
 using MAUIClientUI.Services;
-using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
 namespace MAUIClientUI.UserInterface;
@@ -22,8 +19,8 @@ public partial class NoteView : ContentPage
     private readonly INoteServices _noteServices;
     private bool _isNewNote;
     private CancellationTokenSource _autoSaveCts;
-    private NoteCursor noteCursor;
-    private List<CRDTCharacterClient> _crdtCharacters;  
+    private CRDTCharacterRepository _crdtCharactetrRepository;
+    private NoteCursor _noteCursor;
     private int _lastCursorPosition = 0; // Track cursor position
 
     public NoteView(NoteClient note, INoteServices noteService, bool isNewNote = false)
@@ -34,11 +31,31 @@ public partial class NoteView : ContentPage
         _databaseService = IPlatformApplication.Current.Services.GetService<IDatabaseServices>();
         _noteRepository = IPlatformApplication.Current.Services.GetService<NoteRepository>();
         _notificationService = IPlatformApplication.Current.Services.GetService<NotificationServices>();
+        _crdtCharactetrRepository = IPlatformApplication.Current.Services.GetService<CRDTCharacterRepository>();
         _noteServices = noteService;
-        noteCursor = new NoteCursor(_currentNote.Content);
+        // Convert Guid to int for clientId (take first 4 bytes of Guid)
+        //int clientId = BitConverter.ToInt32(UserDevice.LocalUser.ToByteArray(), 0);
+        _noteCursor = new NoteCursor(_crdtCharactetrRepository.GetCRDTCharacterFromNote(note.IdNote), DeviceIdentityService.GetCurrentUserId());
         //new NoteServices("/api/notes"); // should split clientNoteServices into multiple classes
         LoadNoteData();
     }
+
+    //public NoteView(Guid idNote, INoteServices noteService, bool isNewNote = false)
+    //{
+    //    InitializeComponent();
+    //    _isNewNote = isNewNote;
+    //    _databaseService = IPlatformApplication.Current.Services.GetService<IDatabaseServices>();
+    //    _noteRepository = IPlatformApplication.Current.Services.GetService<NoteRepository>();
+    //    _notificationService = IPlatformApplication.Current.Services.GetService<NotificationServices>();
+    //    _noteServices = noteService;
+    //    // Convert Guid to int for clientId (take first 4 bytes of Guid)
+    //    //int clientId = BitConverter.ToInt32(UserDevice.LocalUser.ToByteArray(), 0);
+    //    //new NoteServices("/api/notes"); // should split clientNoteServices into multiple classes
+    //    _crdtCharactetrRepository = IPlatformApplication.Current.Services.GetService<CRDTCharacterRepository>();
+
+    //    _noteCursor = new NoteCursor(_crdtCharactetrRepository.GetCRDTCharacterFromNote(idNote), DeviceIdentityService.GetCurrentUserId());
+    //    LoadNoteData();
+    //}
     protected override async void OnAppearing()
     {
         base.OnAppearing();
@@ -123,7 +140,7 @@ public partial class NoteView : ContentPage
         if (_currentNote != null && !_isNewNote)
         {
             TitleEntry.Text = _currentNote.Title;
-            ContentEditor.Text = _currentNote.Content;
+            ContentEditor.Text = _noteCursor.GetString();
         }
     }
 
@@ -261,7 +278,7 @@ public partial class NoteView : ContentPage
 
     private void OnEditorHandlerChanged(object sender, EventArgs e)
     {
-        
+
         if (sender is Editor editor && editor.Handler is not null)
         {
 #if WINDOWS
@@ -283,29 +300,40 @@ public partial class NoteView : ContentPage
 
 #if WINDOWS
     private void ContentEditor_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
-{
+    {
     // Get the actual character
     var key = e.Key.ToString();
+    int cursorPosition = GetEditorCursorPosition(ContentEditor);
     // For character input, you might need to handle special cases
-    if (key.Length == 1)
+    if (key.Length == 1 || key == "Space" )
     {
+    if(key == "Space"){
+        key = " ";
+    }
         GetCharacterFromInput(key[0]);
         
+        var newCharacterId = _noteCursor.InsertCharacter(cursorPosition, key[0]);
+        newCharacterId.IdNote = _currentNote.IdNote; // not the best solution replace it later
+        _crdtCharactetrRepository.SaveNewCrdtCharacter(newCharacterId);
+        Debug.WriteLine($"Left And Right are: {newCharacterId}");
         Debug.WriteLine($"Key Down: {key}");
+    }
+    else if(key == "Back"){
+        var leftCharacter =  _noteCursor.deleteCharacterToTheLeft(cursorPosition);
+        _crdtCharactetrRepository.UpdateCharacter(leftCharacter);
     }
     else
     {
         // Handle special keys (Enter, Shift, etc.)
         Debug.WriteLine($"Special Key: {key}");
     }
-    int cursorPosition = GetEditorCursorPosition(ContentEditor);
-    var newCharacterId = noteCursor.GetAdjacentCharacterIds(cursorPosition);
-        Debug.WriteLine($"Left And Right are: {newCharacterId}");
+    
 
-    }
+ }
 
 private void ContentEditor_KeyUp(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
 {
+
     Debug.WriteLine($"Key Up: {e.Key.ToString()}");
 }
 #elif ANDROID
@@ -316,7 +344,7 @@ private void ContentEditor_KeyUp(object sender, Microsoft.UI.Xaml.Input.KeyRoute
             CRDTCharacterClient CRDT = GetCharacterFromInput((char)e.Event.UnicodeChar);
             Debug.WriteLine($"Key Pressed: {CRDT.Character}");
         }
-    }                                                                                                                                                                                                           
+    }
 #endif
 
     private CRDTCharacterClient GetCharacterFromInput(char character)
