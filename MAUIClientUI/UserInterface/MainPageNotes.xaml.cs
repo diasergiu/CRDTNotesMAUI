@@ -74,7 +74,7 @@ public partial class MainPageNotes : ContentPage
             LastUpdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
         };
         _noteRepository.createNote(newNote);
-        await Navigation.PushAsync(new NoteView(newNote, _noteServices, isNewNote: true));
+        await Navigation.PushAsync(new NoteView(newNote, _noteServices, isNewNote: false));
     }
 
     protected override async void OnAppearing()

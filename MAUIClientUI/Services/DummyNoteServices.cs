@@ -30,9 +30,9 @@ namespace MAUIClientUI.Services
             return ApiResult.Success();
         }
 
-        public async Task<NoteConflictResult> UpdateNote(NoteClient updatedNote)
+        public async Task<ApiResultData<NoteConflictResult>> UpdateNote(NoteClient updatedNote)
         {
-            return NoteConflictResult.Success(EntityMapper.MapNoteClientToNoteServer(updatedNote));
+            return ApiResultData<NoteConflictResult>.Success(NoteConflictResult.Success(EntityMapper.MapNoteClientToNoteServer(updatedNote)));
         }
 
         public async Task<ApiResult> DeleteNote(Guid noteId)

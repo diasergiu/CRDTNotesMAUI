@@ -191,7 +191,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
             Assert.True(user1Result.IsSuccess, "User 1 update failed: " + user1Result.ErrorMessage);
 
             // Get the updated version from server response
-            var serverVersionAfterUser1 = user1Result.ServerNote.Version;
+            var serverVersionAfterUser1 = user1Result.Data.ServerNote.Version;
 
             // Act - User 2 updates the same note (simulating concurrent update)
             // User 2 doesn't know about User 1's update, so uses version 1, but server has a higher version now
@@ -213,8 +213,8 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
             Assert.NotNull(user2Result);
 
             // If there's a conflict, the test should document it
-            Assert.True(user2Result.IsSuccess && user2Result.IsVersionConflict);
-            Assert.NotNull(user2Result.ServerNote);
+            Assert.True(user2Result.IsSuccess && user2Result.Data.IsVersionConflict);
+            Assert.NotNull(user2Result.Data.ServerNote);
       
         }
 
@@ -255,9 +255,9 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
 
                 var result = await _noteService.UpdateNote(updatedNote);
                 Assert.True(result.IsSuccess, $"Update {i} failed: {result.ErrorMessage}");
-                Assert.False(result.IsVersionConflict, $"Update {i} should not have Version conflict");
+                Assert.False(result.Data.IsVersionConflict, $"Update {i} should not have Version conflict");
 
-                currentVersion = result.ServerNote.Version;
+                currentVersion = result.Data.ServerNote.Version;
             }
 
             // Assert

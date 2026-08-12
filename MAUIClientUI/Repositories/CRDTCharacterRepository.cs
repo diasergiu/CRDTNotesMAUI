@@ -39,8 +39,8 @@ namespace MAUIClientUI.Repositories
                 return;
             }
 
-            _dbContext.CRDTCharacters.Add(newCharacter);
-            _dbContext.SaveChanges();
+           _dbContext.CRDTCharacters.Add(newCharacter);
+           _dbContext.SaveChanges();
         }
 
         public void UpdateCharacter(CRDTCharacterClient updateCharacter)

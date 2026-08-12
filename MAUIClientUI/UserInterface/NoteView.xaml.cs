@@ -249,12 +249,12 @@ public partial class NoteView : ContentPage
 
             if (updateResult.IsSuccess)
             {
-                _currentNote.Version = updateResult.ServerNote.Version;
+                _currentNote.Version = updateResult.Data.ServerNote.Version;
             }
             // CONFLICT DETECTED - Version mismatch
-            else if (updateResult.IsVersionConflict)
+            else if (updateResult.Data?.IsVersionConflict == true)
             {
-                await ShowConflictDialog(updateResult.ServerNote);
+                await ShowConflictDialog(updateResult.Data.ServerNote);
                 return;  // ← DO NOT save locally, exit here
             }
 
