@@ -46,7 +46,7 @@ namespace MAUIClientUI.Cursor
                 return rightId.Value / 2;
 
             // Case 3: Insert after last character
-            if (rightId == null)
+            if (rightId == null)    
                 return leftId.Value + 1;
                     //+ (decimal) Math.Pow(10, -depth + 1);
 
@@ -74,30 +74,30 @@ namespace MAUIClientUI.Cursor
         /// ADVANCED: Handle simultaneous insert conflict using ClientId ordering
         /// This is called when server detects two operations with same generated ID
         /// </summary>
-        public bool ShouldAcceptConflictingInsert(
-            CRDTCharacterClient existingChar,
-            CRDTCharacterClient newChar,
-            DateTime existingTimestamp,
-            DateTime newTimestamp)
-        {
-            // Same ID from different clients
-            if (existingChar.IdCharacter != newChar.IdCharacter)
-                return true; // No conflict
+        //public bool ShouldAcceptConflictingInsert(
+        //    CRDTCharacterClient existingChar,
+        //    CRDTCharacterClient newChar,
+        //    DateTime existingTimestamp,
+        //    DateTime newTimestamp)
+        //{
+        //    // Same ID from different clients
+        //    if (existingChar.IdCharacter != newChar.IdCharacter)
+        //        return true; // No conflict
 
-            // Tiebreaker 1: By ClientId (deterministic)
-            // Lower ClientId takes precedence
-            if (existingChar.ClientId != newChar.ClientId)
-                return existingChar.ClientId < newChar.ClientId;
+        //    // Tiebreaker 1: By ClientId (deterministic)
+        //    // Lower ClientId takes precedence
+        //    if (existingChar.ClientId != newChar.ClientId)
+        //        return existingChar.ClientId < newChar.ClientId;
 
-            // Tiebreaker 2: By Timestamp (causal ordering)
-            if (existingTimestamp != newTimestamp)
-                return existingTimestamp < newTimestamp;
+        //    // Tiebreaker 2: By Timestamp (causal ordering)
+        //    if (existingTimestamp != newTimestamp)
+        //        return existingTimestamp < newTimestamp;
 
-            // Should never reach here - same ID, same client, same timestamp is invalid
-            throw new InvalidOperationException(
-                $"Duplicate insert detected: " +
-                $"Client {existingChar.ClientId} at {existingTimestamp.Ticks}");
-        }
+        //    // Should never reach here - same ID, same client, same timestamp is invalid
+        //    throw new InvalidOperationException(
+        //        $"Duplicate insert detected: " +
+        //        $"Client {existingChar.ClientId} at {existingTimestamp.Ticks}");
+        //}
 
         /// <summary>
         /// Detect and resolve ID collisions in a batch of concurrent operations

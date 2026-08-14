@@ -1,6 +1,7 @@
 ﻿using DatabaseLibrary.Entities.Client;
 using Microsoft.Maui.Layouts;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,8 @@ namespace MAUIClientUI.Cursor
 {
     public class NoteCursor
     {
-        public Dictionary<decimal, CRDTCharacterClient> characterList; // o should change acccess modifier to private
+        private SortedDictionary<decimal, CRDTCharacterClient> _characterList;
+        private SortedList<decimal, CRDTCharacterClient> _sortedList;
         private readonly LseqIdService _idService;
         private readonly Guid _clientId;
 
@@ -17,7 +19,8 @@ namespace MAUIClientUI.Cursor
         {
             _clientId = clientId;
             _idService = new LseqIdService(clientId);
-            characterList = new Dictionary<decimal, CRDTCharacterClient>();
+            _characterList = new SortedDictionary<decimal, CRDTCharacterClient>();
+            _sortedList = new SortedList<decimal, CRDTCharacterClient>();
             int i = 0;
             foreach (Char c in initialText)
             {
@@ -30,16 +33,27 @@ namespace MAUIClientUI.Cursor
         {
            
             _idService = new LseqIdService(clientId);
-
-            characterList = new Dictionary<decimal, CRDTCharacterClient>();
+            _sortedList = new SortedList<decimal, CRDTCharacterClient>();
+            _characterList = new SortedDictionary<decimal, CRDTCharacterClient>();
             if (listFromDataBase != null)
             {
                 foreach (CRDTCharacterClient character in listFromDataBase)
                 {
-                    characterList.Add(character.IdCharacter, character);
+                    
+                    _characterList.Add(character.IdCharacter, character);
+                    _sortedList.Add(character.IdCharacter, character);
                 }
             }
         }
+
+        public CRDTCharacterClient deleteCharacterToTheLeft(int cursorPosition)
+        {
+            var (leftId, rightId) = GetAdjacentCharacterIds(cursorPosition);
+            _characterList[(decimal)leftId].Tombstone = true; // dosent delete properly
+            _characterList[(decimal)leftId].IsDirtyFlag = true;
+            return _characterList[(decimal)leftId];
+        }
+
 
         /// <summary>
         /// Insert character at cursor position with conflict resolution
@@ -51,10 +65,10 @@ namespace MAUIClientUI.Cursor
             // Generate unique ID using LSEQ with conflict resolution
             decimal newId = _idService.GenerateIdBetween(leftId, rightId, _clientId);
             // if we insert a character in an Id belonginng to a deleted character
-            if (characterList.ContainsKey(newId))
+            if (_characterList.ContainsKey(newId))
             {
-                characterList[newId].Tombstone = false;
-                characterList[newId].Character = character;
+                _characterList[newId].Tombstone = false;
+                _characterList[newId].Character = character;
             }
             else
             {
@@ -62,26 +76,25 @@ namespace MAUIClientUI.Cursor
                 {
                     Character = character,
                     IdCharacter = newId,
-                    IdLeftCharacter = leftId,
-                    IdRightCharacter = rightId,
                     Tombstone = false,
                     ClientId = _clientId,
                     ClockDateTime = DateTime.UtcNow.ToString("O"),
-                    Opperation = "insert"
+                    Opperation = "insert",
+                    IsDirtyFlag = true
                 };
 
-                characterList.Add(newId, newCharacter);
-              
-                if (leftId.HasValue && characterList.ContainsKey(leftId.Value))
-                {
-                    characterList[leftId.Value].IdRightCharacter = newCharacter.IdCharacter;
-                }
-                if (rightId.HasValue && characterList.ContainsKey(rightId.Value))
-                {
-                    characterList[rightId.Value].IdLeftCharacter = newCharacter.IdCharacter;
-                }
+                _characterList.Add(newId, newCharacter);
+                _sortedList.Add(newId, newCharacter);
+                //if (leftId.HasValue && characterList.ContainsKey(leftId.Value))
+                //{
+                //    characterList[leftId.Value].IdRightCharacter = newCharacter.IdCharacter;
+                //}
+                //if (rightId.HasValue && characterList.ContainsKey(rightId.Value))
+                //{
+                //    characterList[rightId.Value].IdLeftCharacter = newCharacter.IdCharacter;
+                //}
             }
-            return characterList[newId];
+            return _characterList[newId];
         }
 
         /// <summary>
@@ -139,91 +152,93 @@ namespace MAUIClientUI.Cursor
         /// <summary>
         /// Get the IDs of characters immediately left and right of cursor position
         /// </summary>
-        public (decimal? leftCharacterId, decimal? rightCharacterId) GetAdjacentCharacterIds(
-              // might change it with something else, Like a HashSet or a Dictionary
-            int cursorPosition)
+        /// 
+        private (decimal? left, decimal? right) GetAdjacentCharacterIds(int currentPosition)
         {
-            if (characterList == null || characterList.Count == 0)
-                return (null, null);
-
-            // Get all non-tombstone characters in order
-            var orderedChars = GetVisibleCharactersInOrder();
-
-            // Cursor position 0 = before all characters
-            if (cursorPosition == 0)
-                return (null, orderedChars.Count > 0 ? orderedChars[0].IdCharacter : null);
-
-            // Cursor at end
-            if (cursorPosition >= orderedChars.Count)
-                return (orderedChars.Count > 0 ? orderedChars[orderedChars.Count - 1].IdCharacter : null, null);
-
-            // Cursor between characters
-            return (orderedChars[cursorPosition - 1].IdCharacter, orderedChars[cursorPosition].IdCharacter);
+            decimal? rightId = _sortedList.Count > currentPosition ? _sortedList.GetKeyAtIndex(currentPosition) : (decimal?)null;
+            decimal? leftId = currentPosition > 0 && _sortedList.Count > currentPosition - 1 ? _sortedList.GetKeyAtIndex(currentPosition - 1) : (decimal?)null; 
+        
+            return (leftId, rightId);
         }
+        //public (decimal? leftCharacterId, decimal? rightCharacterId) GetAdjacentCharacterIds(
+        //      // might change it with something else, Like a HashSet or a Dictionary
+        //    int cursorPosition)
+        //{
+        //    if (characterList == null || characterList.Count == 0)
+        //        return (null, null);
 
-        /// <summary>
-        /// Get visible (non-tombstone) characters in inorder traversal
-        /// </summary>
-        public List<CRDTCharacterClient> GetVisibleCharactersInOrder()
-        {
-            var result = new List<CRDTCharacterClient>();
-            var visited = new HashSet<decimal>();
+        //    // Get all non-tombstone characters in order
+        //    var orderedChars = GetVisibleCharactersInOrder();
 
-            // Find root (character with no left sibling)
-            var root= characterList
-                .FirstOrDefault(x => !x.Value.IdLeftCharacter.HasValue);
-  
-            if (root.Value != null)
-                TraverseInorder(root.Value, result, visited);
+        //    // Cursor position 0 = before all characters
+        //    if (cursorPosition == 0)
+        //        return (null, orderedChars.Count > 0 ? orderedChars[0].IdCharacter : null);
 
-            return result.Where(c => !c.Tombstone).ToList();
-        }
+        //    // Cursor at end
+        //    if (cursorPosition >= orderedChars.Count)
+        //        return (orderedChars.Count > 0 ? orderedChars[orderedChars.Count - 1].IdCharacter : null, null);
+
+        //    // Cursor between characters
+        //    return (orderedChars[cursorPosition - 1].IdCharacter, orderedChars[cursorPosition].IdCharacter);
+        //}
+
+        ///// <summary>
+        ///// Get visible (non-tombstone) characters in inorder traversal
+        ///// </summary>
+        //public List<CRDTCharacterClient> GetVisibleCharactersInOrder()
+        //{
+        //    var result = new List<CRDTCharacterClient>();
+        //    var visited = new HashSet<decimal>();
+
+        //    // Find root (character with no left sibling)
+        //    var root= characterList
+        //        .FirstOrDefault(x => !x.Value.IdLeftCharacter.HasValue);
+
+        //    if (root.Value != null)
+        //        TraverseInorder(root.Value, result, visited);
+
+        //    //return result.Where(c => !c.Tombstone).ToList();
+        //    return result.ToList();
+        //}
 
         public string GetString()
         {
-            var listCRDT = GetVisibleCharactersInOrder();
             StringBuilder builder = new StringBuilder();
-            foreach(CRDTCharacterClient character in listCRDT)
+            foreach (KeyValuePair<decimal, CRDTCharacterClient> character in _sortedList)
             {
-                builder.Append(character.Character);
+                builder.Append(character.Value.Character);
             }
 
             return builder.ToString();
         }
 
-        private void TraverseInorder(CRDTCharacterClient node, List<CRDTCharacterClient> result, HashSet<decimal> visited)
-        {
-            if (node == null || visited.Contains(node.IdCharacter))
-                return;
+        //private void TraverseInorder(CRDTCharacterClient node, List<CRDTCharacterClient> result, HashSet<decimal> visited)
+        //{
+        //    if (node == null || visited.Contains(node.IdCharacter))
+        //        return;
 
-            visited.Add(node.IdCharacter);
+        //    visited.Add(node.IdCharacter);
 
-            // Left subtree
-            if (node.IdLeftCharacter.HasValue)
-            {
-                var left = characterList.FirstOrDefault(c => c.Value.IdCharacter == node.IdLeftCharacter);
-                if (left.Value != null)
-                    TraverseInorder(left.Value, result, visited);
-            }
+        //    // Left subtree
+        //    if (node.IdLeftCharacter.HasValue)
+        //    {
+        //        var left = characterList.FirstOrDefault(c => c.Value.IdCharacter == node.IdLeftCharacter);
+        //        if (left.Value != null)
+        //            TraverseInorder(left.Value, result, visited);
+        //    }
 
-            // Current node
-            result.Add(node);
+        //    // Current node
+        //    result.Add(node);
 
-            // Right subtree
-            if (node.IdRightCharacter.HasValue)
-            {
-                var right = characterList.FirstOrDefault(c => c.Value.IdCharacter == node.IdRightCharacter);
-                if (right.Value != null)
-                    TraverseInorder(right.Value, result, visited);
-            }
-        }
+        //    // Right subtree
+        //    if (node.IdRightCharacter.HasValue)
+        //    {
+        //        var right = characterList.FirstOrDefault(c => c.Value.IdCharacter == node.IdRightCharacter);
+        //        if (right.Value != null)
+        //            TraverseInorder(right.Value, result, visited);
+        //    }
+        //}
 
-        public CRDTCharacterClient deleteCharacterToTheLeft(int cursorPosition)
-        {
-            var (leftId, rightId) = GetAdjacentCharacterIds(cursorPosition);
-            characterList[(decimal)leftId].Tombstone = true; // dosent delete properly
-            return characterList[(decimal)leftId];
-        }
 
         /// <summary>
         /// Given a character position in plain text, find its CRDTCharacter ID

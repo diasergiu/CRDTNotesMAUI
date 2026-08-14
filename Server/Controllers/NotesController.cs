@@ -84,18 +84,16 @@ namespace Server.Controllers
 
         //// PUT /api/notes/{id}
         [HttpPut("{id}")]
-        public async Task<UpdateNoteWithVersionResult> UpdateNotes(Guid noteId, [FromBody] NoteClient note)
+        public async Task<IActionResult> UpdateNotes(Guid noteId, [FromBody] NoteClient note)
         {
             Guid idUser = GetUserIdFromRequest();
             var validationError = ValidateUserId(idUser);
             if (validationError != null)
             {
-                //return validationError;
-                return UpdateNoteWithVersionResult.Error("error");
+                return validationError;
             }
-            //var updateNoteWithVersionResult =
-             return await _notesRepository.UpdateChanges(EntityMapper.MapNoteClientToNoteServer(note), idUser);
-            //return Ok(new { success = true, updateNoteWithVersionResult = updateNoteWithVersionResult }); // this needs to be tested
+            var updateNoteWithVersionResult = await _notesRepository.UpdateChanges(EntityMapper.MapNoteClientToNoteServer(note), idUser);
+            return Ok(new { success = true, data = updateNoteWithVersionResult }); // this needs to be tested
 
 
         }
@@ -111,7 +109,7 @@ namespace Server.Controllers
                 return validationError;
             }
             NoteServer note = await _notesRepository.GetNoteById(noteId, idUser);
-            return Ok(new { success = true, note = note });
+            return Ok(new { success = true, data = note });
 
 
         }

@@ -21,6 +21,7 @@ namespace DatabaseLibrary.Entities.Client
         public Guid IdNote { get; set; }
         public UserClient? User { get; set; }
         public NoteClient? Note { get; set; }
+        public int version { get; set ;}
 
         public Note_UserClient()
         {

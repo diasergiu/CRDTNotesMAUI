@@ -18,8 +18,7 @@ namespace MAUIClientUI.Repositories
 
         public List<NoteClient> GetNoteFromUser(Guid idUser)
         {
-            //return _dbContextUser.Notes.Where(n => n.NoteUser.Any(nu => nu.IdUser == idUser)).ToList();
-            return _dbContextUser.Notes.ToList();
+            return _dbContextUser.Notes.Where(n => n.NoteUser.Any(nu => nu.IdUser == idUser)).ToList();
         }
 
         public List<SyncQueueClient> getAllChanges(UserClient user)

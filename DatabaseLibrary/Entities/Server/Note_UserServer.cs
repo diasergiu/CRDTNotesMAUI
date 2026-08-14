@@ -21,5 +21,6 @@ namespace DatabaseLibrary.Entities.Server
         public Guid IdNote { get; set; }
         public UserServer? User { get; set; }
         public NoteServer? Note { get; set; }
+        public int version { get; set; }
     }
 }

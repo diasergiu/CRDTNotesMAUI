@@ -40,6 +40,8 @@ public partial class NoteView : ContentPage
         _noteCursor = new NoteCursor(_currentNote.CRDTCharacter, DeviceIdentityService.GetCurrentUserId());
         //new NoteServices("/api/notes"); // should split clientNoteServices into multiple classes
         LoadNoteData();
+  
+
     }
 
     //public NoteView(Guid idNote, INoteServices noteService, bool isNewNote = false)
@@ -143,19 +145,20 @@ public partial class NoteView : ContentPage
         {
             TitleEntry.Text = _currentNote.Title;
             ContentEditor.Text = _noteCursor.GetString();
+            _lastEditorText = ContentEditor.Text;
         }
     }
 
     private void OnTitleTextChanged(object sender, TextChangedEventArgs e)
     {
         WarningIcon.IsVisible = string.IsNullOrWhiteSpace(e.NewTextValue);
-        TriggerAutoSave();
+        PerformSaveAsync(silent: true);
     }
 
-    private void OnContentTextChanged(object sender, TextChangedEventArgs e)
-    {
-        TriggerAutoSave();
-    }
+    //private void OnContentTextChanged(object sender, TextChangedEventArgs e)
+    //{
+    //    PerformSaveAsync(silent: true);
+    //}
 
     /// <summary>
     /// Platform-specific: Get cursor position from Editor
@@ -285,7 +288,7 @@ public partial class NoteView : ContentPage
         {
             platformView.KeyDown += ContentEditor_KeyDown;
             platformView.KeyUp += ContentEditor_KeyUp;
-            platformView.TextChanging += ContentEditor_TextChanging;
+           // platformView.TextChanging += ContentEditor_TextChanging;
         }
 #elif ANDROID
             var platformView = (Android.Widget.EditText)editor.Handler.PlatformView;
@@ -314,12 +317,15 @@ public partial class NoteView : ContentPage
             e.Handled = true;
             Debug.WriteLine("Backspace pressed");
         }
-        else if (e.Key == Windows.System.VirtualKey.Enter)
+        else 
         {
-            // Handle Enter key if needed
-            // For now, let the editor handle it normally
-            Debug.WriteLine("Enter pressed");
-        }
+            Debug.WriteLine("Key pressed", e.Key.ToString());
+        
+            var newCharacterId = _noteCursor.InsertCharacter(cursorPosition, e.Key.ToString()[0]);
+            newCharacterId.IdNote = _currentNote.IdNote; // not the best solution replace it later
+            _crdtCharactetrRepository.SaveNewCrdtCharacter(newCharacterId);
+       }
+       PerformSaveAsync(silent: true);
     }
 
 private void ContentEditor_KeyUp(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
@@ -336,8 +342,8 @@ private void ContentEditor_TextChanging(Microsoft.UI.Xaml.Controls.TextBox sende
     string newText = sender.Text ?? "";
 
     // Only process if exactly one character was added
-    if (newText.Length == oldText.Length + 1)
-    {
+  //  if (newText.Length == oldText.Length + 1)
+  //  {
         // Find which character was added
         int insertPosition = -1;
         for (int i = 0; i < oldText.Length; i++)
@@ -355,7 +361,7 @@ private void ContentEditor_TextChanging(Microsoft.UI.Xaml.Controls.TextBox sende
             insertPosition = oldText.Length;
         }
 
-        char typedCharacter = newText[insertPosition];
+        char typedCharacter = oldText[insertPosition];
         int cursorPosition = sender.SelectionStart;
 
         GetCharacterFromInput(typedCharacter);
@@ -364,7 +370,7 @@ private void ContentEditor_TextChanging(Microsoft.UI.Xaml.Controls.TextBox sende
         newCharacterId.IdNote = _currentNote.IdNote;
         _crdtCharactetrRepository.SaveNewCrdtCharacter(newCharacterId);
         Debug.WriteLine($"Character Typed: {typedCharacter}");
-    }
+  //  }
 
     _lastEditorText = newText;
 }

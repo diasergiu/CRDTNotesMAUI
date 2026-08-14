@@ -12,5 +12,6 @@ namespace DatabaseLibrary.Entities.Client
         [ForeignKey("IdNote")]
         [JsonIgnore]
         public NoteClient NoteClient { get; set; }
+
     }
 }

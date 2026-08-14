@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Migrations.Operations;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -11,10 +12,10 @@ namespace DatabaseLibrary.Entities
                 int IdSync { get; set; }
                 Guid IdNote { get; set; }
                 Guid IdUser { get; set; }
-                string Operation { get; set; }
                 string ContentChanges { get; set; }
                 string LastUpdate { get; set; }
            }
     
+   
     
 }
