@@ -90,14 +90,14 @@ public partial class MainPageNotes : ContentPage
         if (charResults.IsSuccess)
         {
             // Update the local repository with the notes from the server
-            _noteRepository.saveCRDTChanges(charResults.Data);
+            _noteRepository.saveCRDTChanges(charResults.Data.Select(a => new CRDTCharacterClient(a)).ToList());
         }
     }
 
     private async void OnLoginSucceeded(object? sender, Guid userId)
     {
         // ✅ Re-create the service with real implementation
-        this._noteServices = new NoteServices("/api/notes");
+        this._noteServices = new NoteServices("/api/notes", _noteRepository);
         _currentUserId = userId;
         _isLoggedIn = true;
 
@@ -115,7 +115,8 @@ public partial class MainPageNotes : ContentPage
         }
 
         var offlineChanges = await _noteRepository.GetAllCRDTCharacters();
-        var crdtChangesResult = await _noteServices.SendCRDTChangestoServer(offlineChanges);
+
+        var crdtChangesResult = await _noteServices.SendCRDTChangestoServer(prepperCRDTForServer(offlineChanges));
         if (crdtChangesResult.IsSuccess)
         {
             await _noteRepository.ClearDirtyFlag(offlineChanges);
@@ -124,8 +125,19 @@ public partial class MainPageNotes : ContentPage
         var charResults = await _noteServices.GetAllCharacterByUser();
         if (charResults.IsSuccess)
         {
-            // Update the local repository with the notes from the server
-            _noteRepository.saveCRDTChanges(charResults.Data);
+            // Update the local repository with the Charactrers from the server
+            _noteRepository.saveCRDTChanges(charResults.Data.Select(a => new CRDTCharacterClient(a)).ToList());
         }
+    }
+
+
+    private List<CRDTCharacter> prepperCRDTForServer(List<CRDTCharacterClient> toChange)
+    {
+        List<CRDTCharacter> result = new List<CRDTCharacter>();
+        foreach (var item in toChange)
+        {
+            result.Add(new CRDTCharacter(item));
+        }
+        return result;
     }
 }

@@ -3,10 +3,14 @@ using DatabaseLibrary.RequestBody;
 using DatabaseLibrary.ResponsBody;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using Server.Controllers;
 using Server.ServeRepositories;
+using Server.ServerHub;
 using System.Reflection;
+using System.Text.Json;
 using Xunit;
 
 namespace Server.Test
@@ -24,7 +28,9 @@ namespace Server.Test
                 .Options;
 
             _dbContext = new DbContextServer(options);
-            _repository = new NotesRepository(_dbContext, null);
+
+      
+            _repository = new NotesRepository(_dbContext);
             _controller = new UserController(_dbContext, _repository);
         }
 
@@ -62,11 +68,10 @@ namespace Server.Test
 
             // The Data should be an anonymous object with idUser property
             Assert.NotNull(apiResponse.Data);
-            var dataDict = apiResponse.Data;
-
+           
             // Try to extract using dynamic as a fallback for anonymous types
-            dynamic data = apiResponse.Data;
-            Assert.Equal(userId, data.idUser);
+            var dataDict = apiResponse.Data as IDictionary<string, object>;
+            Assert.Equal(userId, ((JsonElement)dataDict["idUser"]).GetGuid());
         }
 
         [Fact]

@@ -24,7 +24,6 @@ namespace DatabaseLibrary.Entities.Server
             this.ClockDateTime = character.ClockDateTime;
             this.Tombstone = character.Tombstone;
             this.ClientId = character.ClientId;
-            this.IsDirtyFlag = character.IsDirtyFlag;
         }
 
         public CRDTCharacterServer(CRDTCharacter character, NoteServer noteServer) : this(character)

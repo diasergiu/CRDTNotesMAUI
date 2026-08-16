@@ -24,8 +24,7 @@ namespace MAUIClientUI.Cursor
         /// Generate unique ID between two boundaries
         /// Handles conflict when two users pick same ID
         /// </summary>
-        public decimal 
-            GenerateIdBetween(decimal? leftId, decimal? rightId, Guid clientId)
+        public decimal GenerateIdBetween(decimal? leftId, decimal? rightId, Guid clientId)
         {
             return GenerateIdBetweenInternal(leftId, rightId, clientId, depth: 1);
         }

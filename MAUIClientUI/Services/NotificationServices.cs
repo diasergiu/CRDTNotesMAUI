@@ -94,7 +94,7 @@ namespace MAUIClientUI.Services
 
         public bool IsConnected => _isConnected;
     }
-
+    
     public class NoteUpdateEventArgs : EventArgs
     {  
         public CRDTCharacter crdtCharacter { get; set; }

@@ -48,9 +48,6 @@ public partial class NoteView : ContentPage
         _crdtCharactetrRepository = IPlatformApplication.Current.Services.GetService<CRDTCharacterRepository>();
         _noteServices = noteService;
         _noteRepository = IPlatformApplication.Current.Services.GetService<NoteRepository>();
-        // Convert Guid to int for clientId (take first 4 bytes of Guid)
-        //int clientId = BitConverter.ToInt32(UserDevice.LocalUser.ToByteArray(), 0);
-        // we already load the CRDT data when we open the program. We should not need to make another 
         _noteCursor = new NoteCursor(_currentNote.CRDTCharacter, DeviceIdentityService.GetCurrentUserId());
         //new NoteServices("/api/notes"); // should split clientNoteServices into multiple classes
         LoadNoteData();
@@ -116,7 +113,7 @@ public partial class NoteView : ContentPage
         // Filter: only handle updates for the note currently being viewed
         if (e.IdNote != _currentNote?.IdNote) return;
 
-        _noteCursor.MergeCharacter(e);
+        _noteCursor.MergeCharacter(new CRDTCharacterClient(e));
 
         // Marshal the UI update to the main thread
         MainThread.BeginInvokeOnMainThread(() =>
@@ -306,7 +303,7 @@ public partial class NoteView : ContentPage
                 _crdtCharactetrRepository.UpdateCharacter(leftCharacter);
             }
             e.Handled = true;
-            SendChangesToServer(leftCharacter);
+            SendChangesToServer(new CRDTCharacter(leftCharacter));
             Debug.WriteLine("Backspace pressed");
         }
         else if (key.Length == 1 || key == "Space")
@@ -321,7 +318,7 @@ public partial class NoteView : ContentPage
             var newCharacter = _noteCursor.InsertCharacter(cursorPosition, e.Key.ToString()[0]);
             newCharacter.IdNote = _currentNote.IdNote; // not the best solution replace it later
             _crdtCharactetrRepository.SaveNewCrdtCharacter(newCharacter);
-            SendChangesToServer(newCharacter);
+            SendChangesToServer(new CRDTCharacter(newCharacter));
        
        }
        

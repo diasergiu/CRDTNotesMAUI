@@ -26,7 +26,7 @@ namespace DatabaseLibrary.Entities.Client
         [JsonIgnore]
         public List<Note_UserClient>? NoteUser { get; set; }
         [JsonIgnore]
-        public List<CRDTCharacter>? CRDTCharacter { get; set; }
+        public List<CRDTCharacterClient>? CRDTCharacter { get; set; }
 
     }
 }

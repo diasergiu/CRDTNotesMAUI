@@ -1,8 +1,11 @@
 using DatabaseLibrary.Entities;
 using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.Entities.Server;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using Server.ServeRepositories;
+using Server.ServerHub;
 
 namespace Server.Test
 {
@@ -18,7 +21,7 @@ namespace Server.Test
                 .Options;
 
             _dbContext = new DbContextServer(options);
-            _repository = new NotesRepository(_dbContext, null);
+            _repository = new NotesRepository(_dbContext);
         }
 
         #region GetUser Tests

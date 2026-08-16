@@ -4,6 +4,7 @@ using DatabaseLibrary.Entities.Server;
 using DatabaseLibrary.ResponsBody;
 using DatabaseLibrary.WrapperClasses;
 using MAUIClientUI.Miscellaneous;
+using MAUIClientUI.Repositories;
 using Newtonsoft.Json;
 using System.Net.Http.Json;
 using System.Text;
@@ -12,14 +13,14 @@ namespace MAUIClientUI.Services
 {
     public class NoteServices : ServicesClient, INoteServices
     {
-        public NoteServices(string URLModifier) : base(URLModifier)
+        private NoteRepository _notesRepository;
+        public NoteServices(string URLModifier, NoteRepository noteRepository) : base(URLModifier)
         {
-            //_baseURL = 
-
+            _notesRepository = noteRepository;    
         }
         public async Task<ApiResult> SendChangesToServer(List<NoteClient> noteClient)
         {
-            return await ExceptionHandlingHelper.ExecuteAsync(
+             return await ExceptionHandlingHelper.ExecuteAsync(
                 async () => await SendRequest<List<NoteClient>>(HttpMethod.Post, $"{_baseURL}/SendChangesToServer", noteClient),
                 nameof(SendChangesToServer)
             );
@@ -81,6 +82,12 @@ namespace MAUIClientUI.Services
                 async () => await SendRequest<List<CRDTCharacter>>(
                 HttpMethod.Put, $"{_baseURL}/SendCRDTChangestoServer", characters),
                 nameof(SendCRDTChangestoServer));
+
+            if (result.IsSuccess)
+            {
+                await _notesRepository.ClearDirtyFlag(characters.Select(a => new CRDTCharacterClient(a)).ToList());
+            }
+
             return result;
         }
         public async Task<ApiResultData<List<CRDTCharacter>>> GetAllCharacterByUser()

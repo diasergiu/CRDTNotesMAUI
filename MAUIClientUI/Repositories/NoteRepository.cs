@@ -114,17 +114,18 @@ namespace MAUIClientUI.Repositories
             _dbContextUser.SaveChanges();
         }
 
-        public async Task<List<CRDTCharacter>> GetAllCRDTCharacters()
+        public async Task<List<CRDTCharacterClient>> GetAllCRDTCharacters()
         {
-            return _dbContextUser.CRDTCharacters.Where(n => n.IsDirtyFlag == true).ToList();
+            return _dbContextUser.CRDTCharacters
+                .Where(n => n.IsDirtyFlag == true).AsNoTracking().ToList();
         }
 
         internal async Task<List<NoteClient>> GetAllNotes()
         {
-            return _dbContextUser.Notes.ToList();
+            return _dbContextUser.Notes.Include(b => b.CRDTCharacter).ToList();
         }
 
-        public async Task ClearDirtyFlag(List<CRDTCharacter> offlineChanges)
+        public async Task ClearDirtyFlag(List<CRDTCharacterClient> offlineChanges)
         {
             foreach (var character in offlineChanges)
             {
@@ -132,9 +133,11 @@ namespace MAUIClientUI.Repositories
             }
             _dbContextUser.CRDTCharacters.UpdateRange(offlineChanges);
             _dbContextUser.SaveChangesAsync();
+            _dbContextUser.ChangeTracker.Clear();
+
         }
 
-        public async Task saveCRDTChanges(List<CRDTCharacter> changes)
+        public async Task saveCRDTChanges(List<CRDTCharacterClient> changes)
         {
             // Get all IDs from the list
             var changeIds = changes.Select(c => c.IdCharacter).ToList();

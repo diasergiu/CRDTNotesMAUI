@@ -7,11 +7,22 @@ using System.Text;
 
 namespace DatabaseLibrary.Entities.Client
 {
+    [Table("CRDTCharacters")]
     public class CRDTCharacterClient: CRDTCharacter
     {
+
+        public CRDTCharacterClient()
+        {
+                
+        }
+        public CRDTCharacterClient(CRDTCharacter e) : base(e)
+        {
+            IsDirtyFlag = false;
+        }
         [ForeignKey("IdNote")]
         [JsonIgnore]
         public NoteClient NoteClient { get; set; }
+        public bool IsDirtyFlag { get; set; }
 
     }
 }

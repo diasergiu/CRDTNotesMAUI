@@ -25,7 +25,7 @@ public partial class LoginPopup : ContentPage
         _noteRepository = IPlatformApplication.Current.Services.GetService<NoteRepository>(); // should DbContext be singleton
         _authService = IPlatformApplication.Current.Services.GetService<IAuthenticationService>();
         _loginServices = new UserServices("/api/user");
-        _noteServices = new NoteServices("/api/notes");
+        _noteServices = new NoteServices("/api/notes", _noteRepository);
 
     }
 
