@@ -147,7 +147,8 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
             Assert.NotNull(loginResult);
             Assert.True(loginResult.IsSuccess, $"Login failed: {loginResult.ErrorMessage}");
             Assert.NotNull(loginResult.Data);
-            Assert.IsType<List<ISyncQueue>>(loginResult.Data);
+            Assert.IsType<UserClient>(loginResult.Data);
+            Assert.NotEqual(Guid.Empty, loginResult.Data.IdUser);
         }
 
         [Fact]
@@ -217,7 +218,8 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
             // Assert - Login
             Assert.True(loginResult.IsSuccess, $"Login failed: {loginResult.ErrorMessage}");
             Assert.NotNull(loginResult.Data);
-            Assert.IsType<Guid>(loginResult.Data);
+            Assert.IsType<UserClient>(loginResult.Data);
+            Assert.Equal(userId, loginResult.Data.IdUser);
         }
 
         [Fact]

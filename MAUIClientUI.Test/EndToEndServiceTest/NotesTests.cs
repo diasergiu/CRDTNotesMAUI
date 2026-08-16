@@ -144,7 +144,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
             }
 
             // Act
-            var retrieveResult = await _noteService.GetAllNotesFromUser(_user1.UserId);
+            var retrieveResult = await _noteService.GetAllCharacterByUser(_user1.UserId);
 
             // Assert
             Assert.True(retrieveResult.IsSuccess, $"Failed to retrieve notes: {retrieveResult.ErrorMessage}");
@@ -369,8 +369,8 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
             }
 
             // Act & Assert - Each user can retrieve their notes
-            var user1RetrieveResult = await _noteService.GetAllNotesFromUser(_user1.UserId);
-            var user2RetrieveResult = await _noteService.GetAllNotesFromUser(_user2.UserId);
+            var user1RetrieveResult = await _noteService.GetAllCharacterByUser(_user1.UserId);
+            var user2RetrieveResult = await _noteService.GetAllCharacterByUser(_user2.UserId);
 
             Assert.True(user1RetrieveResult.IsSuccess, "User 1 failed to retrieve notes");
             Assert.True(user2RetrieveResult.IsSuccess, "User 2 failed to retrieve notes");
@@ -485,7 +485,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
 
             // Act
             var createResult = await _noteService.CreateNewNote(note);
-            var retrieveResult = await _noteService.GetAllNotesFromUser(note.IdNote);
+            var retrieveResult = await _noteService.GetAllCharacterByUser(note.IdNote);
 
             // Assert
             Assert.True(createResult.IsSuccess, "Failed to create note");

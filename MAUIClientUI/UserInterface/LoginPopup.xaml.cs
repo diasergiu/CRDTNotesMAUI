@@ -60,7 +60,7 @@ public partial class LoginPopup : ContentPage
             _authService.OnLoginSuccess(result.Data.IdUser);
 
             // Login successful - close the popup
-
+           
 
 
             ShowStatus("Login successful!", false);

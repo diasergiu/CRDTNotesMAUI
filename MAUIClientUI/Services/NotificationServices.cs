@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
+﻿using DatabaseLibrary.Entities;
+using DatabaseLibrary.WrapperClasses;
+using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,31 +12,25 @@ namespace MAUIClientUI.Services
         private HubConnection _hubConnection;
         private bool _isConnected = false;
 
-        public event EventHandler<NoteUpdateEventArgs> NoteUpdated;
+        public event EventHandler<CRDTCharacter> NoteUpdated;
         public event EventHandler<string> ConnectionStatusChanged;
 
         public NotificationServices(string serverUrl)
         {
             _hubConnection = new HubConnectionBuilder()
-                .WithUrl($"{serverUrl}/notesHub")
+                .WithUrl($"{serverUrl}/notesHub", options =>
+                {
+                    options.Headers.Add("X-User-Id", UserDevice.LocalUser.ToString());
+                })
                 .WithAutomaticReconnect(new[] { TimeSpan.Zero, TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(10) })
                 .Build();
             
-            _hubConnection.On<dynamic>("NoteUpdated", (data) =>
+            _hubConnection.On<CRDTCharacter>("NoteUpdated", (data) =>
             {
                 try
                 {
-                    var args = new NoteUpdateEventArgs
-                    {
-                        NoteId = data.GetProperty("noteId").GetGuid(),  
-                        Title = data.GetProperty("title").GetString(),
-                        Content = data.GetProperty("content").GetString(),
-                        LastUpdate = DateTime.ParseExact(data.GetProperty("lastUpdate").GetString(),
-                        "yyyy-MM-dd HH:mm:ss",
-                        System.Globalization.CultureInfo.InvariantCulture),
-                        Version = data.GetProperty("version").GetInt32()
-                    };
-                    NoteUpdated?.Invoke(this, args);
+                    
+                    NoteUpdated?.Invoke(this, data);
                 }
                 catch (KeyNotFoundException ex)
                 {
@@ -100,12 +96,16 @@ namespace MAUIClientUI.Services
     }
 
     public class NoteUpdateEventArgs : EventArgs
-    {
-        public Guid NoteId { get; set; }
-        public string Title { get; set; }
-        public string Content { get; set; }
-        public DateTime LastUpdate { get; set; }
-        public int Version { get; set; }
+    {  
+        public CRDTCharacter crdtCharacter { get; set; }
+        //public decimal IdCharacter { get; set; }
+        //public Guid IdNote { get; set; }
+        //public char Character { get; set; }
+        //public string Operation { get; set; }
+        //public string ClockDateTime { get; set; }
+        //public bool Tombstone { get; set; }
+        //public Guid ClientId { get; set; } // Essential for conflict resolution
+        //public bool IsDirtyFlag { get; set; }
     }
 
 }

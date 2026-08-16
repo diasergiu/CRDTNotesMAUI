@@ -9,6 +9,5 @@ namespace DatabaseLibrary.Entities
         public Guid IdNote { get; set; }
         public Guid IdUser { get; set; }
 
-        public int version { get; set; }
     }
 }

@@ -25,6 +25,11 @@ namespace MAUIClientUI.Services
             return ApiResultData<List<NoteClient>>.Success(new List<NoteClient>());
         }
 
+        public async Task<ApiResultData<List<NoteClient>>> GetAllCharacterByUser(Guid IdUser)
+        {
+            return ApiResultData<List<NoteClient>>.Success(new List<NoteClient>());
+        }
+
         public async Task<ApiResult> CreateNewNote(NoteClient currentNote)
         {
             return ApiResult.Success();
@@ -38,6 +43,16 @@ namespace MAUIClientUI.Services
         public async Task<ApiResult> DeleteNote(Guid noteId)
         {
             return ApiResult.Success();
+        }
+
+        public async Task<ApiResult> SendCRDTChangestoServer(List<CRDTCharacter> characters)
+        {
+            return ApiResult.Success();
+        }
+
+        public async Task<ApiResultData<List<CRDTCharacter>>> GetAllCharacterByUser()
+        {
+            return ApiResultData<List<CRDTCharacter>>.Success(new List<CRDTCharacter>());
         }
     }
 }

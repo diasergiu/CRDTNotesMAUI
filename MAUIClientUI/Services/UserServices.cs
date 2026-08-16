@@ -72,19 +72,26 @@ namespace MAUIClientUI.Services
                 string url = $"{_baseURL}/login?username={Uri.EscapeDataString(username)}&password={Uri.EscapeDataString(password)}";
 
                 var response = _httpClient.GetAsync(url).Result;
-                if (response.IsSuccessStatusCode)
+                var responseData = await response.Content.ReadFromJsonAsync<ApiResponse<object>>();
+
+                if (response.IsSuccessStatusCode && responseData?.Success == true)
                 {
-                    var user = response.Content.ReadFromJsonAsync<UserClient>().Result;
-                    
-                    // save user id to local memory, and to file in the future 
-                    UserDevice.localUser(user.IdUser);
-                    Console.WriteLine(UserDevice.LocalUser);
-                    return ApiResultData<UserClient>.Success(user);
+                    var userData = (System.Text.Json.JsonElement)responseData.Data;
+                    var idUserStr = userData.GetProperty("idUser").GetString();
+
+                    if (Guid.TryParse(idUserStr, out var userId))
+                    {
+                        var user = new UserClient { IdUser = userId };
+                        UserDevice.localUser(user.IdUser);
+                        Console.WriteLine(UserDevice.LocalUser);
+                        return ApiResultData<UserClient>.Success(user);
+                    }
                 }
-                else
-                {
-                    return ApiResultData<UserClient>.Failure($"Login failed: {response.ReasonPhrase}", ApiErrorType.ServerError);
-                }
+
+                return ApiResultData<UserClient>.Failure(
+                    responseData?.Message ?? $"Login failed: {response.ReasonPhrase}",
+                    ApiErrorType.ServerError
+                );
             }
             catch (HttpRequestException ex)
             {
@@ -110,16 +117,31 @@ namespace MAUIClientUI.Services
             try
             {
                 var response = await _httpClient.PostAsync("/api/user/register", content);
-                if (response.IsSuccessStatusCode)
+                var responseData = await response.Content.ReadFromJsonAsync<ApiResponse<object>>();
+
+                if (response.IsSuccessStatusCode && responseData?.Success == true)
                 {
-                    //var result = await LoginAsync(username, password);
-                    return ApiResultData<UserClient>.Success(await response.Content.ReadFromJsonAsync<UserClient>());
+                    var userData = (System.Text.Json.JsonElement)responseData.Data;
+                    var idUserStr = userData.GetProperty("idUser").GetString();
+                    var userName = userData.GetProperty("username").GetString();
+                    var userNameProp = userData.GetProperty("name").GetString();
+
+                    if (Guid.TryParse(idUserStr, out var userId))
+                    {
+                        var user = new UserClient 
+                        { 
+                            IdUser = userId,
+                            Username = userName,
+                            Name = userNameProp
+                        };
+                        return ApiResultData<UserClient>.Success(user);
+                    }
                 }
-                else
-                {
-                    var errorMessage = await response.Content.ReadAsStringAsync();
-                    return ApiResultData<UserClient>.Failure(errorMessage, ApiErrorType.ServerError);
-                }
+
+                return ApiResultData<UserClient>.Failure(
+                    responseData?.Message ?? "Registration failed.",
+                    ApiErrorType.ServerError
+                );
             }
             catch (Exception ex)
             {

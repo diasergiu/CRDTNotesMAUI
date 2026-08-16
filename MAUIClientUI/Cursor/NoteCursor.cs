@@ -1,4 +1,5 @@
-﻿using DatabaseLibrary.Entities.Client;
+﻿using DatabaseLibrary.Entities;
+using DatabaseLibrary.Entities.Client;
 using Microsoft.Maui.Layouts;
 using System;
 using System.Collections;
@@ -10,8 +11,8 @@ namespace MAUIClientUI.Cursor
 {
     public class NoteCursor
     {
-        private SortedDictionary<decimal, CRDTCharacterClient> _characterList;
-        private SortedList<decimal, CRDTCharacterClient> _sortedList;
+        private SortedDictionary<decimal, CRDTCharacter> _characterList;
+        private SortedList<decimal, CRDTCharacter> _sortedList;
         private readonly LseqIdService _idService;
         private readonly Guid _clientId;
 
@@ -19,8 +20,8 @@ namespace MAUIClientUI.Cursor
         {
             _clientId = clientId;
             _idService = new LseqIdService(clientId);
-            _characterList = new SortedDictionary<decimal, CRDTCharacterClient>();
-            _sortedList = new SortedList<decimal, CRDTCharacterClient>();
+            _characterList = new SortedDictionary<decimal, CRDTCharacter>();
+            _sortedList = new SortedList<decimal, CRDTCharacter>();
             int i = 0;
             foreach (Char c in initialText)
             {
@@ -29,15 +30,15 @@ namespace MAUIClientUI.Cursor
             }
         }
 
-        public NoteCursor(List<CRDTCharacterClient> listFromDataBase, Guid clientId)
+        public NoteCursor(List<CRDTCharacter> listFromDataBase, Guid clientId)
         {
            
             _idService = new LseqIdService(clientId);
-            _sortedList = new SortedList<decimal, CRDTCharacterClient>();
-            _characterList = new SortedDictionary<decimal, CRDTCharacterClient>();
+            _sortedList = new SortedList<decimal, CRDTCharacter>();
+            _characterList = new SortedDictionary<decimal, CRDTCharacter>();
             if (listFromDataBase != null)
             {
-                foreach (CRDTCharacterClient character in listFromDataBase)
+                foreach (CRDTCharacter character in listFromDataBase)
                 {
                     
                     _characterList.Add(character.IdCharacter, character);
@@ -46,7 +47,7 @@ namespace MAUIClientUI.Cursor
             }
         }
 
-        public CRDTCharacterClient deleteCharacterToTheLeft(int cursorPosition)
+        public CRDTCharacter deleteCharacterToTheLeft(int cursorPosition)
         {
             var (leftId, rightId) = GetAdjacentCharacterIds(cursorPosition);
             _characterList[(decimal)leftId].Tombstone = true; // dosent delete properly
@@ -58,7 +59,7 @@ namespace MAUIClientUI.Cursor
         /// <summary>
         /// Insert character at cursor position with conflict resolution
         /// </summary>
-        public CRDTCharacterClient InsertCharacter(int atPosition, char character)
+        public CRDTCharacter InsertCharacter(int atPosition, char character)
         {
             var (leftId, rightId) = GetAdjacentCharacterIds(atPosition);
 
@@ -72,14 +73,14 @@ namespace MAUIClientUI.Cursor
             }
             else
             {
-                var newCharacter = new CRDTCharacterClient()
+                var newCharacter = new CRDTCharacter()
                 {
                     Character = character,
                     IdCharacter = newId,
                     Tombstone = false,
                     ClientId = _clientId,
                     ClockDateTime = DateTime.UtcNow.ToString("O"),
-                    Opperation = "insert",
+                    Operation = "insert",
                     IsDirtyFlag = true
                 };
 
@@ -101,8 +102,8 @@ namespace MAUIClientUI.Cursor
         /// Handle concurrent inserts that generated the same ID
         /// </summary>
         //public void ResolveConflictingInsert(
-        //    CRDTCharacterClient existingChar,
-        //    CRDTCharacterClient incomingChar)
+        //    CRDTCharacter existingChar,
+        //    CRDTCharacter incomingChar)
         //{
         //    var existingTime = DateTime.Parse(existingChar.ClockDateTime);
         //    var incomingTime = DateTime.Parse(incomingChar.ClockDateTime);
@@ -135,7 +136,7 @@ namespace MAUIClientUI.Cursor
         ///// <summary>
         ///// Resolve batch of concurrent operations with potential ID collisions
         ///// </summary>
-        //public void ResolveBatchConflicts(List<CRDTCharacterClient> incomingChars)
+        //public void ResolveBatchConflicts(List<CRDTCharacter> incomingChars)
         //{
         //    var resolved = _idService.ResolveBatchConflicts(characterList, incomingChars);
 
@@ -185,9 +186,9 @@ namespace MAUIClientUI.Cursor
         ///// <summary>
         ///// Get visible (non-tombstone) characters in inorder traversal
         ///// </summary>
-        //public List<CRDTCharacterClient> GetVisibleCharactersInOrder()
+        //public List<CRDTCharacter> GetVisibleCharactersInOrder()
         //{
-        //    var result = new List<CRDTCharacterClient>();
+        //    var result = new List<CRDTCharacter>();
         //    var visited = new HashSet<decimal>();
 
         //    // Find root (character with no left sibling)
@@ -204,7 +205,7 @@ namespace MAUIClientUI.Cursor
         public string GetString()
         {
             StringBuilder builder = new StringBuilder();
-            foreach (KeyValuePair<decimal, CRDTCharacterClient> character in _sortedList)
+            foreach (KeyValuePair<decimal, CRDTCharacter> character in _sortedList)
             {
                 builder.Append(character.Value.Character);
             }
@@ -212,7 +213,16 @@ namespace MAUIClientUI.Cursor
             return builder.ToString();
         }
 
-        //private void TraverseInorder(CRDTCharacterClient node, List<CRDTCharacterClient> result, HashSet<decimal> visited)
+        internal void MergeCharacter(CRDTCharacter c)
+        {
+            if (!_characterList.ContainsKey(c.IdCharacter))
+            {
+                _sortedList.Add(c.IdCharacter, c);
+                _characterList.Add(c.IdCharacter, c);
+            }
+        }
+
+        //private void TraverseInorder(CRDTCharacter node, List<CRDTCharacter> result, HashSet<decimal> visited)
         //{
         //    if (node == null || visited.Contains(node.IdCharacter))
         //        return;
@@ -244,7 +254,7 @@ namespace MAUIClientUI.Cursor
         /// Given a character position in plain text, find its CRDTCharacter ID
         /// </summary>
         //public int? FindCharacterIdAtPosition(
-        //    List<CRDTCharacterClient> characters,
+        //    List<CRDTCharacter> characters,
         //    int position)
         //{
         //    var ordered = GetVisibleCharactersInOrder(characters);
@@ -258,7 +268,7 @@ namespace MAUIClientUI.Cursor
         ///// <summary>
         ///// Reconstruct plain text from CRDT characters
         ///// </summary>
-        //public string ReconstructText(List<CRDTCharacterClient> characters)
+        //public string ReconstructText(List<CRDTCharacter> characters)
         //{
         //    var ordered = GetVisibleCharactersInOrder(characters);
         //    return string.Concat(ordered.Select(c => c.Character));

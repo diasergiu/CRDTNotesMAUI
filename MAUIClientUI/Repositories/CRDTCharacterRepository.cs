@@ -1,4 +1,5 @@
-﻿using DatabaseLibrary.Entities.Client;
+﻿using DatabaseLibrary.Entities;
+using DatabaseLibrary.Entities.Client;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace MAUIClientUI.Repositories
         }
 
 
-        public List<CRDTCharacterClient> GetCRDTCharacterFromNote(Guid IdNote)
+        public List<CRDTCharacter> GetCRDTCharacterFromNote(Guid IdNote)
         {
             // Use AsNoTracking to prevent EF Core from tracking these entities
             // This avoids conflicts when updating later
@@ -26,7 +27,7 @@ namespace MAUIClientUI.Repositories
                 .ToList();
         }
 
-        public void SaveNewCrdtCharacter(CRDTCharacterClient newCharacter)
+        public void SaveNewCrdtCharacter(CRDTCharacter newCharacter)
         {
             // Check if character exists using AsNoTracking to avoid tracking conflicts
             var existing = _dbContext.CRDTCharacters
@@ -43,7 +44,7 @@ namespace MAUIClientUI.Repositories
            _dbContext.SaveChanges();
         }
 
-        public void UpdateCharacter(CRDTCharacterClient updateCharacter)
+        public void UpdateCharacter(CRDTCharacter updateCharacter)
         {
           _dbContext.CRDTCharacters.Update(updateCharacter);
             _dbContext.SaveChanges();

@@ -1,9 +1,11 @@
 using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.Entities.Server;
 using DatabaseLibrary.RequestBody;
+using DatabaseLibrary.ResponsBody;
 using Microsoft.EntityFrameworkCore;
 using Server.Controllers;
 using Server.ServeRepositories;
+using System.Reflection;
 using Xunit;
 
 namespace Server.Test
@@ -22,9 +24,9 @@ namespace Server.Test
                 .Options;
 
             _dbContext = new DbContextServer(options);
-            _repository = new NotesRepository(_dbContext, null);
+            _repository = new NotesRepository(_dbContext);
             _userController = new UserController(_dbContext, _repository);
-            _notesController = new NotesController(_dbContext, _repository);
+            _notesController = new NotesController(_dbContext, _repository, new  NoteSyncHub(null));
         }
 
         #region User Registration and Login Flow
@@ -48,7 +50,15 @@ namespace Server.Test
             var registerOkResult = registerResult as Microsoft.AspNetCore.Mvc.OkObjectResult;
             Assert.NotNull(registerOkResult);
 
-            var registeredUserId = ((dynamic)registerOkResult.Value).user.IdUser;
+            var registerResponse = registerOkResult.Value as ApiResponse<object>;
+            Assert.NotNull(registerResponse);
+            Assert.True(registerResponse.Success);
+
+            // Extract user ID from response data using reflection
+            var dataType = registerResponse.Data.GetType();
+            var idUserProperty = dataType.GetProperty("IdUser") ?? dataType.GetProperty("idUser");
+            Assert.NotNull(idUserProperty);
+            var registeredUserId = (Guid)idUserProperty.GetValue(registerResponse.Data);
             Assert.NotEqual(Guid.Empty, registeredUserId);
 
             // Act - Login with registered credentials
@@ -59,7 +69,14 @@ namespace Server.Test
             var loginOkResult = loginResult as Microsoft.AspNetCore.Mvc.OkObjectResult;
             Assert.NotNull(loginOkResult);
 
-            var loginUserId = ((dynamic)loginOkResult.Value).IdUser;
+            var loginResponse = loginOkResult.Value as ApiResponse<object>;
+            Assert.NotNull(loginResponse);
+            Assert.True(loginResponse.Success);
+
+            var loginDataType = loginResponse.Data.GetType();
+            var loginIdUserProperty = loginDataType.GetProperty("IdUser") ?? loginDataType.GetProperty("idUser");
+            Assert.NotNull(loginIdUserProperty);
+            var loginUserId = (Guid)loginIdUserProperty.GetValue(loginResponse.Data);
             Assert.Equal(registeredUserId, loginUserId);
         }
 

@@ -2,9 +2,11 @@
 using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.Entities.Server;
 using DatabaseLibrary.RequestBody.EntityMappers;
+using DatabaseLibrary.ResponsBody;
 using DatabaseLibrary.WrapperClasses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Server.ServeRepositories;
 using Server.ServerHub;
 using System.Linq.Expressions;
@@ -20,66 +22,37 @@ namespace Server.Controllers
 
         private NotesRepository _notesRepository;
         private DbContextServer _context;
+        private NoteSyncHub _noteSyncHub;
 
 
-        public NotesController(DbContextServer dbContextServer, NotesRepository notesRepository)
+        public NotesController(DbContextServer dbContextServer, NotesRepository notesRepository, NoteSyncHub noteSyncHub)
         {
             _context = dbContextServer;
             _notesRepository = notesRepository;
+            _noteSyncHub = noteSyncHub;
         }
-        //[HttpPost("SaveOrUpdateNote")]
-        //public async Task SaveOrUpdateNote([FromBody] SyncQueueServer changesMade)
-        //{
-        //    await _notesRepository.SyncData(changesMade);
-        //}
-
-        //[HttpGet("getNotesChangesFromServer")] // iActionResult can sent json back to the client (look more into this)
-        //public async Task<IActionResult> getNotesChangesFromServer(Guid IdNote)
-        //{
-        //    try
-        //    {
-        //        List<SyncQueueServer> changesServer = _notesRepository.GetChangesFromNote(IdNote);
-        //        List<SyncQueueClient> _changesMade = new List<SyncQueueClient>();
-        //        foreach (SyncQueueServer syncQueue in changesServer)
-        //        {
-        //            _changesMade.Add(EntityMapper.MapSyncQueueServerToSyncQueueClient(syncQueue));
-        //        }
-        //        return Ok(new {
-        //            success = true,
-        //            message = "Changes synced successfully.",
-        //            data = _changesMade
-        //        });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, new { success = false, message = $"Error syncing changes: {ex.Message}" });
-        //    }
-
-        //}
 
         [HttpGet("GetAllNotesFromUser")] // iActionResult can sent json back to the client (look more into this)
         public async Task<IActionResult> GetAllNotesFromUser()
         {
-            try
-            {
-                Guid idUser = GetUserIdFromRequest();
-                var validationError = ValidateUserId(idUser);
-                if (validationError != null)
-                {
-                    return validationError;
-                }
-                List<NoteServer> notes = await _notesRepository.GetAllNotesFromUser(idUser);
-                List<NoteClient> toSend = new List<NoteClient>();
-                foreach (NoteServer note in notes)
-                {
-                    toSend.Add(EntityMapper.MapNoteServerToNoteClient(note));
-                }
-                return Ok(new { success = true, data = toSend });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { success = false, message = $"Error syncing changes: {ex.Message}" });
-            }
+           
+            Guid idUser = GetUserIdFromRequest();
+            List<NoteServer> notes = await _notesRepository.GetAllNotesFromUser(idUser);
+            List<NoteClient> toSend = notes
+                .Select(note => EntityMapper.MapNoteServerToNoteClient(note))
+                .ToList();
+            return Ok(ApiResponse<List<NoteClient>>.SuccessResponse(toSend));
+         
+        }
+
+        [HttpPut("SendCRDTChangestoServer")]
+        public async Task<IActionResult> SendCRDTChangestoServer([FromBody] List<CRDTCharacter> changes)
+        {
+            Guid idUser = GetUserIdFromRequest();
+            await _notesRepository.saveCRDTChanges(changes);
+            await _noteSyncHub.PushUpdatesToSubscribedUserAsync(changes, idUser);
+          
+            return Ok("Success");
         }
 
         //// PUT /api/notes/{id}
@@ -87,15 +60,8 @@ namespace Server.Controllers
         public async Task<IActionResult> UpdateNotes(Guid noteId, [FromBody] NoteClient note)
         {
             Guid idUser = GetUserIdFromRequest();
-            var validationError = ValidateUserId(idUser);
-            if (validationError != null)
-            {
-                return validationError;
-            }
             var updateNoteWithVersionResult = await _notesRepository.UpdateChanges(EntityMapper.MapNoteClientToNoteServer(note), idUser);
-            return Ok(new { success = true, data = updateNoteWithVersionResult }); // this needs to be tested
-
-
+            return Ok(ApiResponse<object>.SuccessResponse(updateNoteWithVersionResult));
         }
 
         //// Get /api/notes/{id}
@@ -103,70 +69,46 @@ namespace Server.Controllers
         public async Task<IActionResult> GetNote(Guid noteId)
         {
             Guid idUser = GetUserIdFromRequest();
-            var validationError = ValidateUserId(idUser);
-            if (validationError != null)
-            {
-                return validationError;
-            }
             NoteServer note = await _notesRepository.GetNoteById(noteId, idUser);
-            return Ok(new { success = true, data = note });
-
-
+            return Ok(ApiResponse<object>.SuccessResponse(note));
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateNote([FromBody] NoteClient changesMade)
         {
-            try
-            {
-                Guid idUser = GetUserIdFromRequest();
-                var validationError = ValidateUserId(idUser);
-                if (validationError != null)
-                {
-                    return validationError;
-                }
-                var newNote = await _notesRepository.CreateNote(changesMade, idUser);
-
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { success = false, message = ex.Message });
-            }
-            return Ok(new { success = true });
+          
+            Guid idUser = GetUserIdFromRequest();
+            var newNote = await _notesRepository.CreateNote(changesMade, idUser);
+            var noteData = new { idNote = newNote.IdNote };
+            return Ok(ApiResponse<object>.SuccessResponse(
+                noteData,
+                "Note created successfully."
+            ));
+    
         }
 
         [HttpPost("SendChangesToServer")]
         public async Task<IActionResult> SendChangesToServer([FromBody] List<NoteClient> noteClient)
         {
-            try { 
-                Guid idUser = GetUserIdFromRequest();
-                var validationError = ValidateUserId(idUser);
-                if (validationError != null)
-                {
-                    return validationError;
-                }
+         
+            Guid idUser = GetUserIdFromRequest();
+            await _notesRepository.SaveAllChangesFromClient(ConvertListClientToServer(noteClient), idUser);
+            return Ok(ApiResponse<object>.SuccessResponse(
+                data: null,
+                message: "Changes synced successfully."
+            ));
 
-                await _notesRepository.SaveAllChangesFromClient(ConvertListClientToServer(noteClient), idUser);
-                    return Ok(new { success = true, message = "Changes synced successfully." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { success = false, message = $"Error syncing changes: {ex.Message}" });
-            }
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteNote(Guid id)
         {
             Guid idUser = GetUserIdFromRequest();
-            var validationError = ValidateUserId(idUser);
-            if (validationError != null)
-            {
-                return validationError;
-            }
-
             await _notesRepository.DeleteNote(id, idUser);
-            return Ok(new { success = true, message = "Note deleted successfully." });
+            return Ok(ApiResponse<object>.SuccessResponse(
+                data: null,
+                message: "Note deleted successfully."
+            ));
         }
 
         private Guid GetUserIdFromRequest()
@@ -178,22 +120,26 @@ namespace Server.Controllers
             }
             return userId;
         }
-        private IActionResult ValidateUserId(Guid userId)
-        {
-            if (userId == Guid.Empty)
-            {
-                return Unauthorized(new { success = false, message = "Missing or invalid user ID" });
-            }
-            return null;
-        }
-        private List<NoteServer> ConvertListClientToServer( List<NoteClient> list)
+        private List<NoteServer> ConvertListClientToServer(List<NoteClient> list)
         {
             List<NoteServer> newList = new List<NoteServer>();
-            foreach(NoteClient note in list)
+            foreach (NoteClient note in list)
             {
                 newList.Add(EntityMapper.MapNoteClientToNoteServer(note));
             }
             return newList;
+        }
+    
+
+    [HttpGet("GetServerChanges")]
+        public async Task<IActionResult> GetServerChanges()
+        {
+            Guid userId = GetUserIdFromRequest();
+            var changes = await _notesRepository.GetAllCRDTByUser(userId);
+            return Ok(ApiResponse<object>.SuccessResponse(
+                data: changes,
+                message: "Server changes retrieved successfully."
+            ));
         }
     }
 }

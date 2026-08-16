@@ -1,4 +1,5 @@
-﻿using DatabaseLibrary.Entities.Client;
+﻿using DatabaseLibrary.Entities;
+using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.Entities.Server;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using System;
@@ -20,7 +21,9 @@ namespace DatabaseLibrary.RequestBody.EntityMappers
                 LastUpdate = noteClient.LastUpdate,
                 CreationDate = noteClient.CreationDate,
                 Version = noteClient.Version,
-                DirtyFlagChangesMade = noteClient.DirtyFlagChangesMade
+                DirtyFlagChangesMade = noteClient.DirtyFlagChangesMade,
+              //  CRDTCharacter = MapCharacterClientToServer(noteClient.CRDTCharacter)
+
             };
         }
 
@@ -35,10 +38,54 @@ namespace DatabaseLibrary.RequestBody.EntityMappers
                 Content = noteServer.Content,
                 LastUpdate = noteServer.LastUpdate,
                 Version = noteServer.Version,
-                DirtyFlagChangesMade = noteServer.DirtyFlagChangesMade
+                DirtyFlagChangesMade = noteServer.DirtyFlagChangesMade,
+                //CRDTCharacter = MapCharacterServerToClient(noteServer.CRDTCharacter)
             };
         }
 
+        public static List<CRDTCharacter> MapCharacterClientToServer(List<CRDTCharacterClient> client)
+        {
+            List<CRDTCharacter> map = new List<CRDTCharacter>();
+            foreach(var character in client)
+            {
+                map.Add(MapCharacterClientToServer(character));
+            }
+            return map;
+        }
+
+        public static List<CRDTCharacterClient> MapCharacterServerToClient(List<CRDTCharacter> client)
+        {
+            List<CRDTCharacterClient> map = new List<CRDTCharacterClient>();
+            foreach (var character in client)
+            {
+                map.Add(MapCharacterServerToClient(character));
+            }
+            return map;
+        }
+        public static CRDTCharacter MapCharacterClientToServer(CRDTCharacterClient client) // how do those dont create conflicts with already existing data from the server
+        {
+            return new CRDTCharacter()
+            {
+                Character = client.Character,
+                IdCharacter = client.IdCharacter,
+                IdNote = client.IdNote,
+                ClockDateTime = client.ClockDateTime,
+                Tombstone = client.Tombstone,
+                ClientId = client.ClientId
+            };
+        }
+        public static CRDTCharacterClient MapCharacterServerToClient(CRDTCharacter Server) // how do those dont create conflicts with already existing data from the server
+        {
+            return new CRDTCharacterClient()
+            {
+                Character = Server.Character,
+                IdCharacter = Server.IdCharacter,
+                IdNote = Server.IdNote,
+                ClockDateTime = Server.ClockDateTime,
+                Tombstone = Server.Tombstone,
+                ClientId = Server.ClientId
+            };
+        }
         public static UserServer MapUserClientToUserServer(UserClient userClient)
         {
             return new UserServer
@@ -67,7 +114,7 @@ namespace DatabaseLibrary.RequestBody.EntityMappers
             return new SyncQueueServer
             {
                 IdSync = syncQueueClient.IdSync,
-             //   IdUser = syncQueueClient.IdUser,
+                //   IdUser = syncQueueClient.IdUser,
                 IdDevice = IdDevice,
                 IdNote = syncQueueClient.IdNote,
                 Operation = syncQueueClient.Operation,
@@ -82,7 +129,7 @@ namespace DatabaseLibrary.RequestBody.EntityMappers
             return new SyncQueueClient
             {
                 IdSync = syncQueueServer.IdSync,
-              //  IdUser = syncQueueServer.IdUser,
+                //  IdUser = syncQueueServer.IdUser,
                 IdNote = syncQueueServer.IdNote,
                 Operation = syncQueueServer.Operation,
                 ContentChanges = syncQueueServer.ContentChanges,

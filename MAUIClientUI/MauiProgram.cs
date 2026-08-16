@@ -1,6 +1,7 @@
 ﻿using DatabaseLibrary.Entities;
 using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.WrapperClasses;
+using MAUIClientUI.MVVM;
 using MAUIClientUI.Repositories;
 using MAUIClientUI.Services;
 using Microsoft.Extensions.Logging;
@@ -34,6 +35,7 @@ namespace MAUIClientUI
                 .AddScoped<NoteRepository>()
                 .AddScoped<CRDTCharacterRepository>()
                 .AddScoped<ClientServices>();
+                //.AddScoped<NotesViewModel>();
 #if DEBUG
             builder.Logging.AddDebug();
 #endif

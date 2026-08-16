@@ -10,7 +10,6 @@ public partial class MainPageNotes : ContentPage
 {
     private NotesViewModel _viewModel;
     private readonly NoteRepository _noteRepository;
-    private readonly IDatabaseServices _databaseService;
     private INoteServices _noteServices;
     private readonly IAuthenticationService _authService;
     private Guid _currentUserId;
@@ -19,7 +18,6 @@ public partial class MainPageNotes : ContentPage
     public MainPageNotes()
     {
         _noteRepository = IPlatformApplication.Current.Services.GetService<NoteRepository>();
-        _databaseService = IPlatformApplication.Current.Services.GetService<IDatabaseServices>();
         _authService = IPlatformApplication.Current.Services.GetService<IAuthenticationService>();
 
         InitializeComponent();
@@ -32,15 +30,10 @@ public partial class MainPageNotes : ContentPage
 
     private async void LoadData()
     {
-
-        using (var dbContext = _databaseService.GetContext())
-        {
-            // Ensure database is created
-            await dbContext.Database.EnsureCreatedAsync();
-
-            // Load notes from database
-            await _viewModel.LoadNotesAsync(dbContext);
-        }
+       
+        // Load notes from database
+        await _viewModel.LoadNotesAsync();
+       
     }
     #region Just navigation to other elements
     private async void OnOpenNoteClicked(object sender, EventArgs e)
@@ -65,26 +58,12 @@ public partial class MainPageNotes : ContentPage
     #endregion
     private async void OnCreateNoteClicked(object sender, EventArgs e)
     {
-
-        var newNote = new NoteClient
-        {
-            Title = "",
-            Content = "",
-            CreationDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-            LastUpdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
-        };
-        _noteRepository.createNote(newNote);
-        await Navigation.PushAsync(new NoteView(newNote, _noteServices, isNewNote: false));
+        await Navigation.PushAsync(new NoteView(_noteServices));
     }
 
     protected override async void OnAppearing()
     {
-        base.OnAppearing();
-
-        using (var dbContext = _databaseService.GetContext())
-        {
-            await _viewModel.LoadNotesAsync(dbContext);
-        }
+        await _viewModel.LoadNotesAsync();       
     }
     private async void OnSyncNotesClicked(object sender, EventArgs e)
     {
@@ -106,6 +85,13 @@ public partial class MainPageNotes : ContentPage
         {
             await DisplayAlert("Error", "Failed to sync notes from server.", "OK");
         }
+
+        var charResults = await _noteServices.GetAllCharacterByUser();
+        if (charResults.IsSuccess)
+        {
+            // Update the local repository with the notes from the server
+            _noteRepository.saveCRDTChanges(charResults.Data);
+        }
     }
 
     private async void OnLoginSucceeded(object? sender, Guid userId)
@@ -118,7 +104,6 @@ public partial class MainPageNotes : ContentPage
         // Enable the sync and NoteAccess buttons
         SyncNotesButton.IsEnabled = true;
         GetAccessToNotesButton.IsEnabled = true;
-
         var clientChanges = _noteRepository.GetNoteFromUser(userId);
         var result = _noteServices.SendChangesToServer(clientChanges);
 
@@ -127,6 +112,20 @@ public partial class MainPageNotes : ContentPage
         {
             // Update the local repository with the notes from the server
             _noteRepository.UpdateListNotes(notesResult.Data);
+        }
+
+        var offlineChanges = await _noteRepository.GetAllCRDTCharacters();
+        var crdtChangesResult = await _noteServices.SendCRDTChangestoServer(offlineChanges);
+        if (crdtChangesResult.IsSuccess)
+        {
+            await _noteRepository.ClearDirtyFlag(offlineChanges);
+
+        }
+        var charResults = await _noteServices.GetAllCharacterByUser();
+        if (charResults.IsSuccess)
+        {
+            // Update the local repository with the notes from the server
+            _noteRepository.saveCRDTChanges(charResults.Data);
         }
     }
 }

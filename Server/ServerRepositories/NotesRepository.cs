@@ -19,11 +19,9 @@ namespace Server.ServeRepositories
     public class NotesRepository
     {
         private DbContextServer _dbContextServer;
-        private IHubContext<NotesHub> _notesHubContext;
-        public NotesRepository(DbContextServer context, IHubContext<NotesHub> notesHubContext)
+        public NotesRepository(DbContextServer context)
         {
             _dbContextServer = context;
-            _notesHubContext = notesHubContext;
         }
 
         public async Task<UserServer> getUser(string username, string password)
@@ -32,53 +30,6 @@ namespace Server.ServeRepositories
                 .FirstOrDefaultAsync(u => u.Username == username && u.Password == password);
             return user;
         }
-
-        //public async Task<UserServer> SaveOrUpdateNotes(UserServer user, List<Note> notesUpdate)
-        //{
-        //    List<Note> listNewNotes = new List<Note>();
-
-        //    if (user != null) {
-        //        foreach (var note in notesUpdate)
-        //        {
-        //            note.DirtyFlagChangesMade = false; // Reset the dirty flag after saving
-        //            var existingNote = await _dbContextServer.Notes.FirstOrDefaultAsync(n => n.IdNote == note.IdNote);
-        //            if (existingNote != null)
-        //            {
-        //                _dbContextServer.Entry(existingNote).CurrentValues.SetValues(note);
-        //            }
-        //            else
-        //            {
-        //                listNewNotes.Add(note);
-        //                _dbContextServer.Notes.Add(note);
-        //            }
-        //        }
-
-        //        await _dbContextServer.SaveChangesAsync();
-
-        //        foreach (var note in listNewNotes)
-        //        {
-        //            var noteExists = await _dbContextServer.Notes.FirstOrDefaultAsync(n => n.IdNote == note.IdNote);
-        //            if (noteExists != null)
-        //            {
-        //                //var existingRelationship = await dbContextServer.NoteUsers.FirstOrDefaultAsync(nu => nu.IdNote == note.IdNote && nu.IdUser == user.IdUser);
-
-        //                //if (existingRelationship == null)
-        //                //{
-        //                var noteUser = new Note_UserServer
-        //                {
-        //                    IdNote = note.IdNote,
-        //                    IdUser = user.IdUser
-        //                };
-        //                _dbContextServer.Note_Users.Add(noteUser);
-        //                //}
-
-        //            }
-        //        }
-
-        //        await _dbContextServer.SaveChangesAsync();
-        //    }
-        //    return user;
-        //}
 
         public async Task<List<SyncQueueServer>> GetServerSyncChanges(IUser user, Guid deviceId)
         {
@@ -97,6 +48,7 @@ namespace Server.ServeRepositories
                  )
                 .Where(nu => nu.NoteUser.IdUser == IdUser)
                 .Select(nu => nu.Note)
+                .Include(n => n.CRDTCharacter) // added recently we need to return the CRDT from server
                 .ToListAsync();
             return notes;
         }
@@ -235,27 +187,6 @@ namespace Server.ServeRepositories
                     _dbContextServer.SaveChanges();
                     await transaction.CommitAsync();
 
-                    // *** NEW: Notify all other users viewing this note ***
-                    if (_notesHubContext != null)
-                    {
-                        var groupName = $"note-{note.IdNote}";
-                        var senderConnectionId = NotesHub.GetConnectionId(idUser.ToString());
-
-                        var sendTask = senderConnectionId != null
-                            ? _notesHubContext.Clients.GroupExcept(groupName, senderConnectionId)
-                            : _notesHubContext.Clients.Group(groupName);
-
-                        await sendTask.SendAsync("NoteUpdated", new
-                        {
-                            noteId = existingNote.IdNote,
-                            title = existingNote.Title,
-                            content = existingNote.Content,
-                            lastUpdate = existingNote.LastUpdate,
-                            version = existingNote.Version,
-                            updatedAt = DateTime.UtcNow
-                        });
-                    }
-
                     return UpdateNoteWithVersionResult.Success(existingNote);
                 }
                 catch
@@ -359,6 +290,52 @@ namespace Server.ServeRepositories
                 return _dbContextServer.Notes.FirstOrDefault(n => n.IdNote == IdNote);
             }
             return null;
+        }
+
+        public async Task ManageCRDTCharacters(List<CRDTCharacter> crdtCharacters)
+        {
+            if (crdtCharacters == null || crdtCharacters.Count == 0)
+                return;
+            _dbContextServer.ChangeTracker.Clear(); // probably because of he entityMapper mapping, we need to clear the change tracker to avoid tracking issues
+            _dbContextServer.CRDTCharacters.AddRange(crdtCharacters);
+            await _dbContextServer.SaveChangesAsync();
+        }
+        public async Task saveCRDTChanges(List<CRDTCharacter> changes)
+        {
+            var changeIds = changes.Select(c => c.IdCharacter).ToList();
+
+            var existingCharacters = await _dbContextServer.CRDTCharacters
+                .AsNoTracking()
+                .Where(c => changeIds.Contains(c.IdCharacter))
+                .ToListAsync();
+
+            var existingLookup = existingCharacters
+                .ToDictionary(c => (c.IdCharacter, c.IdNote));
+
+            foreach (var character in changes)
+            {
+                if (existingLookup.TryGetValue((character.IdCharacter, character.IdNote), out var existing))
+                {
+                    // Update existing - mark as modified
+                    //  _dbContextServer.Entry(character).State = EntityState.Modified;
+                    _dbContextServer.CRDTCharacters.Update(character);
+                }
+                else
+                {
+                    // New entity - mark as added
+                    //_dbContextServer.Entry(character).State = EntityState.Added;
+                    _dbContextServer.CRDTCharacters.Add(character);
+                }
+            }
+            await _dbContextServer.SaveChangesAsync();
+        }
+
+        public async Task<List<CRDTCharacter>> GetAllCRDTByUser(Guid userId) // dont forget to make the connecction of note with the client
+        {
+            return await _dbContextServer.CRDTCharacters
+            .Where(c => _dbContextServer.Note_Users
+                .Any(nu => nu.IdUser == userId && nu.IdNote == c.IdNote))
+            .ToListAsync();
         }
     }
 

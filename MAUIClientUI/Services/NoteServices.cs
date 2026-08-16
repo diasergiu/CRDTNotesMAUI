@@ -1,5 +1,7 @@
-﻿using DatabaseLibrary.Entities.Client;
+﻿using DatabaseLibrary.Entities;
+using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.Entities.Server;
+using DatabaseLibrary.ResponsBody;
 using DatabaseLibrary.WrapperClasses;
 using MAUIClientUI.Miscellaneous;
 using Newtonsoft.Json;
@@ -23,7 +25,6 @@ namespace MAUIClientUI.Services
             );
         }
 
-
         public async Task<ApiResultData<List<NoteClient>>> GetAllNotesFromUser(Guid IdUser)
         {
             var result = await ExceptionHandlingHelper.ExecuteAsyncWithDataExtraction<List<NoteClient>>(
@@ -33,9 +34,18 @@ namespace MAUIClientUI.Services
             return result;
         }
 
+        public async Task<ApiResultData<List<NoteClient>>> GetAllCharacterByUser(Guid IdUser)
+        {
+            var result = await ExceptionHandlingHelper.ExecuteAsyncWithDataExtraction<List<NoteClient>>(
+                async () => await SendRequest<Object>(HttpMethod.Get, $"{_baseURL}/GetAllNotesFromUser", null),
+                nameof(GetAllCharacterByUser)
+            );
+            return result;
+        }
+
         public async Task<ApiResultData<NoteClient>> GetNote(Guid noteId)
         {
-            return await ExceptionHandlingHelper.ExecuteAsync<NoteClient>(
+            return await ExceptionHandlingHelper.ExecuteAsyncWithDataExtraction<NoteClient>(
                 async () => await SendRequest<Object>(HttpMethod.Get, $"{_baseURL}/{noteId}", null),
                 nameof(GetNote)
             );
@@ -51,7 +61,7 @@ namespace MAUIClientUI.Services
 
         public async Task<ApiResultData<NoteConflictResult>> UpdateNote(NoteClient updatedNote)
         { 
-            var result = await ExceptionHandlingHelper.ExecuteAsync<NoteConflictResult>(
+            var result = await ExceptionHandlingHelper.ExecuteAsyncWithDataExtraction<NoteConflictResult>(
                 async () => await SendRequest<NoteClient>(HttpMethod.Put, $"{_baseURL}/{updatedNote.IdNote}", updatedNote),
                 nameof(UpdateNote)
             );
@@ -65,7 +75,23 @@ namespace MAUIClientUI.Services
                 nameof(DeleteNote)
             );
         }
+        public async Task<ApiResult> SendCRDTChangestoServer(List<CRDTCharacter> characters)
+        {
+            var result = await ExceptionHandlingHelper.ExecuteAsync(
+                async () => await SendRequest<List<CRDTCharacter>>(
+                HttpMethod.Put, $"{_baseURL}/SendCRDTChangestoServer", characters),
+                nameof(SendCRDTChangestoServer));
+            return result;
+        }
+        public async Task<ApiResultData<List<CRDTCharacter>>> GetAllCharacterByUser()
+        {
+            var result = await ExceptionHandlingHelper.ExecuteAsyncWithDataExtraction<List<CRDTCharacter>>
+                (async () => await SendRequest<object>
+            (HttpMethod.Get, $"{_baseURL}/GetServerChanges", null),
+                nameof(GetAllCharacterByUser));
+            return result;
 
+        }
         private HttpRequestMessage GetRequestWithHIdHeader(HttpMethod method ,string url) {
             var request = new HttpRequestMessage(method, url);
             request.Headers.Add("X-User-Id", UserDevice.LocalUser.ToString());
@@ -87,40 +113,6 @@ namespace MAUIClientUI.Services
             return result;
         }
 
-        private class CreateNoteResponse
-        {
-            public bool success { get; set; }
-            public CreateNoteData data { get; set; }
-        }
-
-        private class CreateNoteData
-        {
-            public Guid id { get; set; }
-        }
-
-        // Response wrapper for GetAllNotesFromUser endpoint
-        // Server returns: { success: true, data: [...] }
-        private class NotesResponse
-        {
-            public bool success { get; set; }
-            public List<NoteClient> data { get; set; }
-        }
-
-        public class NoteUpdateResponse
-        {
-            [JsonProperty("isSuccess")]
-
-            public bool IsSuccess { get; set; }
-
-            [JsonProperty("message")]
-            public string Message { get; set; }
-
-            [JsonProperty("serverNote")]
-            public NoteServer ServerNote { get; set; }
-
-            [JsonProperty("isVersionConflict")]
-            /// <summary>True if version mismatch (concurrency conflict)</summary>
-            public bool IsVersionConflict { get; set; }
-        }
+       
     }
 }

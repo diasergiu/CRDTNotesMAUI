@@ -11,14 +11,12 @@ namespace DatabaseLibrary.Entities
     [PrimaryKey(nameof(IdCharacter), nameof(IdNote))]
     public class CRDTCharacter
     {
-
-
         public CRDTCharacter()
         {
             
         }
 
-        public CRDTCharacter(char character, int IdCharacter)
+        public CRDTCharacter(char character, decimal IdCharacter)
         {
             this.IdCharacter = IdCharacter;
             this.Character = character;
@@ -28,7 +26,7 @@ namespace DatabaseLibrary.Entities
         //public decimal? IdRightCharacter { get; set; }
         public Guid IdNote { get; set; }
         public char Character { get; set; }
-        public string Opperation { get; set; } 
+        public string Operation { get; set; } 
         public string ClockDateTime { get; set; }
         public bool Tombstone { get; set; }
         public Guid ClientId { get; set; } // Essential for conflict resolution

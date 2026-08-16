@@ -20,6 +20,6 @@ namespace DatabaseLibrary.Entities.Server
         public bool DirtyFlagChangesMade { get; set; }
         public int Version { get; set; }
         public List<Note_UserServer>? NoteUser { get; set; }
-        public List<CRDTCharacterServer>? CRDTCharacter { get; set; }
+        public List<CRDTCharacter>? CRDTCharacter { get; set; }
     }
 }

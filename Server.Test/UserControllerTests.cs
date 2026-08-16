@@ -1,10 +1,12 @@
 using DatabaseLibrary.Entities.Server;
 using DatabaseLibrary.RequestBody;
+using DatabaseLibrary.ResponsBody;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Server.Controllers;
 using Server.ServeRepositories;
+using System.Reflection;
 using Xunit;
 
 namespace Server.Test
@@ -54,9 +56,17 @@ namespace Server.Test
             var okResult = Assert.IsType<OkObjectResult>(result);
             Assert.NotNull(okResult.Value);
 
-            var resultObject = okResult.Value as dynamic;
-            Assert.True(resultObject.success);
-            Assert.Equal(userId, resultObject.IdUser);
+            var apiResponse = okResult.Value as ApiResponse<object>;
+            Assert.NotNull(apiResponse);
+            Assert.True(apiResponse.Success);
+
+            // The Data should be an anonymous object with idUser property
+            Assert.NotNull(apiResponse.Data);
+            var dataDict = apiResponse.Data;
+
+            // Try to extract using dynamic as a fallback for anonymous types
+            dynamic data = apiResponse.Data;
+            Assert.Equal(userId, data.idUser);
         }
 
         [Fact]
@@ -73,9 +83,10 @@ namespace Server.Test
             var unauthorizedResult = Assert.IsType<UnauthorizedObjectResult>(result);
             Assert.NotNull(unauthorizedResult.Value);
 
-            var resultObject = unauthorizedResult.Value as dynamic;
-            Assert.False(resultObject.success);
-            Assert.Contains("Invalid username or password", resultObject.message.ToString());
+            var apiResponse = unauthorizedResult.Value as ApiResponse<object>;
+            Assert.NotNull(apiResponse);
+            Assert.False(apiResponse.Success);
+            Assert.Contains("Invalid username or password", apiResponse.Message);
         }
 
         [Fact]
@@ -103,8 +114,9 @@ namespace Server.Test
 
             // Assert
             var unauthorizedResult = Assert.IsType<UnauthorizedObjectResult>(result);
-            var resultObject = unauthorizedResult.Value as dynamic;
-            Assert.False(resultObject.success);
+            var apiResponse = unauthorizedResult.Value as ApiResponse<object>;
+            Assert.NotNull(apiResponse);
+            Assert.False(apiResponse.Success);
         }
 
         #endregion
@@ -129,9 +141,14 @@ namespace Server.Test
             var okResult = Assert.IsType<OkObjectResult>(result);
             Assert.NotNull(okResult.Value);
 
-            var resultObject = okResult.Value as dynamic;
-            Assert.True(resultObject.success);
-            Assert.NotEqual(Guid.Empty, (Guid)resultObject.IdUser);
+            var apiResponse = okResult.Value as ApiResponse<object>;
+            Assert.NotNull(apiResponse);
+            Assert.True(apiResponse.Success);
+
+            // Extract IdUser from the anonymous Data object using reflection
+            var dataProperty = apiResponse.Data?.GetType().GetProperty("IdUser", System.Reflection.BindingFlags.IgnoreCase | System.Reflection.BindingFlags.Public);
+            var idUserValue = dataProperty?.GetValue(apiResponse.Data) as Guid?;
+            Assert.NotEqual(Guid.Empty, idUserValue);
 
             // Verify user was actually created in database
             var createdUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
@@ -156,9 +173,10 @@ namespace Server.Test
 
             // Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-            var resultObject = badRequestResult.Value as dynamic;
-            Assert.False(resultObject.success);
-            Assert.Contains("required", resultObject.message.ToString().ToLower());
+            var apiResponse = badRequestResult.Value as ApiResponse<object>;
+            Assert.NotNull(apiResponse);
+            Assert.False(apiResponse.Success);
+            Assert.Contains("required", apiResponse.Message.ToLower());
         }
 
         [Fact]
@@ -177,8 +195,9 @@ namespace Server.Test
 
             // Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-            var resultObject = badRequestResult.Value as dynamic;
-            Assert.False(resultObject.success);
+            var apiResponse = badRequestResult.Value as ApiResponse<object>;
+            Assert.NotNull(apiResponse);
+            Assert.False(apiResponse.Success);
         }
 
         [Fact]
@@ -210,10 +229,11 @@ namespace Server.Test
             var result = await _controller.Register(request);
 
             // Assert
-            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-            var resultObject = badRequestResult.Value as dynamic;
-            Assert.False(resultObject.success);
-            Assert.Contains("already exists", resultObject.message.ToString());
+            var conflictResult = Assert.IsType<ConflictObjectResult>(result);
+            var apiResponse = conflictResult.Value as ApiResponse<object>;
+            Assert.NotNull(apiResponse);
+            Assert.False(apiResponse.Success);
+            Assert.Contains("already exists", apiResponse.Message);
         }
 
         #endregion

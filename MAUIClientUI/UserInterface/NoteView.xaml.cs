@@ -24,48 +24,51 @@ public partial class NoteView : ContentPage
     private int _lastCursorPosition = 0; // Track cursor position
     private string _lastEditorText = ""; // Track previous editor text for character detection
 
+
+    public NoteView(INoteServices noteService)
+    : this(new NoteClient()
+    {
+        Title = "",
+        Content = "",
+        CreationDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+        LastUpdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+        Version = 1
+    }, noteService, true)
+    {
+        _isNewNote = true;
+        _noteRepository.createNote(_currentNote);
+    }
     public NoteView(NoteClient note, INoteServices noteService, bool isNewNote = false)
     {
         InitializeComponent();
         _currentNote = note;
         _isNewNote = isNewNote;
         _databaseService = IPlatformApplication.Current.Services.GetService<IDatabaseServices>();
-        _noteRepository = IPlatformApplication.Current.Services.GetService<NoteRepository>();
         _notificationService = IPlatformApplication.Current.Services.GetService<NotificationServices>();
         _crdtCharactetrRepository = IPlatformApplication.Current.Services.GetService<CRDTCharacterRepository>();
         _noteServices = noteService;
+        _noteRepository = IPlatformApplication.Current.Services.GetService<NoteRepository>();
         // Convert Guid to int for clientId (take first 4 bytes of Guid)
         //int clientId = BitConverter.ToInt32(UserDevice.LocalUser.ToByteArray(), 0);
         // we already load the CRDT data when we open the program. We should not need to make another 
         _noteCursor = new NoteCursor(_currentNote.CRDTCharacter, DeviceIdentityService.GetCurrentUserId());
         //new NoteServices("/api/notes"); // should split clientNoteServices into multiple classes
         LoadNoteData();
-  
-
     }
 
-    //public NoteView(Guid idNote, INoteServices noteService, bool isNewNote = false)
-    //{
-    //    InitializeComponent();
-    //    _isNewNote = isNewNote;
-    //    _databaseService = IPlatformApplication.Current.Services.GetService<IDatabaseServices>();
-    //    _noteRepository = IPlatformApplication.Current.Services.GetService<NoteRepository>();
-    //    _notificationService = IPlatformApplication.Current.Services.GetService<NotificationServices>();
-    //    _noteServices = noteService;
-    //    // Convert Guid to int for clientId (take first 4 bytes of Guid)
-    //    //int clientId = BitConverter.ToInt32(UserDevice.LocalUser.ToByteArray(), 0);
-    //    //new NoteServices("/api/notes"); // should split clientNoteServices into multiple classes
-    //    _crdtCharactetrRepository = IPlatformApplication.Current.Services.GetService<CRDTCharacterRepository>();
 
-    //    _noteCursor = new NoteCursor(_crdtCharactetrRepository.GetCRDTCharacterFromNote(idNote), DeviceIdentityService.GetCurrentUserId());
-    //    LoadNoteData();
-    //}
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        _currentNote.Version = 1;
 
-        // Subscribe to real-time updates when page appears
-        if (_currentNote != null && !_isNewNote)
+       // var createResult = await _noteServices.CreateNewNote(_currentNote);
+        //if (createResult.IsSuccess)
+        //{
+        //    _isNewNote = false;
+        //}
+        //// Subscribe to real-time updates when page appears
+        if (_currentNote != null)
         {
             try
             {
@@ -107,35 +110,18 @@ public partial class NoteView : ContentPage
     /// <summary>
     /// Handles updates from other users editing the same note
     /// </summary>
-    private async void OnRemoteNoteUpdated(object sender, NoteUpdateEventArgs e)
+
+    private async void OnRemoteNoteUpdated(object sender, CRDTCharacter e)
     {
         // Filter: only handle updates for the note currently being viewed
-        if (e.NoteId != _currentNote?.IdNote) return;
+        if (e.IdNote != _currentNote?.IdNote) return;
 
-        await MainThread.InvokeOnMainThreadAsync(async () =>
+        _noteCursor.MergeCharacter(e);
+
+        // Marshal the UI update to the main thread
+        MainThread.BeginInvokeOnMainThread(() =>
         {
-            bool hasLocalChanges = TitleEntry.Text != _currentNote.Title
-                                || ContentEditor.Text != _currentNote.Content;
-
-            bool accept = true;
-            if (hasLocalChanges)
-            {
-                accept = await DisplayAlert(
-                    "Note Updated",
-                    "Another user changed this note. You have unsaved changes. Overwrite your changes with the latest version?",
-                    "Accept", "Keep Mine");
-            }
-
-            if (accept)
-            {
-                _currentNote.Title = e.Title;
-                _currentNote.Content = e.Content;
-                _currentNote.LastUpdate = e.LastUpdate.ToString("yyyy-MM-dd HH:mm:ss");
-                _currentNote.Version = e.Version;
-
-                TitleEntry.Text = e.Title;
-                ContentEditor.Text = e.Content;
-            }
+            ContentEditor.Text = _noteCursor.GetString();
         });
     }
 
@@ -209,7 +195,14 @@ public partial class NoteView : ContentPage
 
     private async void OnSaveClicked(object sender, EventArgs e)
     {
-        await PerformSaveAsync(silent: false);
+       // await PerformSaveAsync(silent: false);
+    }
+
+    private async Task SendChangesToServer(CRDTCharacter change)
+    {
+        List<CRDTCharacter> characters = new List<CRDTCharacter>();
+        characters.Add(change);
+        await _noteServices.SendCRDTChangestoServer(characters);
     }
 
     private async Task PerformSaveAsync(bool silent)
@@ -228,14 +221,11 @@ public partial class NoteView : ContentPage
 
         _currentNote.Title = TitleEntry.Text;
         _currentNote.Content = ContentEditor.Text ?? "";
-        _currentNote.CreationDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-        _currentNote.LastUpdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         _currentNote.DirtyFlagChangesMade = true;
 
         if (_isNewNote)
         {
             _currentNote.Version = 1;
-            _noteRepository.createNote(_currentNote);
 
             var createResult = await _noteServices.CreateNewNote(_currentNote);
             if (!createResult.IsSuccess)
@@ -243,7 +233,8 @@ public partial class NoteView : ContentPage
                 await DisplayAlert("Error", createResult.ErrorMessage, "OK");
                 return;
             }
-            _isNewNote = false;
+            _isNewNote = false; // this should fire only it we are logged in
+           
         }
         else
         {
@@ -306,7 +297,7 @@ public partial class NoteView : ContentPage
         // Only handle special keys here (backspace, delete, enter, etc.)
         // Regular character input is handled by ContentEditor_TextComposition
         int cursorPosition = GetEditorCursorPosition(ContentEditor);
-
+        var key = e.Key.ToString();
         if (e.Key == Windows.System.VirtualKey.Back)
         {
             var leftCharacter = _noteCursor.deleteCharacterToTheLeft(cursorPosition + 1);
@@ -315,17 +306,26 @@ public partial class NoteView : ContentPage
                 _crdtCharactetrRepository.UpdateCharacter(leftCharacter);
             }
             e.Handled = true;
+            SendChangesToServer(leftCharacter);
             Debug.WriteLine("Backspace pressed");
         }
-        else 
+        else if (key.Length == 1 || key == "Space")
         {
+
+            if(key == "Space"){
+                key = " ";
+            }
+           // GetCharacterFromInput(key[0]);
             Debug.WriteLine("Key pressed", e.Key.ToString());
         
-            var newCharacterId = _noteCursor.InsertCharacter(cursorPosition, e.Key.ToString()[0]);
-            newCharacterId.IdNote = _currentNote.IdNote; // not the best solution replace it later
-            _crdtCharactetrRepository.SaveNewCrdtCharacter(newCharacterId);
+            var newCharacter = _noteCursor.InsertCharacter(cursorPosition, e.Key.ToString()[0]);
+            newCharacter.IdNote = _currentNote.IdNote; // not the best solution replace it later
+            _crdtCharactetrRepository.SaveNewCrdtCharacter(newCharacter);
+            SendChangesToServer(newCharacter);
+       
        }
-       PerformSaveAsync(silent: true);
+       
+
     }
 
 private void ContentEditor_KeyUp(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
@@ -379,15 +379,15 @@ private void ContentEditor_TextChanging(Microsoft.UI.Xaml.Controls.TextBox sende
     {
         if (e.Event.Action == Android.Views.KeyEventActions.Down)
         {
-            CRDTCharacterClient CRDT = GetCharacterFromInput((char)e.Event.UnicodeChar);
+            CRDTCharacter CRDT = GetCharacterFromInput((char)e.Event.UnicodeChar);
             Debug.WriteLine($"Key Pressed: {CRDT.Character}");
         }
     }
 #endif
 
-    private CRDTCharacterClient GetCharacterFromInput(char character)
+    private CRDTCharacter GetCharacterFromInput(char character)
     {
-        CRDTCharacterClient CRDT = new CRDTCharacterClient();
+        CRDTCharacter CRDT = new CRDTCharacter();
         CRDT.Character = character;
         CRDT.ClockDateTime = DateTime.Now.ToString("yyyy-MM-dd");
         return CRDT;

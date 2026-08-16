@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 using DatabaseLibrary.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,8 +23,10 @@ namespace DatabaseLibrary.Entities.Client
 
         public int Version { get; set; }
         public bool DirtyFlagChangesMade { get; set; }
+        [JsonIgnore]
         public List<Note_UserClient>? NoteUser { get; set; }
         [JsonIgnore]
-        public List<CRDTCharacterClient>? CRDTCharacter { get; set; }
+        public List<CRDTCharacter>? CRDTCharacter { get; set; }
+
     }
 }

@@ -30,21 +30,17 @@ namespace Server.Controllers
             var user = await _notesRepository.getUser(username, password);
             if (user != null)
             {
-                // Return user info and notes as JSON
-                return Ok(new
-                {
-                    success = true,
-                    IdUser = user.IdUser,
-                });
+                // Return user info as JSON
+                var userData = new { idUser = user.IdUser };
+                return Ok(ApiResponse<object>.SuccessResponse(userData));
             }
             else
             {
                 // Authentication failed, return error as JSON
-                return Unauthorized(new
-                {
-                    success = false,
-                    message = "Invalid username or password."
-                });
+                return Unauthorized(ApiResponse<object>.ErrorResponse(
+                    "Invalid username or password.",
+                    "UNAUTHORIZED"
+                ));
             }
         }
 
@@ -54,29 +50,26 @@ namespace Server.Controllers
             // Validate input
             if (string.IsNullOrWhiteSpace(request.Username) || string.IsNullOrWhiteSpace(request.Password))
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = "Username and password are required."
-                });
+                return BadRequest(ApiResponse<object>.ErrorResponse(
+                    "Username and password are required.",
+                    "INVALID_INPUT"
+                ));
             }
 
             if (request.Username.Length < 3)
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = "Username must be at least 3 characters."
-                });
+                return BadRequest(ApiResponse<object>.ErrorResponse(
+                    "Username must be at least 3 characters.",
+                    "INVALID_USERNAME_LENGTH"
+                ));
             }
 
             if (request.Password.Length < 6)
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = "Password must be at least 6 characters."
-                });
+                return BadRequest(ApiResponse<object>.ErrorResponse(
+                    "Password must be at least 6 characters.",
+                    "INVALID_PASSWORD_LENGTH"
+                ));
             }
 
             // Check if username already exists
@@ -85,11 +78,10 @@ namespace Server.Controllers
 
             if (existingUser != null)
             {
-                return Conflict(new
-                {
-                    success = false,
-                    message = "Username already exists."
-                });
+                return Conflict(ApiResponse<object>.ErrorResponse(
+                    "Username already exists.",
+                    "USERNAME_EXISTS"
+                ));
             }
 
             // Create new user
@@ -107,25 +99,24 @@ namespace Server.Controllers
                 _context.Users.Add(newUser);
                 await _context.SaveChangesAsync();
 
-                return Ok(new
+                var userData = new
                 {
-                    success = true,
-                    message = "Account created successfully.",
-                    user = new
-                    {
-                        IdUser = newUser.IdUser,
-                        Name = newUser.Name,
-                        Username = newUser.Username
-                    }
-                });
+                    idUser = newUser.IdUser,
+                    name = newUser.Name,
+                    username = newUser.Username
+                };
+
+                return Ok(ApiResponse<object>.SuccessResponse(
+                    userData,
+                    "Account created successfully."
+                ));
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = $"Error creating account: {ex.Message}"
-                });
+                return StatusCode(500, ApiResponse<object>.ErrorResponse(
+                    $"Error creating account: {ex.Message}",
+                    "SERVER_ERROR"
+                ));
             }
         }
 

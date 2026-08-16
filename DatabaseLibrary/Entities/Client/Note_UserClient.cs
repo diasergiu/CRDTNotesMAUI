@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -19,13 +20,14 @@ namespace DatabaseLibrary.Entities.Client
         //[Column(Order = 1)]
         //[ForeignKey("Note")]
         public Guid IdNote { get; set; }
+        [JsonIgnore]
         public UserClient? User { get; set; }
+        [JsonIgnore]
         public NoteClient? Note { get; set; }
-        public int version { get; set ;}
 
         public Note_UserClient()
         {
-                
+
         }
     }
 }

@@ -1,9 +1,11 @@
+//using Android.Content;
 using DatabaseLibrary.Entities;
 using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.Entities.Server;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 
 namespace MAUIClientUI.Repositories
@@ -18,7 +20,8 @@ namespace MAUIClientUI.Repositories
 
         public List<NoteClient> GetNoteFromUser(Guid idUser)
         {
-            return _dbContextUser.Notes.Where(n => n.NoteUser.Any(nu => nu.IdUser == idUser)).ToList();
+            //            return _dbContextUser.Notes.Where(n => n.NoteUser.Any(nu => nu.IdUser == idUser)).ToList();
+            return _dbContextUser.Notes.ToList();
         }
 
         public List<SyncQueueClient> getAllChanges(UserClient user)
@@ -77,32 +80,13 @@ namespace MAUIClientUI.Repositories
                 _dbContextUser.SaveChanges();
             }
         }
-        //untested if it saves the changes to the database
-        // kind of duplicated but i might need to use the device ID
-        //public void UpdateListNotes(List<ISyncQueue> flaggedNotes)
-        //{
-        //    if (flaggedNotes == null) return;
-        //    foreach (SyncQueueClient queue in flaggedNotes)
-        //    {
-        //        if (queue.Operation == "Update")
-        //        {
-        //            NoteClient existingNote = _dbContextUser.Notes.FirstOrDefault(n => n.IdNote == queue.IdNote); // probably SyncData dosent needto have IdUser
-        //            if (existingNote != null)
-        //            {
-        //                existingNote.Content = queue.ContentChanges;
-        //                existingNote.LastUpdate = queue.LastUpdate;
-        //            }
-        //        }
-        //        _dbContextUser.SaveChangesAsync();
-        //    }
-        //}
 
         public void SaveNewUser(UserClient newUser)
         {
             _dbContextUser.Users.Add(newUser);
         }
 
-        public void updateNote(NoteClient note) 
+        public void updateNote(NoteClient note)
         {
             _dbContextUser.ChangeTracker.Clear();
             _dbContextUser.Notes.Update(note);
@@ -128,6 +112,59 @@ namespace MAUIClientUI.Repositories
         {
             _dbContextUser.CRDTCharacters.AddRange(characters);
             _dbContextUser.SaveChanges();
+        }
+
+        public async Task<List<CRDTCharacter>> GetAllCRDTCharacters()
+        {
+            return _dbContextUser.CRDTCharacters.Where(n => n.IsDirtyFlag == true).ToList();
+        }
+
+        internal async Task<List<NoteClient>> GetAllNotes()
+        {
+            return _dbContextUser.Notes.ToList();
+        }
+
+        public async Task ClearDirtyFlag(List<CRDTCharacter> offlineChanges)
+        {
+            foreach (var character in offlineChanges)
+            {
+                character.IsDirtyFlag = false;
+            }
+            _dbContextUser.CRDTCharacters.UpdateRange(offlineChanges);
+            _dbContextUser.SaveChangesAsync();
+        }
+
+        public async Task saveCRDTChanges(List<CRDTCharacter> changes)
+        {
+            // Get all IDs from the list
+            var changeIds = changes.Select(c => c.IdCharacter).ToList();
+            var existingCharacters = await _dbContextUser.CRDTCharacters
+                .AsNoTracking()
+                .Where(c => changeIds.Contains(c.IdCharacter))
+                .ToListAsync();
+
+
+            // Create lookup for O(1) access
+            var existingLookup = existingCharacters
+                .ToDictionary(c => (c.IdCharacter, c.IdNote));
+
+            foreach (var character in changes)
+            {
+                if (existingLookup.TryGetValue((character.IdCharacter, character.IdNote), out var existing))
+                {
+                    // Update existing - mark as modified
+                    //  _dbContextServer.Entry(character).State = EntityState.Modified;
+                    _dbContextUser.CRDTCharacters.Update(character);
+                }
+                else
+                {
+                    // New entity - mark as added
+                    //_dbContextServer.Entry(character).State = EntityState.Added;
+                    _dbContextUser.CRDTCharacters.Add(character);
+                }
+            }
+
+            await _dbContextUser.SaveChangesAsync();
         }
     }
 }

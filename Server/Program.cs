@@ -32,11 +32,16 @@ public partial class Program
 
         builder.Services.AddScoped(provider =>
             new NotesRepository(
-        provider.GetRequiredService<DbContextServer>(),
-        provider.GetRequiredService<IHubContext<NotesHub>>()
-    )
-);
+        provider.GetRequiredService<DbContextServer>()) );
 
+        builder.Services.AddScoped<NoteSyncHub>();
+
+        builder.Services.AddScoped(provider =>
+        new NotesController(
+            provider.GetRequiredService<DbContextServer>(),
+            provider.GetRequiredService<NotesRepository>(),
+            provider.GetRequiredService<NoteSyncHub>()
+            ));
         // Optional: Add health checks
         //builder.Services.AddHealthChecks()
         //    .AddDbContextCheck<DbContextServer>();
@@ -73,7 +78,8 @@ public partial class Program
         // Disable HTTPS redirection for development/testing with local clients
         // app.UseHttpsRedirection();
         app.UseAuthorization();
-
+        // Add middleware BEFORE MapControllers
+        app.UseMiddleware<RequestValidationMiddleware>();
         app.MapControllers();
 
         //Health check endpoint
