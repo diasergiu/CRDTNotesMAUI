@@ -463,3 +463,4 @@ tmp/
 
 DatabaseLibrary/Migrations/*
 *.md
+output.txt

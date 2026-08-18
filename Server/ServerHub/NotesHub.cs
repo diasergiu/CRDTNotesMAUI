@@ -9,8 +9,8 @@ namespace Server.ServerHub
         // Thread-safe: ConnectionId -> (UserId, Set<NoteId>)
         private static readonly ConcurrentDictionary<string, (string UserId, HashSet<string> NoteIds)> _connections = new();
 
-        // Thread-safe reverse lookup: UserId -> ConnectionId (latest connection wins)
-        private static readonly ConcurrentDictionary<string, string> _userConnections = new();
+        // Thread-safe reverse lookup: UserId -> all active ConnectionIds of that user
+        private static readonly ConcurrentDictionary<string, ConcurrentDictionary<string, byte>> _userConnections = new();
         public override async Task OnConnectedAsync()
         {
             await base.OnConnectedAsync();
@@ -20,7 +20,14 @@ namespace Server.ServerHub
         {
             if (_connections.TryRemove(Context.ConnectionId, out var entry))
             {
-                _userConnections.TryRemove(entry.UserId, out _);
+                if (_userConnections.TryGetValue(entry.UserId, out var connectionIds))
+                {
+                    connectionIds.TryRemove(Context.ConnectionId, out _);
+                    if (connectionIds.IsEmpty)
+                    {
+                        _userConnections.TryRemove(entry.UserId, out _);
+                    }
+                }
             }
             await base.OnDisconnectedAsync(exception);
         }
@@ -37,8 +44,8 @@ namespace Server.ServerHub
                 (_, existing) => { existing.NoteIds.Add(idNote); return existing; }
             );
 
-            // Track latest connection for this user (for GroupExcept exclusion)
-            _userConnections[idUser] = Context.ConnectionId;
+            // Track every connection of this user
+            _userConnections.GetOrAdd(idUser, _ => new ConcurrentDictionary<string, byte>())[Context.ConnectionId] = 0;
         }
         // how do we make a new connection
         // way do we send notId when we want to disconnect from the group,
@@ -53,7 +60,12 @@ namespace Server.ServerHub
             }
         }
 
-        public static string? GetConnectionId(string userId)
-           => _userConnections.TryGetValue(userId, out var connId) ? connId : null;
+        public static IReadOnlyCollection<string> GetConnectionIds(string userId)
+           => _userConnections.TryGetValue(userId, out var connIds)
+                ? connIds.Keys.ToArray()
+                : Array.Empty<string>();
+
+        public static bool IsConnectionOfUser(string userId, string connectionId)
+           => _userConnections.TryGetValue(userId, out var connIds) && connIds.ContainsKey(connectionId);
     }
 }

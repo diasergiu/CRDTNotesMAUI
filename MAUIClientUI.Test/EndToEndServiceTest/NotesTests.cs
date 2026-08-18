@@ -36,11 +36,11 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
         private TestUserContext _user2;
         private TestUserContext _user3;
 
-        public EndToEndNoteServicesTest()
+        public EndToEndNoteServicesTest(Repositories.NoteRepository noteRepository)
         {
             _httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
             _userService = new UserServices("/api/user");
-            _noteService = new NoteServices("/api/notes");
+            _noteService = new NoteServices("/api/notes", noteRepository);
         }
 
         public async Task InitializeAsync()

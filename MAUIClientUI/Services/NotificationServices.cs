@@ -40,12 +40,14 @@ namespace MAUIClientUI.Services
 
             _hubConnection.Reconnected += (connectionId) =>
             {
+                UserDevice.HubConnectionId = connectionId;
                 ConnectionStatusChanged?.Invoke(this, "Reconnected");
                 return Task.CompletedTask;
             };
 
             _hubConnection.Closed += (ex) =>
             {
+                UserDevice.HubConnectionId = null;
                 ConnectionStatusChanged?.Invoke(this, "Disconnected");
                 return Task.CompletedTask;
             };
@@ -59,6 +61,7 @@ namespace MAUIClientUI.Services
             {
                 await _hubConnection.StartAsync();
                 _isConnected = true;
+                UserDevice.HubConnectionId = _hubConnection.ConnectionId;
                 ConnectionStatusChanged?.Invoke(this, "Connected");
             }
             catch (Exception ex)
@@ -89,6 +92,7 @@ namespace MAUIClientUI.Services
             {
                 await _hubConnection.StopAsync();
                 _isConnected = false;
+                UserDevice.HubConnectionId = null;
             }
         }
 

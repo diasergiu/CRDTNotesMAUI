@@ -92,6 +92,11 @@ namespace DatabaseLibrary.WrapperClasses
 
         public static Guid LocalUser { get; set; }
 
+        // SignalR connection id of this application instance.
+        // Sent with every update so the server can exclude only this connection,
+        // not every connection belonging to the same user.
+        public static string? HubConnectionId { get; set; }
+
         public static Guid localUser(Guid user)
         {
             LocalUser = user;

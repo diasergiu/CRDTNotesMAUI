@@ -5,6 +5,7 @@ using DatabaseLibrary.WrapperClasses;
 using MAUIClientUI.Cursor;
 using MAUIClientUI.Repositories;
 using MAUIClientUI.Services;
+using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
 namespace MAUIClientUI.UserInterface;
@@ -17,6 +18,7 @@ public partial class NoteView : ContentPage
     //private readonly ClientServices _clientNoteServices;
     private readonly NotificationServices _notificationService;
     private readonly INoteServices _noteServices;
+    private readonly ILogger<NoteView> _logger;
     private bool _isNewNote;
     private CancellationTokenSource _autoSaveCts;
     private CRDTCharacterRepository _crdtCharactetrRepository;
@@ -48,8 +50,16 @@ public partial class NoteView : ContentPage
         _crdtCharactetrRepository = IPlatformApplication.Current.Services.GetService<CRDTCharacterRepository>();
         _noteServices = noteService;
         _noteRepository = IPlatformApplication.Current.Services.GetService<NoteRepository>();
-        _noteCursor = new NoteCursor(_currentNote.CRDTCharacter, DeviceIdentityService.GetCurrentUserId());
+
+        // Get logger factory and create logger
+        var loggerFactory = IPlatformApplication.Current.Services.GetService<ILoggerFactory>();
+        _logger = loggerFactory?.CreateLogger<NoteView>();
+
+        var cursorLogger = loggerFactory?.CreateLogger<NoteCursor>();
+        _noteCursor = new NoteCursor(_currentNote.CRDTCharacter, Guid.NewGuid(), cursorLogger);
         //new NoteServices("/api/notes"); // should split clientNoteServices into multiple classes
+
+        _logger?.LogInformation($"NoteView initialized for note: {_currentNote.IdNote}");
         LoadNoteData();
     }
 
@@ -58,6 +68,7 @@ public partial class NoteView : ContentPage
     {
         base.OnAppearing();
         _currentNote.Version = 1;
+        _logger?.LogInformation($"NoteView appearing for note: {_currentNote.IdNote}");
 
        // var createResult = await _noteServices.CreateNewNote(_currentNote);
         //if (createResult.IsSuccess)
@@ -70,12 +81,14 @@ public partial class NoteView : ContentPage
             try
             {
                 await _notificationService.SubscribeToNoteAsync(UserDevice.LocalUser, _currentNote.IdNote);
+                _logger?.LogDebug($"Subscribed to note updates for: {_currentNote.IdNote}");
 
                 // Listen for updates from other users
                 _notificationService.NoteUpdated += OnRemoteNoteUpdated;
             }
             catch (Exception ex)
             {
+                _logger?.LogError($"Error subscribing to notifications: {ex.Message}");
                 await DisplayAlert("Connection Warning", $"Could not connect to real-time notifications: {ex.Message}", "OK");
             }
         }
@@ -84,6 +97,7 @@ public partial class NoteView : ContentPage
     protected override async void OnDisappearing()
     {
         base.OnDisappearing();
+        _logger?.LogInformation($"NoteView disappearing for note: {_currentNote.IdNote}");
 
         // Unsubscribe when leaving the page
         if (_currentNote != null && !_isNewNote)
@@ -91,10 +105,12 @@ public partial class NoteView : ContentPage
             try
             {
                 await _notificationService.UnsubscribeFromNoteAsync(_currentNote.IdNote);
+                _logger?.LogDebug($"Unsubscribed from note updates for: {_currentNote.IdNote}");
                 _notificationService.NoteUpdated -= OnRemoteNoteUpdated;
             }
             catch (Exception ex)
             {
+                _logger?.LogError($"Error unsubscribing: {ex.Message}");
                 System.Diagnostics.Debug.WriteLine($"Error unsubscribing: {ex.Message}");
             }
         }
@@ -112,7 +128,8 @@ public partial class NoteView : ContentPage
     {
         // Filter: only handle updates for the note currently being viewed
         if (e.IdNote != _currentNote?.IdNote) return;
-
+        await _noteRepository.saveCRDTChanges(new List<CRDTCharacterClient> { new CRDTCharacterClient(e) });
+    
         _noteCursor.MergeCharacter(new CRDTCharacterClient(e));
 
         // Marshal the UI update to the main thread
@@ -172,18 +189,6 @@ public partial class NoteView : ContentPage
         return 0;
     }
 
-    private void TriggerAutoSave()
-    {
-        _autoSaveCts?.Cancel();
-        _autoSaveCts = new CancellationTokenSource();
-        var token = _autoSaveCts.Token;
-
-        Task.Delay(800, token).ContinueWith(t =>
-        {
-            if (!t.IsCanceled)
-                MainThread.BeginInvokeOnMainThread(() => _ = PerformSaveAsync(silent: true));
-        }, TaskScheduler.Default);
-    }
 
     private async void OnWarningIconTapped(object sender, EventArgs e)
     {
@@ -217,12 +222,12 @@ public partial class NoteView : ContentPage
         if (_currentNote == null) return;
 
         _currentNote.Title = TitleEntry.Text;
-        _currentNote.Content = ContentEditor.Text ?? "";
         _currentNote.DirtyFlagChangesMade = true;
 
         if (_isNewNote)
         {
             _currentNote.Version = 1;
+            _isNewNote = false; // this should fire only it we are logged in
 
             var createResult = await _noteServices.CreateNewNote(_currentNote);
             if (!createResult.IsSuccess)
@@ -230,7 +235,6 @@ public partial class NoteView : ContentPage
                 await DisplayAlert("Error", createResult.ErrorMessage, "OK");
                 return;
             }
-            _isNewNote = false; // this should fire only it we are logged in
            
         }
         else

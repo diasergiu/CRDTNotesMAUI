@@ -102,6 +102,10 @@ namespace MAUIClientUI.Services
         private HttpRequestMessage GetRequestWithHIdHeader(HttpMethod method ,string url) {
             var request = new HttpRequestMessage(method, url);
             request.Headers.Add("X-User-Id", UserDevice.LocalUser.ToString());
+            if (!string.IsNullOrEmpty(UserDevice.HubConnectionId))
+            {
+                request.Headers.Add("X-Connection-Id", UserDevice.HubConnectionId);
+            }
             return request;
         }
         private async Task<HttpResponseMessage> SendRequest<T>(HttpMethod method, String url, T? data)
@@ -120,6 +124,15 @@ namespace MAUIClientUI.Services
             return result;
         }
 
-       
+        public async Task<ApiResultData<List<CRDTCharacter>>> GetAllCharacterByNote(Guid noteId)
+        {
+            var result = await ExceptionHandlingHelper.ExecuteAsyncWithDataExtraction<List<CRDTCharacter>>
+                (async () => await SendRequest<object>
+            (HttpMethod.Get, $"{_baseURL}/GetAllCharacterByNote/{noteId}", null),
+                nameof(GetAllCharacterByNote));
+            return result;
+        }
+
+
     }
 }

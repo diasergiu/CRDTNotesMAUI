@@ -8,7 +8,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DatabaseLibrary.Entities
 {
-    [PrimaryKey(nameof(IdCharacter), nameof(IdNote), nameof(ClientId))]
+    [PrimaryKey(nameof(IdCharacter), nameof(IdNote))]
     public class CRDTCharacter
     {
         public CRDTCharacter()
@@ -21,7 +21,6 @@ namespace DatabaseLibrary.Entities
             this.Character = characterClient.Character;
             this.IdNote = characterClient.IdNote;
             this.Tombstone = characterClient.Tombstone;
-            this.ClientId = characterClient.ClientId;
             this.Operation = characterClient.Operation;
             this.ClockDateTime = characterClient.ClockDateTime;
         }
@@ -31,44 +30,25 @@ namespace DatabaseLibrary.Entities
             this.Character = characterClient.Character;
             this.IdNote = characterClient.IdNote;
             this.Tombstone = characterClient.Tombstone;
-            this.ClientId = characterClient.ClientId;
             this.Operation = characterClient.Operation;
             this.ClockDateTime = characterClient.ClockDateTime;
         }
-        public CRDTCharacter(char character, decimal IdCharacter)
+        public CRDTCharacter(char character, string IdCharacter)
         {
             this.IdCharacter = IdCharacter;
             this.Character = character;
         }
-        public decimal IdCharacter { get; set; }
+
+        /// <summary>
+        /// Composite ID string in format: decimal (simple) or (pos,site)(pos,site)... (composite)
+        /// Used as primary key component for conflict resolution
+        /// </summary>
+        public string IdCharacter { get; set; }
 
         public Guid IdNote { get; set; }
         public char Character { get; set; }
         public string Operation { get; set; }
         public string ClockDateTime { get; set; }
         public bool Tombstone { get; set; }
-        public Guid ClientId { get; set; } // Essential for conflict resolution
-
-        public CRDTId crdtId()
-        {
-            return new CRDTId { Position = this.IdCharacter, ClientId = this.ClientId };
-        }
-
-    }
-
-    public class CRDTId : IComparable<CRDTId>
-    {
-        public decimal Position { get; set; }
-        public Guid ClientId { get; set; }
-
-        public int CompareTo(CRDTId other)
-        {
-            int posComparison = this.Position.CompareTo(other.Position);
-            if (posComparison != 0)
-                return posComparison;
-
-            // Tiebreaker: clientId comparison (lexicographic for deterministic ordering)
-            return this.ClientId.CompareTo(other.ClientId);
-        }
     }
 }

@@ -35,14 +35,14 @@ namespace Server.Controllers
         [HttpGet("GetAllNotesFromUser")] // iActionResult can sent json back to the client (look more into this)
         public async Task<IActionResult> GetAllNotesFromUser()
         {
-           
+
             Guid idUser = GetUserIdFromRequest();
             List<NoteServer> notes = await _notesRepository.GetAllNotesFromUser(idUser);
             List<NoteClient> toSend = notes
                 .Select(note => EntityMapper.MapNoteServerToNoteClient(note))
                 .ToList();
             return Ok(ApiResponse<List<NoteClient>>.SuccessResponse(toSend));
-         
+
         }
 
         [HttpPut("SendCRDTChangestoServer")]
@@ -50,8 +50,9 @@ namespace Server.Controllers
         {
             Guid idUser = GetUserIdFromRequest();
             await _notesRepository.saveCRDTChanges(changes);
-            await _noteSyncHub.PushUpdatesToSubscribedUserAsync(changes, idUser);
-          
+            string? senderConnectionId = Request.Headers["X-Connection-Id"].FirstOrDefault();
+            await _noteSyncHub.PushUpdatesToSubscribedUserAsync(changes, idUser, senderConnectionId);
+
             return Ok("Success");
         }
 
@@ -70,13 +71,17 @@ namespace Server.Controllers
         {
             Guid idUser = GetUserIdFromRequest();
             NoteServer note = await _notesRepository.GetNoteById(noteId, idUser);
+            if (note == null)
+            {
+                return BadRequest("Note not found or you do not have access to it.");
+            }
             return Ok(ApiResponse<object>.SuccessResponse(note));
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateNote([FromBody] NoteClient changesMade)
         {
-          
+
             Guid idUser = GetUserIdFromRequest();
             var newNote = await _notesRepository.CreateNote(changesMade, idUser);
             var noteData = new { idNote = newNote.IdNote };
@@ -84,13 +89,13 @@ namespace Server.Controllers
                 noteData,
                 "Note created successfully."
             ));
-    
+
         }
 
         [HttpPost("SendChangesToServer")]
         public async Task<IActionResult> SendChangesToServer([FromBody] List<NoteClient> noteClient)
         {
-         
+
             Guid idUser = GetUserIdFromRequest();
             await _notesRepository.SaveAllChangesFromClient(ConvertListClientToServer(noteClient), idUser);
             return Ok(ApiResponse<object>.SuccessResponse(
@@ -129,9 +134,9 @@ namespace Server.Controllers
             }
             return newList;
         }
-    
 
-    [HttpGet("GetServerChanges")]
+
+        [HttpGet("GetServerChanges")]
         public async Task<IActionResult> GetServerChanges()
         {
             Guid userId = GetUserIdFromRequest();
@@ -139,6 +144,19 @@ namespace Server.Controllers
             return Ok(ApiResponse<object>.SuccessResponse(
                 data: changes,
                 message: "Server changes retrieved successfully."
+            ));
+        }
+
+
+        [HttpGet("GetAllCharacterByNote")]
+        public async Task<IActionResult> GetAllCharacterByNote(Guid noteId)
+        {
+            Guid userId = GetUserIdFromRequest();
+            _notesRepository.saveNoteUserConnection(noteId, userId);
+            var characters = await _notesRepository.getCRDTCharactersbyIdNote(noteId);
+            return Ok(ApiResponse<object>.SuccessResponse(
+                data: characters,
+                message: "Characters retrieved successfully."
             ));
         }
     }

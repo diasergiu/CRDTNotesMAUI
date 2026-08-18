@@ -46,7 +46,7 @@ public partial class MainPageNotes : ContentPage
 
     private async void OnGetAccessToNotesClicked(object? sender, EventArgs e)
     {
-        await Navigation.PushModalAsync(new NoteConnectionPopup());
+        await Navigation.PushModalAsync(new NoteConnectionPopup(_noteServices));
     }
 
 
@@ -74,7 +74,15 @@ public partial class MainPageNotes : ContentPage
         }
 
         var notesResult = await _noteServices.GetAllNotesFromUser(_currentUserId);
-        if (notesResult.IsSuccess)
+      
+
+        var charResults = await _noteServices.GetAllCharacterByUser();
+        if (charResults.IsSuccess)
+        {
+            // Update the local repository with the notes from the server
+            _noteRepository.saveCRDTChanges(charResults.Data.Select(a => new CRDTCharacterClient(a)).ToList());
+        }
+        if (notesResult.IsSuccess && charResults.IsSuccess)
         {
             // Update the local repository with the notes from the server
             _noteRepository.UpdateListNotes(notesResult.Data);
@@ -84,13 +92,6 @@ public partial class MainPageNotes : ContentPage
         else
         {
             await DisplayAlert("Error", "Failed to sync notes from server.", "OK");
-        }
-
-        var charResults = await _noteServices.GetAllCharacterByUser();
-        if (charResults.IsSuccess)
-        {
-            // Update the local repository with the notes from the server
-            _noteRepository.saveCRDTChanges(charResults.Data.Select(a => new CRDTCharacterClient(a)).ToList());
         }
     }
 

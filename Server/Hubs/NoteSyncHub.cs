@@ -13,15 +13,20 @@ public class NoteSyncHub
         _notesHubContext = notesHubContext;
     }
 
-    public async Task PushUpdatesToSubscribedUserAsync(List<CRDTCharacter> changes, Guid currentUser)
+    public async Task PushUpdatesToSubscribedUserAsync(List<CRDTCharacter> changes, Guid currentUser, string? senderConnectionId = null)
     {
+        // Only exclude the connection the update actually came from. Excluding "the"
+        // connection of the user breaks when the same user is signed in from two apps.
+        if (senderConnectionId != null && !NotesHub.IsConnectionOfUser(currentUser.ToString(), senderConnectionId))
+        {
+            senderConnectionId = null;
+        }
 
         foreach (CRDTCharacter c in changes)
         {
             if (_notesHubContext != null)
             {
                 var groupName = $"note-{c.IdNote}";
-                var senderConnectionId = NotesHub.GetConnectionId(currentUser.ToString());
 
                 var sendTask = senderConnectionId != null
                     ? _notesHubContext.Clients.GroupExcept(groupName, senderConnectionId)

@@ -54,5 +54,15 @@ namespace MAUIClientUI.Services
         {
             return ApiResultData<List<CRDTCharacter>>.Success(new List<CRDTCharacter>());
         }
+
+        public async Task<ApiResultData<List<CRDTCharacter>>> GetAllCharacterByNote(Guid noteId)
+        {
+            return ApiResultData<List<CRDTCharacter>>.Success(new List<CRDTCharacter>());
+        }
+
+        public async Task<ApiResultData<NoteClient>> GetNote(Guid noteId)
+        {
+            return ApiResultData<NoteClient>.Success(new NoteClient());
+        }
     }
 }

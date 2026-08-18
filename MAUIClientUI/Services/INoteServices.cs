@@ -16,5 +16,7 @@ namespace MAUIClientUI.Services
         Task<ApiResult> DeleteNote(Guid noteId);
         Task<ApiResult> SendChangesToServer(List<NoteClient> noteClient);
         Task<ApiResult> SendCRDTChangestoServer(List<CRDTCharacter> characters);
+        Task<ApiResultData<List<CRDTCharacter>>> GetAllCharacterByNote(Guid noteId);
+        Task<ApiResultData<NoteClient>> GetNote(Guid noteId);
     }
 }

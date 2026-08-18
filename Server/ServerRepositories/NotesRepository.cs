@@ -60,18 +60,6 @@ namespace Server.ServeRepositories
 
         public async Task<NoteServer> CreateNote(NoteClient note, Guid idUser)
         {
-            //NoteServer newNote = new NoteServer
-            //{
-            //    Content = changesMade.ContentChanges,
-            //    LastUpdate = changesMade.LastUpdate
-            //};
-            //_dbContextServer.Notes.Add(newNote);
-            //Note_UserServer newConnection = new Note_UserServer
-            //{
-            //    IdNote = changesMade.IdNote,
-            //    IdUser = changesMade.IdUser
-            //};
-            //_dbContextServer.Note_Users.Add(newConnection);
 
             NoteServer newNote = EntityMapper.MapNoteClientToNoteServer(note);
             _dbContextServer.Notes.Add(newNote);
@@ -226,12 +214,12 @@ namespace Server.ServeRepositories
 
         public async Task<NoteServer> GetNoteById(Guid IdNote, Guid idUser)
         {
-            var noteAccess = _dbContextServer.Note_Users.FirstOrDefault(n => n.IdUser == idUser && n.IdNote == IdNote);
-            if(noteAccess != null)
-            {
+            //var noteAccess = _dbContextServer.Note_Users.FirstOrDefault(n => n.IdUser == idUser && n.IdNote == IdNote);
+            //if(noteAccess != null)
+            //{
                 return _dbContextServer.Notes.FirstOrDefault(n => n.IdNote == IdNote);
-            }
-            return null;
+            //}
+            //return null;
         }
 
         public async Task ManageCRDTCharacters(List<CRDTCharacter> crdtCharacters)
@@ -278,6 +266,18 @@ namespace Server.ServeRepositories
             .Where(c => _dbContextServer.Note_Users
                 .Any(nu => nu.IdUser == userId && nu.IdNote == c.IdNote))
             .ToListAsync();
+        }
+
+        public async Task<List<CRDTCharacter>> getCRDTCharactersbyIdNote(Guid noteId)
+        {
+            
+            return await _dbContextServer.CRDTCharacters.Where(n => n.IdNote == noteId).ToListAsync();
+        }
+
+        public async Task saveNoteUserConnection(Guid noteId, Guid userId)
+        {
+            _dbContextServer.Note_Users.Add(new Note_UserServer() { IdNote = noteId, IdUser = userId });
+            await _dbContextServer.SaveChangesAsync(); // i dont think this is the best way to handle this 
         }
     }
 

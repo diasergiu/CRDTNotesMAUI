@@ -23,7 +23,6 @@ namespace DatabaseLibrary.Entities.Server
             this.Operation = character.Operation;
             this.ClockDateTime = character.ClockDateTime;
             this.Tombstone = character.Tombstone;
-            this.ClientId = character.ClientId;
         }
 
         public CRDTCharacterServer(CRDTCharacter character, NoteServer noteServer) : this(character)

@@ -71,7 +71,6 @@ namespace DatabaseLibrary.RequestBody.EntityMappers
                 IdNote = client.IdNote,
                 ClockDateTime = client.ClockDateTime,
                 Tombstone = client.Tombstone,
-                ClientId = client.ClientId
             };
         }
         public static CRDTCharacterClient MapCharacterServerToClient(CRDTCharacter Server) // how do those dont create conflicts with already existing data from the server
@@ -83,7 +82,6 @@ namespace DatabaseLibrary.RequestBody.EntityMappers
                 IdNote = Server.IdNote,
                 ClockDateTime = Server.ClockDateTime,
                 Tombstone = Server.Tombstone,
-                ClientId = Server.ClientId
             };
         }
         public static UserServer MapUserClientToUserServer(UserClient userClient)

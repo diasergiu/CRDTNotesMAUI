@@ -1,10 +1,12 @@
 ﻿using DatabaseLibrary.Entities;
 using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.WrapperClasses;
+using MAUIClientUI.Miscellaneous;
 using MAUIClientUI.MVVM;
 using MAUIClientUI.Repositories;
 using MAUIClientUI.Services;
 using Microsoft.Extensions.Logging;
+using System.IO;
 
 namespace MAUIClientUI
 {
@@ -36,11 +38,29 @@ namespace MAUIClientUI
                 .AddScoped<CRDTCharacterRepository>()
                 .AddScoped<ClientServices>();
                 //.AddScoped<NotesViewModel>();
-#if DEBUG
+
+            // Configure logging
+            string logsDir = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Logs"
+            );
+            Directory.CreateDirectory(logsDir);
+            string logFilePath = Path.Combine(logsDir, $"app_{DateTime.Now:yyyy-MM-dd}.log");
+
             builder.Logging.AddDebug();
+            builder.Logging.AddProvider(new FileLoggerProvider(logFilePath));
+
+#if DEBUG
+            builder.Logging.SetMinimumLevel(LogLevel.Debug);
+#else
+            builder.Logging.SetMinimumLevel(LogLevel.Information);
 #endif
            // GetLocalUserFromEnviVariable();
             var app = builder.Build();
+
+            // Register ILoggerFactory in DI container
+            var services = app.Services;
+            var loggerFactory = services.GetRequiredService<ILoggerFactory>();
 
             InitializeDatabase(app.Services, instanceId);
 
@@ -76,19 +96,20 @@ namespace MAUIClientUI
             }
         }
 
-        //private static void GetLocalUserFromEnviVariable()
-        //{
-        //    Guid user = Guid.NewGuid();
-        //    var envId = Environment.GetEnvironmentVariable("INSTANCE_ID");
-        //    if (envId != null) { 
-        //        Guid.TryParse(envId, out user);
-        //    }
-        //    var args = Environment.GetCommandLineArgs();
-        //    if (args.Length > 2)
-        //        Guid.TryParse(args[1], out user);
+        private static void GetLocalUserFromEnviVariable()
+        {
+            Guid user = Guid.NewGuid();
+            var envId = Environment.GetEnvironmentVariable("INSTANCE_ID");
+            if (envId != null)
+            {
+                Guid.TryParse(envId, out user);
+            }
+            var args = Environment.GetCommandLineArgs();
+            if (args.Length > 2)
+                Guid.TryParse(args[1], out user);
 
-        //    // defautl
-        //    UserDevice.localUser(user);
-        //}
+            // defautl
+            UserDevice.localUser(user);
+        }
     }
 }

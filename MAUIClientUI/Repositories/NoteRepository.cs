@@ -131,6 +131,7 @@ namespace MAUIClientUI.Repositories
             {
                 character.IsDirtyFlag = false;
             }
+            _dbContextUser.ChangeTracker.Clear();
             _dbContextUser.CRDTCharacters.UpdateRange(offlineChanges);
             _dbContextUser.SaveChangesAsync();
             _dbContextUser.ChangeTracker.Clear();
