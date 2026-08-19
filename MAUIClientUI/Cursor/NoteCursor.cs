@@ -123,13 +123,15 @@ namespace MAUIClientUI.Cursor
             if (!string.IsNullOrEmpty(rightIdStr) && decimal.TryParse(rightIdStr, out var rd))
                 rightDecimal = rd;
 
-            // Generate decimal ID
-            decimal newDecimal = _idService.GenerateIdBetween(leftDecimal, rightDecimal, _clientId);
 
-            // Convert to composite ID format: (position,clientId)
-            return _idService.BuildCompositeIdString(new[] { 
-                new LseqIdService.IdComponent { Position = newDecimal, SiteId = _clientId } 
-            });
+            return _idService.GenerateIdBetweenComposite(leftIdStr, rightIdStr, _clientId);
+            //// Generate decimal ID
+            //decimal newDecimal = _idService.GenerateIdBetween(leftDecimal, rightDecimal, _clientId);
+
+            //// Convert to composite ID format: (position,clientId)
+            //return _idService.BuildCompositeIdString(new[] { 
+            //    new LseqIdService.IdComponent { Position = newDecimal, SiteId = _clientId } 
+            //});
         }
 
         /// <summary>

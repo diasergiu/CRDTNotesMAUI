@@ -40,9 +40,9 @@ public partial class NoteConnectionPopup : ContentPage
 			var result = await _noteServices.GetNote(guid);
 			if (result.IsSuccess)
 			{
-				_noteRepository.createNote(result.Data);
+				_noteRepository.CreateNote(result.Data);
 				var noteData = await _noteServices.GetAllCharacterByNote(guid);
-				_noteRepository.saveCRDTChanges(noteData.Data.Select(a => new CRDTCharacterClient(a)).ToList());
+				_noteRepository.SaveCRDTChanges(noteData.Data.Select(a => new CRDTCharacterClient(a)).ToList());
 				await Navigation.PopModalAsync();
 			}
 			else

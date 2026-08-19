@@ -83,7 +83,7 @@ namespace Server.Controllers
         {
 
             Guid idUser = GetUserIdFromRequest();
-            var newNote = await _notesRepository.CreateNote(changesMade, idUser);
+            var newNote = await _notesRepository.CreateNote(EntityMapper.MapNoteClientToNoteServer(changesMade), idUser);
             var noteData = new { idNote = newNote.IdNote };
             return Ok(ApiResponse<object>.SuccessResponse(
                 noteData,

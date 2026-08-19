@@ -86,7 +86,7 @@ namespace MAUIClientUI.Repositories
             _dbContextUser.Users.Add(newUser);
         }
 
-        public void updateNote(NoteClient note)
+        public void UpdateNote(NoteClient note)
         {
             _dbContextUser.ChangeTracker.Clear();
             _dbContextUser.Notes.Update(note);
@@ -94,21 +94,21 @@ namespace MAUIClientUI.Repositories
 
 
         }
-        public void createNote(NoteClient note)
+        public void CreateNote(NoteClient note)
         {
             _dbContextUser.ChangeTracker.Clear();
             _dbContextUser.Notes.Add(note);
             _dbContextUser.SaveChanges();
         }
 
-        public void deleteNote(NoteClient note)
+        public void DeleteNote(NoteClient note)
         {
             _dbContextUser.ChangeTracker.Clear();
             _dbContextUser.Notes.Remove(note);
             _dbContextUser.SaveChanges();
         }
 
-        public void textToCRDTCharacter(List<CRDTCharacterClient> characters)
+        public void TextToCRDTCharacter(List<CRDTCharacterClient> characters)
         {
             _dbContextUser.CRDTCharacters.AddRange(characters);
             _dbContextUser.SaveChanges();
@@ -138,7 +138,7 @@ namespace MAUIClientUI.Repositories
 
         }
 
-        public async Task saveCRDTChanges(List<CRDTCharacterClient> changes)
+        public async Task SaveCRDTChanges(List<CRDTCharacterClient> changes)
         {
             // Get all IDs from the list
             var changeIds = changes.Select(c => c.IdCharacter).ToList();
@@ -169,6 +169,11 @@ namespace MAUIClientUI.Repositories
             }
 
             await _dbContextUser.SaveChangesAsync();
+        }
+
+        public async Task DeleteCharacterByNoteId(Guid noteId)
+        {
+            _dbContextUser.CRDTCharacters.Where(n => n.IdNote == noteId).ExecuteDeleteAsync();
         }
     }
 }

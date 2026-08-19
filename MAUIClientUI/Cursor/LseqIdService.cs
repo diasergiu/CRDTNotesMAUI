@@ -27,9 +27,9 @@ namespace MAUIClientUI.Cursor
         /// Generate unique decimal ID between two boundaries
         /// Handles conflict when two users pick same ID
         /// </summary>
-        public decimal GenerateIdBetween(decimal? leftId, decimal? rightId, Guid clientId)
+        public decimal GenerateIdBetween(decimal? leftId, decimal? rightId, Guid clientId) // shuold we just skipp this part
         {
-            return GenerateIdBetweenInternal(leftId, rightId, clientId, depth: 1);
+            return GenerateIdBetweenInternal(leftId, rightId, clientId, depth: 1); // how is this gonna change the string 
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace MAUIClientUI.Cursor
             // Find the first level where positions differ, or determine nesting level
             int minLength = Math.Min(leftComponents.Count, rightComponents.Count);
             int nestingLevel = 0;
-
+            var resultComponents = new List<IdComponent>();
             // Find where components differ
             for (int i = 0; i < minLength; i++)
             {
@@ -56,19 +56,20 @@ namespace MAUIClientUI.Cursor
                     nestingLevel = i;
                     break;
                 }
+                resultComponents.Add(leftComponents[i]); // add left is they are ==
                 nestingLevel = i + 1;
             }
 
             // Build result components up to and including the nesting level
-            var resultComponents = new List<IdComponent>();
+            
             decimal? leftBoundary = nestingLevel < leftComponents.Count ? leftComponents[nestingLevel].Position : null;
             decimal? rightBoundary = nestingLevel < rightComponents.Count ? rightComponents[nestingLevel].Position : null;
 
-            if (nestingLevel < leftComponents.Count - 1)
-            {
-                resultComponents.AddRange(leftComponents.Take(nestingLevel));
-            }
-          
+            //if (nestingLevel < leftComponents.Count - 1) // should it be <=
+            //{
+            //    resultComponents.AddRange(leftComponents.Take(nestingLevel));
+            //}
+
             // Generate new position between left and right at this nesting level
             decimal newPosition = GenerateIdBetweenInternal(
                 leftBoundary,

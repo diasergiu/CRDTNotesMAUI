@@ -58,21 +58,19 @@ namespace Server.ServeRepositories
             return _dbContextServer.Sync_Queues.Where(n => n.IdNote == idNote).ToList();
         }
 
-        public async Task<NoteServer> CreateNote(NoteClient note, Guid idUser)
+        public async Task<NoteServer> CreateNote(NoteServer note, Guid idUser)
         {
-
-            NoteServer newNote = EntityMapper.MapNoteClientToNoteServer(note);
-            _dbContextServer.Notes.Add(newNote);
+            _dbContextServer.Notes.Add(note);
             await _dbContextServer.SaveChangesAsync();
 
             Note_UserServer newConnection = new Note_UserServer()
             {
-                IdNote = newNote.IdNote,
+                IdNote = note.IdNote,
                 IdUser = idUser
             };
             _dbContextServer.Note_Users.Add(newConnection);
             await _dbContextServer.SaveChangesAsync();
-            return newNote;
+            return note;
         }
 
         /// <summary>
@@ -147,67 +145,41 @@ namespace Server.ServeRepositories
 
             // Delete the note itself if there are no users connected to note
             List<Note_UserServer> remainingConnections = _dbContextServer.Note_Users.Where(n => n.IdNote == noteId).ToList();
-            if(remainingConnections.Count == 0)
+            if(remainingConnections.Count == 1)
             {
                 var note = await _dbContextServer.Notes.FirstOrDefaultAsync(n => n.IdNote == noteId);
                 if (note != null)
                 {
                     _dbContextServer.Notes.Remove(note);
                 }
+                DeleteCharacters(note.IdNote);
             }
 
             await _dbContextServer.SaveChangesAsync();
+        }
+
+        public void DeleteCharacters(Guid noteId)
+        {
+            _dbContextServer.CRDTCharacters.Where(n => n.IdNote == noteId).ExecuteDelete();
+
         }
 
         public async Task SaveAllChangesFromClient(List<NoteServer> notesClient, Guid UserId)
         {
             if (notesClient == null || notesClient.Count == 0)
                 return;
-
-            _dbContextServer.ChangeTracker.Clear();
-
-            // Get all existing note IDs from the database
-            var existingNoteIds = _dbContextServer.Notes
-                .AsNoTracking()  // Add this to prevent tracking
-                .Select(n => n.IdNote)
-                .ToList();
-
-            // Separate notes into new and existing_
-            var notesToAdd = notesClient
-                .Where(n => !existingNoteIds.Contains(n.IdNote))
-                .ToList();
-
-            var notesToUpdate = notesClient
-                .Where(n => existingNoteIds.Contains(n.IdNote))
-                .ToList();
-            List<Note_UserServer> connections = new List<Note_UserServer>();
-
-            foreach (NoteServer newNotes in notesToAdd)
+            var allNotes = _dbContextServer.Notes.ToList();
+            foreach (NoteServer note in notesClient)
             {
-                connections.Add(new Note_UserServer()
+                var exists = allNotes.FirstOrDefault(n => n.IdNote == note.IdNote);
+                if(exists == null)
                 {
-                    IdNote = newNotes.IdNote,
-                    IdUser = UserId
-                });
-            }
-            // Add new notes
-            if (notesToAdd.Count > 0)
-            {
-                _dbContextServer.Notes.AddRange(notesToAdd);
-                _dbContextServer.Note_Users.AddRange(connections);
-
-            }
-
-            // Update existing notes
-            if (notesToUpdate.Count > 0)
-            {
-                _dbContextServer.Notes.UpdateRange(notesToUpdate);
-            }
-
-            // Save all changes at once
-            if (notesToAdd.Count > 0 || notesToUpdate.Count > 0)
-            {
-                _dbContextServer.SaveChanges();
+                    CreateNote(note, UserId);
+                }
+                else
+                {
+                    UpdateChanges(note, UserId);
+                }
             }
         }
 

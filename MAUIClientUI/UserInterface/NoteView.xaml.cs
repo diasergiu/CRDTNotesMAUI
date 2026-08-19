@@ -38,7 +38,7 @@ public partial class NoteView : ContentPage
     }, noteService, true)
     {
         _isNewNote = true;
-        _noteRepository.createNote(_currentNote);
+        _noteRepository.CreateNote(_currentNote);
     }
     public NoteView(NoteClient note, INoteServices noteService, bool isNewNote = false)
     {
@@ -128,7 +128,7 @@ public partial class NoteView : ContentPage
     {
         // Filter: only handle updates for the note currently being viewed
         if (e.IdNote != _currentNote?.IdNote) return;
-        await _noteRepository.saveCRDTChanges(new List<CRDTCharacterClient> { new CRDTCharacterClient(e) });
+        await _noteRepository.SaveCRDTChanges(new List<CRDTCharacterClient> { new CRDTCharacterClient(e) });
     
         _noteCursor.MergeCharacter(new CRDTCharacterClient(e));
 
@@ -262,7 +262,7 @@ public partial class NoteView : ContentPage
             }
 
             // TRUE SUCCESS - Only save to local DB when server update succeeds
-            _noteRepository.updateNote(_currentNote);
+            _noteRepository.UpdateNote(_currentNote);
         }
 
         if (!silent)
@@ -445,7 +445,7 @@ private void ContentEditor_TextChanging(Microsoft.UI.Xaml.Controls.TextBox sende
             ContentEditor.Text = _currentNote.Content;
 
             // Save to local DB with server's version
-            _noteRepository.updateNote(_currentNote);
+            _noteRepository.UpdateNote(_currentNote);
 
             await DisplayAlert("Success", "Updated to server Version. Note saved locally.", "OK");
             await Navigation.PopAsync();
@@ -518,7 +518,7 @@ private void ContentEditor_TextChanging(Microsoft.UI.Xaml.Controls.TextBox sende
             TitleEntry.Text = _currentNote.Title;
             ContentEditor.Text = _currentNote.Content;
 
-            _noteRepository.updateNote(_currentNote);
+            _noteRepository.UpdateNote(_currentNote);
             await DisplayAlert("Success", "Updated to server Version. Note saved locally.", "OK");
             await Navigation.PopAsync();
         }
@@ -532,12 +532,6 @@ private void ContentEditor_TextChanging(Microsoft.UI.Xaml.Controls.TextBox sende
 
     private async void OnDeleteClicked(object sender, EventArgs e)
     {
-        if (_isNewNote)
-        {
-            await DisplayAlert("Cannot Delete", "Cannot delete a new note that hasn't been saved.", "OK");
-            return;
-        }
-
         bool confirm = await DisplayAlert("Confirm Delete", "Are you sure you want to delete this note?", "Delete", "Cancel");
         if (!confirm)
         {
@@ -553,7 +547,8 @@ private void ContentEditor_TextChanging(Microsoft.UI.Xaml.Controls.TextBox sende
                 return;
             }
 
-            _noteRepository.deleteNote(_currentNote);
+            _noteRepository.DeleteNote(_currentNote);
+            _noteRepository.DeleteCharacterByNoteId(_currentNote.IdNote);
             await DisplayAlert("Success", "Note deleted successfully!", "OK");
             await Navigation.PopAsync();
         }

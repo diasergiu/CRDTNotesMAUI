@@ -80,7 +80,7 @@ public partial class MainPageNotes : ContentPage
         if (charResults.IsSuccess)
         {
             // Update the local repository with the notes from the server
-            _noteRepository.saveCRDTChanges(charResults.Data.Select(a => new CRDTCharacterClient(a)).ToList());
+            _noteRepository.SaveCRDTChanges(charResults.Data.Select(a => new CRDTCharacterClient(a)).ToList());
         }
         if (notesResult.IsSuccess && charResults.IsSuccess)
         {
@@ -127,7 +127,7 @@ public partial class MainPageNotes : ContentPage
         if (charResults.IsSuccess)
         {
             // Update the local repository with the Charactrers from the server
-            _noteRepository.saveCRDTChanges(charResults.Data.Select(a => new CRDTCharacterClient(a)).ToList());
+            _noteRepository.SaveCRDTChanges(charResults.Data.Select(a => new CRDTCharacterClient(a)).ToList());
         }
     }
 
