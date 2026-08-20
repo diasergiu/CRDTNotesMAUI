@@ -100,7 +100,7 @@ namespace Server.Test
             _dbContext.Users.Add(user);
             await _dbContext.SaveChangesAsync();
 
-            var noteClient = new NoteClient
+            var noteServer = new NoteServer
             {
                 IdNote = Guid.NewGuid(),
                 Title = "Integration Test Note",
@@ -112,12 +112,12 @@ namespace Server.Test
             };
 
             // Act - Create note
-            var createdNote = await _repository.CreateNote(noteClient, userId);
+            var createdNote = await _repository.CreateNote(noteServer, userId);
 
             // Assert - Note was created
             Assert.NotNull(createdNote);
-            Assert.Equal(noteClient.Title, createdNote.Title);
-            Assert.Equal(noteClient.Content, createdNote.Content);
+            Assert.Equal(noteServer.Title, createdNote.Title);
+            Assert.Equal(noteServer.Content, createdNote.Content);
 
             // Act - Retrieve user notes
             var userNotes = await _repository.GetAllNotesFromUser(userId);
@@ -144,7 +144,7 @@ namespace Server.Test
             _dbContext.Users.Add(user);
             await _dbContext.SaveChangesAsync();
 
-            var note1 = new NoteClient
+            var note1 = new NoteServer
             {
                 IdNote = Guid.NewGuid(),
                 Title = "First Note",
@@ -155,7 +155,7 @@ namespace Server.Test
                 DirtyFlagChangesMade = true
             };
 
-            var note2 = new NoteClient
+            var note2 = new NoteServer
             {
                 IdNote = Guid.NewGuid(),
                 Title = "Second Note",
@@ -214,7 +214,7 @@ namespace Server.Test
             await _dbContext.SaveChangesAsync();
 
             // Arrange - Create note for user 1
-            var note1 = new NoteClient
+            var note1 = new NoteServer
             {
                 IdNote = Guid.NewGuid(),
                 Title = "User 1 Note",
@@ -225,7 +225,7 @@ namespace Server.Test
                 DirtyFlagChangesMade = true
             };
 
-            var note2 = new NoteClient
+            var note2 = new NoteServer
             {
                 IdNote = Guid.NewGuid(),
                 Title = "User 2 Note",

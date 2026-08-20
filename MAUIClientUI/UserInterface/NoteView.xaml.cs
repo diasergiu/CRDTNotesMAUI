@@ -195,9 +195,9 @@ public partial class NoteView : ContentPage
         await DisplayAlert("Warning", "Title is required to save the note.", "OK");
     }
 
-    private async void OnSaveClicked(object sender, EventArgs e)
+    private async void OnNoteGiveAccess(object sender, EventArgs e)
     {
-       // await PerformSaveAsync(silent: false);
+       await Navigation.PushAsync(new NoteConnectionPopup(_noteServices, _currentNote.IdNote));
     }
 
     private async Task SendChangesToServer(CRDTCharacter change)

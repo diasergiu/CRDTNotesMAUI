@@ -18,5 +18,6 @@ namespace MAUIClientUI.Services
         Task<ApiResult> SendCRDTChangestoServer(List<CRDTCharacter> characters);
         Task<ApiResultData<List<CRDTCharacter>>> GetAllCharacterByNote(Guid noteId);
         Task<ApiResultData<NoteClient>> GetNote(Guid noteId);
+        Task<ApiResult> GiveNoteAccessToUser(Guid noteId, Guid userId);
     }
 }

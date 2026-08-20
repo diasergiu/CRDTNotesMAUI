@@ -14,15 +14,6 @@
                 HorizontalOptions="Center"
                 VerticalOptions="Center" />
 
-            <Button
-                x:Name="GetAccessToNotesButton"
-                Text="Access Note From Server"
-                HeightRequest="40"
-                WidthRequest="90"
-                IsEnabled="False"
-                Clicked="OnGetAccessToNotesClicked"
-                ></Button>
-            
             <Button 
                 x:Name="SyncNotesButton"
                 Grid.Column="1"

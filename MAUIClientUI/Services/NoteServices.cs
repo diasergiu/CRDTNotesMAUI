@@ -133,6 +133,12 @@ namespace MAUIClientUI.Services
             return result;
         }
 
-
+        public Task<ApiResult> GiveNoteAccessToUser(Guid noteId, Guid userId)
+        {
+            var result = ExceptionHandlingHelper.ExecuteAsync(
+                async () => await SendRequest<object>(HttpMethod.Post, $"{_baseURL}/GiveNoteAccessToUser?userId={userId}&noteId={noteId}", null),
+                nameof(GiveNoteAccessToUser));
+            return result;
+        }
     }
 }

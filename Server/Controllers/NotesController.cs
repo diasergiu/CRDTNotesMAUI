@@ -152,11 +152,22 @@ namespace Server.Controllers
         public async Task<IActionResult> GetAllCharacterByNote(Guid noteId)
         {
             Guid userId = GetUserIdFromRequest();
-            _notesRepository.saveNoteUserConnection(noteId, userId);
+            _notesRepository.SaveNoteUserConnection(noteId, userId);
             var characters = await _notesRepository.getCRDTCharactersbyIdNote(noteId);
             return Ok(ApiResponse<object>.SuccessResponse(
                 data: characters,
                 message: "Characters retrieved successfully."
+            ));
+        }
+
+        [HttpPost("GiveNoteAccessToUser")]
+        public async Task<IActionResult> GiveNoteAccessToUser(Guid userId, Guid noteId)
+        {
+            //Guid userId = GetUserIdFromRequest();
+            await _notesRepository.SaveNoteUserConnection(noteId, userId);
+            return Ok(ApiResponse<object>.SuccessResponse(
+                data: null,
+                message: "Note access granted successfully."
             ));
         }
     }

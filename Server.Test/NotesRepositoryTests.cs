@@ -211,7 +211,7 @@ namespace Server.Test
         {
             // Arrange
             var userId = Guid.NewGuid();
-            var noteClient = new NoteClient
+            var noteServer = new NoteServer
             {
                 IdNote = Guid.NewGuid(),
                 Title = "New Note",
@@ -222,11 +222,11 @@ namespace Server.Test
             };
 
             // Act
-            var result = await _repository.CreateNote(noteClient, userId);
+            var result = await _repository.CreateNote(noteServer, userId);
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(noteClient.Content, result.Content);
+            Assert.Equal(noteServer.Content, result.Content);
 
             var noteInDb = await _dbContext.Notes.FirstOrDefaultAsync(n => n.IdNote == result.IdNote);
             Assert.NotNull(noteInDb);

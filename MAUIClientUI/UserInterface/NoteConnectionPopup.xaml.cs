@@ -9,16 +9,18 @@ public partial class NoteConnectionPopup : ContentPage
 
 	private NoteRepository _noteRepository;
 	private INoteServices _noteServices;
-	public NoteConnectionPopup(INoteServices noteService)
+	private Guid _noteId;
+	public NoteConnectionPopup(INoteServices noteService, Guid IdNote)
 	{
 		_noteRepository = IPlatformApplication.Current.Services.GetService<NoteRepository>(); ;
 		_noteServices = noteService;
+		_noteId = IdNote;
 		InitializeComponent();
 		
 	}
     private async void OnCancelClicked(object sender, EventArgs e)
     {
-        await Navigation.PopModalAsync();
+        await Navigation.PopAsync();
     }
 
 	private async void OnAccessNoteClicked(object sender, EventArgs e)
@@ -29,25 +31,22 @@ public partial class NoteConnectionPopup : ContentPage
 			return;
 		}
 
-		if (!Guid.TryParse(IdNoteEntry.Text, out var guid))
+		if (!Guid.TryParse(IdNoteEntry.Text, out var userId))
 		{
-			await DisplayAlert("Error", "Invalid Note ID format. Please enter a valid GUID.", "OK");
+			await DisplayAlert("Error", "Invalid User ID format. Please enter a valid GUID.", "OK");
 			return;
 		}
 
 		try
 		{
-			var result = await _noteServices.GetNote(guid);
+			var result = await _noteServices.GiveNoteAccessToUser(_noteId, userId);
 			if (result.IsSuccess)
 			{
-				_noteRepository.CreateNote(result.Data);
-				var noteData = await _noteServices.GetAllCharacterByNote(guid);
-				_noteRepository.SaveCRDTChanges(noteData.Data.Select(a => new CRDTCharacterClient(a)).ToList());
 				await Navigation.PopModalAsync();
 			}
 			else
 			{
-				await DisplayAlert("Error", "Failed to access note. Please check the ID and try again.", "OK");
+				await DisplayAlert("Error", "Failed to find User. Please check the ID and try again.", "OK");
 			}
 		}
 		catch (Exception ex)

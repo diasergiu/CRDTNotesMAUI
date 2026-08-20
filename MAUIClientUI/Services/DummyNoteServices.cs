@@ -64,5 +64,10 @@ namespace MAUIClientUI.Services
         {
             return ApiResultData<NoteClient>.Success(new NoteClient());
         }
+
+        public async Task<ApiResult> GiveNoteAccessToUser(Guid noteId, Guid userId)
+        {
+            return ApiResult.Success();
+        }
     }
 }

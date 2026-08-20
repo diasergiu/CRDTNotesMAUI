@@ -174,11 +174,11 @@ namespace Server.ServeRepositories
                 var exists = allNotes.FirstOrDefault(n => n.IdNote == note.IdNote);
                 if(exists == null)
                 {
-                    CreateNote(note, UserId);
+                    await CreateNote(note, UserId);
                 }
                 else
                 {
-                    UpdateChanges(note, UserId);
+                    await UpdateChanges(note, UserId);
                 }
             }
         }
@@ -246,7 +246,7 @@ namespace Server.ServeRepositories
             return await _dbContextServer.CRDTCharacters.Where(n => n.IdNote == noteId).ToListAsync();
         }
 
-        public async Task saveNoteUserConnection(Guid noteId, Guid userId)
+        public async Task SaveNoteUserConnection(Guid noteId, Guid userId)
         {
             _dbContextServer.Note_Users.Add(new Note_UserServer() { IdNote = noteId, IdUser = userId });
             await _dbContextServer.SaveChangesAsync(); // i dont think this is the best way to handle this 

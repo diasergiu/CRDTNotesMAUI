@@ -44,12 +44,6 @@ public partial class MainPageNotes : ContentPage
         }
     }
 
-    private async void OnGetAccessToNotesClicked(object? sender, EventArgs e)
-    {
-        await Navigation.PushModalAsync(new NoteConnectionPopup(_noteServices));
-    }
-
-
     private async void OnLoginClicked(object sender, EventArgs e)
     {
         var loginPopup = new LoginPopup();
@@ -77,18 +71,19 @@ public partial class MainPageNotes : ContentPage
       
 
         var charResults = await _noteServices.GetAllCharacterByUser();
-        if (charResults.IsSuccess)
-        {
-            // Update the local repository with the notes from the server
-            _noteRepository.SaveCRDTChanges(charResults.Data.Select(a => new CRDTCharacterClient(a)).ToList());
-        }
-        if (notesResult.IsSuccess && charResults.IsSuccess)
+        if (notesResult.IsSuccess)
         {
             // Update the local repository with the notes from the server
             _noteRepository.UpdateListNotes(notesResult.Data);
             LoadData();
             await DisplayAlert("Success", "Notes synced from server!", "OK");
         }
+        if (charResults.IsSuccess && notesResult.IsSuccess)
+        {
+            // Update the local repository with the notes from the server
+            await _noteRepository.SaveCRDTChanges(charResults.Data.Select(a => new CRDTCharacterClient(a)).ToList());
+        }
+        
         else
         {
             await DisplayAlert("Error", "Failed to sync notes from server.", "OK");
@@ -104,7 +99,6 @@ public partial class MainPageNotes : ContentPage
 
         // Enable the sync and NoteAccess buttons
         SyncNotesButton.IsEnabled = true;
-        GetAccessToNotesButton.IsEnabled = true;
         var clientChanges = _noteRepository.GetNoteFromUser(userId);
         var result = _noteServices.SendChangesToServer(clientChanges);
 
@@ -127,7 +121,7 @@ public partial class MainPageNotes : ContentPage
         if (charResults.IsSuccess)
         {
             // Update the local repository with the Charactrers from the server
-            _noteRepository.SaveCRDTChanges(charResults.Data.Select(a => new CRDTCharacterClient(a)).ToList());
+            await _noteRepository.SaveCRDTChanges(charResults.Data.Select(a => new CRDTCharacterClient(a)).ToList());
         }
     }
 

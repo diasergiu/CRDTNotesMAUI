@@ -15,13 +15,13 @@
 
             <VerticalStackLayout>
                 <VerticalStackLayout>
-                    <Label  Text="IdNote to Connect" 
+                    <Label  Text="Type IdUser to give access" 
                             FontSize="24"
                             FontAttributes="Bold"
                             HorizontalOptions="Center"
                             TextColor="Black" />
                     <Entry x:Name="IdNoteEntry"
-                           Placeholder="Enter IdNote"
+                           Placeholder="Enter IdUser"
                            FontSize="16"
                            BackgroundColor="#F5F5F5"
                            TextColor="Black" />
