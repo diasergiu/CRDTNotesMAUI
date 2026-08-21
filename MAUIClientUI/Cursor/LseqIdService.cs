@@ -42,6 +42,7 @@ namespace MAUIClientUI.Cursor
             // Parse the left and right IDs into component arrays
             var leftComponents = ParseCompositeId(leftId);
             var rightComponents = ParseCompositeId(rightId);
+            decimal minGapAtDepth = (decimal)Math.Pow(10, -1);
 
             // Find the first level where positions differ, or determine nesting level
             int minLength = Math.Min(leftComponents.Count, rightComponents.Count);
@@ -50,7 +51,7 @@ namespace MAUIClientUI.Cursor
             // Find where components differ
             for (int i = 0; i < minLength; i++)
             {
-                if (leftComponents[i].Position != rightComponents[i].Position)
+                if (leftComponents[i].Position != rightComponents[i].Position && !(leftComponents[i].Position - rightComponents[i].Position <= minGapAtDepth))
                 {
                     // Positions differ at this level - generate new position between them
                     nestingLevel = i;
@@ -64,7 +65,7 @@ namespace MAUIClientUI.Cursor
             
             decimal? leftBoundary = nestingLevel < leftComponents.Count ? leftComponents[nestingLevel].Position : null;
             decimal? rightBoundary = nestingLevel < rightComponents.Count ? rightComponents[nestingLevel].Position : null;
-
+            
             //if (nestingLevel < leftComponents.Count - 1) // should it be <=
             //{
             //    resultComponents.AddRange(leftComponents.Take(nestingLevel));

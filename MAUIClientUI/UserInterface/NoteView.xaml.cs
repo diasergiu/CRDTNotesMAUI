@@ -318,8 +318,10 @@ public partial class NoteView : ContentPage
             }
            // GetCharacterFromInput(key[0]);
             Debug.WriteLine("Key pressed", e.Key.ToString());
-        
-            var newCharacter = _noteCursor.InsertCharacter(cursorPosition, e.Key.ToString()[0]);
+
+            char typedChar = ResolveTypedCharacter(e.Key, key[0]);
+
+            var newCharacter = _noteCursor.InsertCharacter(cursorPosition, typedChar);
             newCharacter.IdNote = _currentNote.IdNote; // not the best solution replace it later
             _crdtCharactetrRepository.SaveNewCrdtCharacter(newCharacter);
             SendChangesToServer(new CRDTCharacter(newCharacter));
@@ -334,6 +336,29 @@ private void ContentEditor_KeyUp(object sender, Microsoft.UI.Xaml.Input.KeyRoute
 
     Debug.WriteLine($"Key Up: {e.Key.ToString()}");
 }
+
+/// <summary>
+/// VirtualKey names for letters are always uppercase, so the actual casing has to be
+/// derived from the current Shift / CapsLock state.
+/// </summary>
+private static char ResolveTypedCharacter(Windows.System.VirtualKey key, char fallback)
+{
+    if (key < Windows.System.VirtualKey.A || key > Windows.System.VirtualKey.Z)
+        return fallback;
+
+    bool shiftDown = IsKeyDown(Windows.System.VirtualKey.Shift);
+    bool capsLockOn = IsKeyLocked(Windows.System.VirtualKey.CapitalLock);
+
+    return (shiftDown ^ capsLockOn) ? char.ToUpperInvariant(fallback) : char.ToLowerInvariant(fallback);
+}
+
+private static bool IsKeyDown(Windows.System.VirtualKey key)
+    => (Microsoft.UI.Input.InputKeyboardSource.GetKeyStateForCurrentThread(key)
+        & Windows.UI.Core.CoreVirtualKeyStates.Down) == Windows.UI.Core.CoreVirtualKeyStates.Down;
+
+private static bool IsKeyLocked(Windows.System.VirtualKey key)
+    => (Microsoft.UI.Input.InputKeyboardSource.GetKeyStateForCurrentThread(key)
+        & Windows.UI.Core.CoreVirtualKeyStates.Locked) == Windows.UI.Core.CoreVirtualKeyStates.Locked;
 
 private void ContentEditor_TextChanging(Microsoft.UI.Xaml.Controls.TextBox sender, Microsoft.UI.Xaml.Controls.TextBoxTextChangingEventArgs args)
 {
