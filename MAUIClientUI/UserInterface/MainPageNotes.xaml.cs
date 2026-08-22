@@ -3,6 +3,7 @@ using DatabaseLibrary.Entities.Client;
 using MAUIClientUI.MVVM;
 using MAUIClientUI.Repositories;
 using MAUIClientUI.Services;
+using MAUIClientUI.Services.HelperClasses;
 
 namespace MAUIClientUI.UserInterface;
 

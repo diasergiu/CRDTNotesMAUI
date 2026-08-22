@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MAUIClientUI.Services
+namespace MAUIClientUI.Services.HelperClasses
 {
     internal class AuthenticationService : IAuthenticationService
     {

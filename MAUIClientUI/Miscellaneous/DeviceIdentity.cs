@@ -1,9 +1,9 @@
 ﻿using Microsoft.Maui.Storage;
 
-namespace MAUIClientUI.Services
+namespace MAUIClientUI.Miscellaneous
 {
     // (s)not a service not one that communicates with the server
-    public class DeviceIdentityService
+    public class DeviceIdentity
     {
         private static string DeviceIdKey = "device_id";
 

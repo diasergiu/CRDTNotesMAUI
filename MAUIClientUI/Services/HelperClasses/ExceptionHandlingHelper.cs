@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Net.Http.Json;
 using System.Text;
 
-namespace MAUIClientUI.Miscellaneous
+namespace MAUIClientUI.Services.HelperClasses
 {
     public static class ExceptionHandlingHelper
     {

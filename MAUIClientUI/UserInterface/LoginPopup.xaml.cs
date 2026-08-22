@@ -3,6 +3,7 @@ using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.WrapperClasses;
 using MAUIClientUI.Repositories;
 using MAUIClientUI.Services;
+using MAUIClientUI.Services.HelperClasses;
 using SlackAPI;
 using System;
 using System.Net.Http;

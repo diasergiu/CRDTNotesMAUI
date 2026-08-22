@@ -1,6 +1,6 @@
 ﻿using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.WrapperClasses;
-using MAUIClientUI.Miscellaneous;
+using MAUIClientUI.Services.HelperClasses;
 
 namespace MAUIClientUI.Services
 {

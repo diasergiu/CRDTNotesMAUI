@@ -102,8 +102,4 @@
 	  </MauiXaml>
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Services\HelperClasses\" />
-	</ItemGroup>
-
 </Project>

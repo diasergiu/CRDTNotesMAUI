@@ -3,7 +3,7 @@ using System.Buffers.Text;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MAUIClientUI.Services
+namespace MAUIClientUI.Services.HelperClasses
 {
     public class BaseURLGetter
     {

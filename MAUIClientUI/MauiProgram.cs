@@ -5,6 +5,7 @@ using MAUIClientUI.Miscellaneous;
 using MAUIClientUI.MVVM;
 using MAUIClientUI.Repositories;
 using MAUIClientUI.Services;
+using MAUIClientUI.Services.HelperClasses;
 using Microsoft.Extensions.Logging;
 using System.IO;
 
