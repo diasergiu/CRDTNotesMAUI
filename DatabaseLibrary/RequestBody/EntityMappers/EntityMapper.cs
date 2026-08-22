@@ -105,34 +105,5 @@ namespace DatabaseLibrary.RequestBody.EntityMappers
                 Password = userServer.Password
             };
         }
-
-
-        public static SyncQueueServer MapSyncQueueClientToSyncQueueServer(SyncQueueClient syncQueueClient, Guid IdDevice)
-        {
-            return new SyncQueueServer
-            {
-                IdSync = syncQueueClient.IdSync,
-                //   IdUser = syncQueueClient.IdUser,
-                IdDevice = IdDevice,
-                IdNote = syncQueueClient.IdNote,
-                Operation = syncQueueClient.Operation,
-                ContentChanges = syncQueueClient.ContentChanges,
-                LastUpdate = syncQueueClient.LastUpdate,
-            };
-        }
-
-
-        public static SyncQueueClient MapSyncQueueServerToSyncQueueClient(SyncQueueServer syncQueueServer)
-        {
-            return new SyncQueueClient
-            {
-                IdSync = syncQueueServer.IdSync,
-                //  IdUser = syncQueueServer.IdUser,
-                IdNote = syncQueueServer.IdNote,
-                Operation = syncQueueServer.Operation,
-                ContentChanges = syncQueueServer.ContentChanges,
-                LastUpdate = syncQueueServer.LastUpdate,
-            };
-        }
     }
 }

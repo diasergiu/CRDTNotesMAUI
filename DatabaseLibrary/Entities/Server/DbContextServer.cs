@@ -12,7 +12,6 @@ namespace DatabaseLibrary.Entities.Server
         public DbSet<UserServer> Users { get; set; }
         public DbSet<Note_UserServer> Note_Users { get; set; }
         public DbSet<User_Device> User_Devices { get; set; }
-        public DbSet<SyncQueueServer> Sync_Queues { get; set; }
         public DbSet<CRDTCharacter> CRDTCharacters { get; set; }
         public string DbPath { get; }
         //Probably Delete

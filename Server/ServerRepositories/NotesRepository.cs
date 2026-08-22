@@ -30,15 +30,6 @@ namespace Server.ServeRepositories
                 .FirstOrDefaultAsync(u => u.Username == username && u.Password == password);
             return user;
         }
-
-        public async Task<List<SyncQueueServer>> GetServerSyncChanges(IUser user, Guid deviceId)
-        {
-            var notesToUpdate = await _dbContextServer.Sync_Queues
-                .Where(nu => nu.IdUser == user.IdUser && nu.IdDevice == deviceId)
-                .Select(nu => nu)
-                .ToListAsync();
-            return notesToUpdate;
-        }
         public async Task<List<NoteServer>> GetAllNotesFromUser(Guid IdUser)
         {
             var notes = await _dbContextServer.Notes
@@ -51,11 +42,6 @@ namespace Server.ServeRepositories
                 .Include(n => n.CRDTCharacter) // added recently we need to return the CRDT from server
                 .ToListAsync();
             return notes;
-        }
-
-        public List<SyncQueueServer> GetChangesFromNote(Guid idNote)
-        {
-            return _dbContextServer.Sync_Queues.Where(n => n.IdNote == idNote).ToList();
         }
 
         public async Task<NoteServer> CreateNote(NoteServer note, Guid idUser)

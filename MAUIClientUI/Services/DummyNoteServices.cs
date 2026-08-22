@@ -10,11 +10,6 @@ namespace MAUIClientUI.Services
 {
     public class DummyNoteServices : INoteServices
     {
-        public async Task<ApiResultData<List<ISyncQueue>>> SendAndReceiveNoteUpdates(List<SyncQueueClient> listChanges, UserClient user)
-        {
-            return ApiResultData<List<ISyncQueue>>.Success(new List<ISyncQueue>());
-        }
-
         public async Task<ApiResult> SendChangesToServer(List<NoteClient> noteClient)
         {
             return ApiResult.Success();

@@ -23,23 +23,6 @@ namespace MAUIClientUI.Repositories
             //            return _dbContextUser.Notes.Where(n => n.NoteUser.Any(nu => nu.IdUser == idUser)).ToList();
             return _dbContextUser.Notes.ToList();
         }
-
-        public List<SyncQueueClient> getAllChanges(UserClient user)
-        {
-            List<SyncQueueClient> changesMade =
-                new List<SyncQueueClient>(); // this line if because the method needs to return a list, but if the query fails, it will return an empty list instead of null
-            try
-            {
-                //changesMade = _dbContextUser.SyncQueues.Where(n => n.UserDevice.IdUser == user.IdUser).ToList();
-                changesMade = _dbContextUser.SyncQueues.ToList(); // get all changes now
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error retrieving flagged notes: {ex.Message}");
-            }
-            return changesMade;
-        }
-
         public void UpdateListNotes(List<NoteClient> noteClients)
         {
             if (noteClients == null || noteClients.Count == 0)

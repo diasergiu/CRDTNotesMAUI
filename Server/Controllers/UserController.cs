@@ -120,36 +120,6 @@ namespace Server.Controllers
             }
         }
 
-
-        //[HttpPost("SyncChanges")]
-        //public async Task<IActionResult> SyncChanges([FromBody] LoginRequest loginBody)
-        //{
-        //    try
-        //    {
-        //        UserServer user = EntityMapper.MapUserClientToUserServer(loginBody.user);
-        //        List<SyncQueueServer> syncChanges = new List<SyncQueueServer>();
-        //        foreach (var change in loginBody.ChangesMade)
-        //        {
-        //            syncChanges.Add(EntityMapper.MapSyncQueueClientToSyncQueueServer(change, loginBody.IdDevice));
-        //        }
-        //        // save all changes done offline
-        //        await _notesRepository.SyncData(syncChanges);
-
-
-        //        await _notesRepository.GetServerSyncChanges(loginBody.user, loginBody.IdDevice);
-
-        //        return Ok(new { 
-        //            success = true, 
-        //            message = "Changes synced successfully.",
-        //            data = syncChanges  
-        //        });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, new { success = false, message = $"Error syncing changes: {ex.Message}" });
-        //    }
-        //}
-
         [HttpDelete()]
         public async Task DeleteUserById(Guid idUser)
         {
