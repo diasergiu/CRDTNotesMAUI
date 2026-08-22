@@ -403,11 +403,43 @@ private void ContentEditor_TextChanging(Microsoft.UI.Xaml.Controls.TextBox sende
 #elif ANDROID
     private void ContentEditor_KeyPress(object sender, Android.Views.View.KeyEventArgs e)
     {
-        if (e.Event.Action == Android.Views.KeyEventActions.Down)
+        // handle Backspace as a deletion and printable keys as an insertion.
+        if (e.Event is null)
         {
-            CRDTCharacter CRDT = GetCharacterFromInput((char)e.Event.UnicodeChar);
-            Debug.WriteLine($"Key Pressed: {CRDT.Character}");
+            e.Handled = false;
+            return;
         }
+
+        int cursorPosition = GetEditorCursorPosition(ContentEditor);
+
+        if (e.KeyCode == Android.Views.Keycode.Del)
+        {
+            var leftCharacter = _noteCursor.deleteCharacterToTheLeft(cursorPosition + 1);
+            if (leftCharacter != null)
+            {
+                _crdtCharactetrRepository.UpdateCharacter(leftCharacter);
+                SendChangesToServer(new CRDTCharacter(leftCharacter));
+            }
+            e.Handled = true;
+            Debug.WriteLine("Backspace pressed");
+            return;
+        }
+
+        char typedChar = (char)e.Event.UnicodeChar;
+        if (typedChar == '\0')
+        {
+            e.Handled = false;
+            return;
+        }
+
+        Debug.WriteLine($"Key pressed: {typedChar}");
+
+        var newCharacter = _noteCursor.InsertCharacter(cursorPosition, typedChar);
+        newCharacter.IdNote = _currentNote.IdNote; // not the best solution replace it later
+        _crdtCharactetrRepository.SaveNewCrdtCharacter(newCharacter);
+        SendChangesToServer(new CRDTCharacter(newCharacter));
+
+        e.Handled = false;
     }
 #endif
 

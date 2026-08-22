@@ -27,7 +27,7 @@ namespace MAUIClientUI
 
             // Register services with DI container
             builder.Services
-                .AddSingleton(sp => new NotificationServices("http://localhost:5266"))
+                .AddSingleton(sp => new NotificationServices(BaseURLGetter.getBaseURL()))
                 .AddSingleton<IDatabaseServices>(new DatabaseServices(instanceId))
                 .AddScoped<DbContextClient>(sp =>
                 {
