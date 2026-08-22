@@ -35,8 +35,7 @@ namespace MAUIClientUI
                 })
                 .AddScoped<IAuthenticationService, AuthenticationService>()
                 .AddScoped<NoteRepository>()
-                .AddScoped<CRDTCharacterRepository>()
-                .AddScoped<ClientServices>();
+                .AddScoped<CRDTCharacterRepository>();
                 //.AddScoped<NotesViewModel>();
 
             // Configure logging
