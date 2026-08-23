@@ -29,12 +29,6 @@ namespace Server.ServeRepositories
             var noteUser = _dbContextServer.Note_Users.FirstOrDefault(nu => nu.IdNote == noteId && nu.IdUser == userId);
             return noteUser != null;
         }
-        public async Task<UserServer> getUser(string username, string password)
-        {
-            UserServer user = await _dbContextServer.Users
-                .FirstOrDefaultAsync(u => u.Username == username && u.Password == password);
-            return user;
-        }
         public async Task<List<NoteServer>> GetAllNotesFromUser(Guid IdUser)
         {
             var notes = await _dbContextServer.Notes

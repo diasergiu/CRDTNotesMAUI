@@ -1,11 +1,11 @@
 ﻿using DatabaseLibrary.Entities;
 using Server.ServeRepositories;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using DatabaseLibrary.RequestBody;
 using DatabaseLibrary.Entities.Server;
 using DatabaseLibrary.RequestBody.EntityMappers;
 using DatabaseLibrary.ResponsBody;
+using Server.Security;
 
 namespace Server.Controllers
 {
@@ -14,20 +14,18 @@ namespace Server.Controllers
     public class UserController : Controller
     {
 
-        private DbContextServer _context; // make a repository for user later
-        private NotesRepository _notesRepository;
+        private UserRepository _userRepository;
 
-        public UserController(DbContextServer context, NotesRepository notesRepository)
+        public UserController(UserRepository userRepository)
         {
-            _context = context;
-            _notesRepository = notesRepository;
+            _userRepository = userRepository;
         }
 
         [HttpPost("login")]
         [HttpGet("login")]
         public async Task<IActionResult> Login(string username, string password)
         {
-            var user = await _notesRepository.getUser(username, password);
+            var user = await _userRepository.getUser(username, password);
             if (user != null)
             {
                 // Return user info as JSON
@@ -73,8 +71,7 @@ namespace Server.Controllers
             }
 
             // Check if username already exists
-            var existingUser = await _context.Users
-                .FirstOrDefaultAsync(u => u.Username == request.Username);
+            var existingUser = await _userRepository.GetUserByUsername(request.Username);
 
             if (existingUser != null)
             {
@@ -90,14 +87,12 @@ namespace Server.Controllers
 
                 Name = request.Name ?? request.Username,
                 Username = request.Username,
-                Password = request.Password // TODO: Hash password in production!
+                Password = PasswordHasher.Hash(request.Password)
             };
 
             try
             {
-                // should put in repository
-                _context.Users.Add(newUser);
-                await _context.SaveChangesAsync();
+                await _userRepository.CreateUser(newUser);
 
                 var userData = new
                 {
@@ -123,8 +118,7 @@ namespace Server.Controllers
         [HttpDelete()]
         public async Task DeleteUserById(Guid idUser)
         {
-            _context.Users.Remove(new UserServer { IdUser = idUser });
-            await _context.SaveChangesAsync();
+            await _userRepository.DeleteUser(idUser);
         }
 
         public class RegisterRequest

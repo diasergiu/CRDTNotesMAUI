@@ -14,6 +14,7 @@ namespace Server.Test
     {
         private readonly DbContextServer _dbContext;
         private readonly NotesRepository _repository;
+        private readonly UserRepository _userRepository;
         private readonly UserController _userController;
         private readonly NotesController _notesController;
 
@@ -25,7 +26,8 @@ namespace Server.Test
 
             _dbContext = new DbContextServer(options);
             _repository = new NotesRepository(_dbContext);
-            _userController = new UserController(_dbContext, _repository);
+            _userRepository = new UserRepository(_dbContext);
+            _userController = new UserController(_userRepository);
             _notesController = new NotesController(_dbContext, _repository, new  NoteSyncHub(null));
         }
 

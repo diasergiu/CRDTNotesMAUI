@@ -34,6 +34,10 @@ public partial class Program
             new NotesRepository(
         provider.GetRequiredService<DbContextServer>()) );
 
+        builder.Services.AddScoped(provider =>
+            new UserRepository(
+        provider.GetRequiredService<DbContextServer>()) );
+
         builder.Services.AddScoped<NoteSyncHub>();
 
         builder.Services.AddScoped(provider =>

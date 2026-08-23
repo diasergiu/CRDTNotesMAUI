@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Server.Controllers;
+using Server.Security;
 using Server.ServeRepositories;
 using Server.ServerHub;
 using System.Reflection;
@@ -18,7 +19,7 @@ namespace Server.Test
     public class UserControllerTests
     {
         private readonly DbContextServer _dbContext;
-        private readonly NotesRepository _repository;
+        private readonly UserRepository _repository;
         private readonly UserController _controller;
 
         public UserControllerTests()
@@ -29,9 +30,9 @@ namespace Server.Test
 
             _dbContext = new DbContextServer(options);
 
-      
-            _repository = new NotesRepository(_dbContext);
-            _controller = new UserController(_dbContext, _repository);
+
+            _repository = new UserRepository(_dbContext);
+            _controller = new UserController(_repository);
         }
 
         #region Login Tests
@@ -49,7 +50,7 @@ namespace Server.Test
                 IdUser = userId,
                 Name = "Test User",
                 Username = username,
-                Password = password
+                Password = PasswordHasher.Hash(password)
             };
 
             _dbContext.Users.Add(user);
@@ -108,7 +109,7 @@ namespace Server.Test
                 IdUser = userId,
                 Name = "Test User",
                 Username = username,
-                Password = correctPassword
+                Password = PasswordHasher.Hash(correctPassword)
             };
 
             _dbContext.Users.Add(user);
@@ -159,7 +160,8 @@ namespace Server.Test
             var createdUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
             Assert.NotNull(createdUser);
             Assert.Equal(request.Name, createdUser.Name);
-            Assert.Equal(request.Password, createdUser.Password);
+            Assert.NotEqual(request.Password, createdUser.Password);
+            Assert.True(PasswordHasher.Verify(request.Password, createdUser.Password));
         }
 
         [Fact]
