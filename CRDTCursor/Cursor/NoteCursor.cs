@@ -1,21 +1,14 @@
-using DatabaseLibrary.Entities;
 using DatabaseLibrary.Entities.Client;
-using Microsoft.Maui.Layouts;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Text;
 
-namespace MAUIClientUI.Cursor
+namespace DatabaseLibrary.Cursor
 {
     public class NoteCursor
     {
         private SortedDictionary<string, CRDTCharacterClient> _characterList;
         private SortedList<string, CRDTCharacterClient> _sortedList;
-        private readonly LseqIdService _idService;
+        private readonly CRDTIdService _idService;
         private readonly Guid _clientId;
         private readonly ILogger<NoteCursor> _logger;
 
@@ -23,7 +16,7 @@ namespace MAUIClientUI.Cursor
         {
             _clientId = clientId;
             _logger = logger;
-            _idService = new LseqIdService(clientId);
+            _idService = new CRDTIdService(clientId);
             _characterList = new SortedDictionary<string, CRDTCharacterClient>(new CompositeIdComparator(_idService));
             _sortedList = new SortedList<string, CRDTCharacterClient>(new CompositeIdComparator(_idService));
             int i = 0;
@@ -39,7 +32,7 @@ namespace MAUIClientUI.Cursor
         {
             _clientId = clientId;
             _logger = logger;
-            _idService = new LseqIdService(clientId);
+            _idService = new CRDTIdService(clientId);
             _sortedList = new SortedList<string, CRDTCharacterClient>(new CompositeIdComparator(_idService));
             _characterList = new SortedDictionary<string, CRDTCharacterClient>(new CompositeIdComparator(_idService));
             if (listFromDataBase != null)
@@ -53,7 +46,7 @@ namespace MAUIClientUI.Cursor
             }
         }
 
-        public CRDTCharacterClient deleteCharacterToTheLeft(int cursorPosition)
+        public CRDTCharacterClient deleteCharacter(int cursorPosition)
         {
             var (leftId, rightId) = GetAdjacentCharacterIds(cursorPosition);
             _characterList[leftId].Tombstone = true;
@@ -68,9 +61,18 @@ namespace MAUIClientUI.Cursor
         /// </summary>
         public CRDTCharacterClient InsertCharacter(int atPosition, char character)
         {
+            if(atPosition > _sortedList.Count)
+            {
+                atPosition = _sortedList.Count;
+            }
+            else if(atPosition < 0)
+            {
+                atPosition = 0;
+            }
+
             var (leftId, rightId) = GetAdjacentCharacterIds(atPosition);
 
-            // Generate new ID between boundaries using standard LSEQ
+            // Generate new ID between boundaries using standard mid-point
             string newIdStr = GenerateNewId(leftId, rightId);
             _logger?.LogDebug($"Generated new ID: {newIdStr} for character '{character}' at position {atPosition}");
             if (_characterList.ContainsKey(newIdStr))
@@ -95,7 +97,7 @@ namespace MAUIClientUI.Cursor
         }
 
         /// <summary>
-        /// Generate new ID between left and right boundaries using LSEQ
+        /// Generate new ID between left and right boundaries using midpoint
         /// Returns composite ID format: (position,clientId) or (pos1,client1)(pos2,client2)...
         /// </summary>
         private string GenerateNewId(string leftIdStr, string rightIdStr)
@@ -125,13 +127,7 @@ namespace MAUIClientUI.Cursor
 
 
             return _idService.GenerateIdBetweenComposite(leftIdStr, rightIdStr, _clientId);
-            //// Generate decimal ID
-            //decimal newDecimal = _idService.GenerateIdBetween(leftDecimal, rightDecimal, _clientId);
 
-            //// Convert to composite ID format: (position,clientId)
-            //return _idService.BuildCompositeIdString(new[] { 
-            //    new LseqIdService.IdComponent { Position = newDecimal, SiteId = _clientId } 
-            //});
         }
 
         /// <summary>
@@ -159,12 +155,18 @@ namespace MAUIClientUI.Cursor
             return builder.ToString();
         }
 
-        internal void MergeCharacter(CRDTCharacterClient c)
+        public void MergeCharacter(CRDTCharacterClient c)
         {
             if (!_characterList.ContainsKey(c.IdCharacter))
             {
                 _sortedList.Add(c.IdCharacter, c);
                 _characterList.Add(c.IdCharacter, c);
+            }
+            else
+            {
+                // If the character already exists, we may want to update its tombstone status
+                var existingCharacter = _characterList[c.IdCharacter];
+                existingCharacter.Tombstone = existingCharacter.Tombstone || c.Tombstone;
             }
         }
     }
@@ -175,9 +177,9 @@ namespace MAUIClientUI.Cursor
     /// </summary>
     public class CompositeIdComparator : IComparer<string>
     {
-        private readonly LseqIdService _idService;
+        private readonly CRDTIdService _idService;
 
-        public CompositeIdComparator(LseqIdService idService)
+        public CompositeIdComparator(CRDTIdService idService)
         {
             _idService = idService;
         }
@@ -199,33 +201,6 @@ namespace MAUIClientUI.Cursor
             // Parse both IDs into components
             var xComponents = _idService.ParseCompositeId(x);
             var yComponents = _idService.ParseCompositeId(y);
-
-            //// Try simple decimal comparison if both are simple (non-composite) decimal IDs
-            //if (xComponents.Count == 0 && yComponents.Count == 0)
-            //{
-            //    if (decimal.TryParse(x, out decimal xDecimal) && decimal.TryParse(y, out decimal yDecimal))
-            //    {
-            //        return xDecimal.CompareTo(yDecimal);
-            //    }
-            //    return string.Compare(x, y, StringComparison.Ordinal);
-            //}
-
-            //// If one is composite and one is not, treat non-composite as decimal
-            //if (xComponents.Count == 0 && decimal.TryParse(x, out decimal xDec))
-            //{
-            //    xComponents = new List<LseqIdService.IdComponent>
-            //    {
-            //        new LseqIdService.IdComponent { Position = xDec, SiteId = Guid.Empty }
-            //    };
-            //}
-
-            //if (yComponents.Count == 0 && decimal.TryParse(y, out decimal yDec))
-            //{
-            //    yComponents = new List<LseqIdService.IdComponent>
-            //    {
-            //        new LseqIdService.IdComponent { Position = yDec, SiteId = Guid.Empty }
-            //    };
-            //}
 
             // Compare component by component
             int minLength = Math.Min(xComponents.Count, yComponents.Count);

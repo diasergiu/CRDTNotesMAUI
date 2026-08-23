@@ -5,20 +5,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace MAUIClientUI.Cursor
+namespace DatabaseLibrary.Cursor
 {
     /// <summary>
-    /// LSEQ (Logoot-like) ID generation with conflict resolution
+    /// (Logoot-like) ID generation with conflict resolution
     /// Handles concurrent inserts at same position by same two users
     /// Supports both simple decimal IDs and composite IDs: (pos,site)(pos,site)...
     /// </summary>
-    public class LseqIdService
+    public class CRDTIdService
     {
         private readonly Guid _localClientId;
         private const int MAX_PRECISION = 1000000; // Decimal places to avoid infinite subdiv
         private const string COMPOSITE_ID_PATTERN = @"\((.*?),(.*?)\)"; // Pattern: (position,clientId)
 
-        public LseqIdService(Guid clientId)
+        public CRDTIdService(Guid clientId)
         {
             _localClientId = clientId;
         }
@@ -122,25 +122,6 @@ namespace MAUIClientUI.Cursor
         public string BuildCompositeIdString(IEnumerable<IdComponent> components)
         {
             return string.Concat(components.Select(c => $"({c.Position},{c.SiteId})"));
-        }
-
-        /// <summary>
-        /// Extract decimal boundaries from composite ID components
-        /// Returns the decimal values to use for LSEQ generation
-        /// </summary>
-        private (decimal?, decimal?) ExtractBoundaryDecimals(List<IdComponent> leftComponents, List<IdComponent> rightComponents)
-        {
-            decimal? leftDecimal = null;
-            decimal? rightDecimal = null;
-
-            // Use the last component's position if available
-            if (leftComponents.Count > 0)
-                leftDecimal = leftComponents[leftComponents.Count - 1].Position;
-
-            if (rightComponents.Count > 0)
-                rightDecimal = rightComponents[rightComponents.Count - 1].Position;
-
-            return (leftDecimal, rightDecimal);
         }
 
         /// <summary>

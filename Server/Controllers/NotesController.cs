@@ -35,7 +35,6 @@ namespace Server.Controllers
         [HttpGet("GetAllNotesFromUser")] // iActionResult can sent json back to the client (look more into this)
         public async Task<IActionResult> GetAllNotesFromUser()
         {
-
             Guid idUser = GetUserIdFromRequest();
             List<NoteServer> notes = await _notesRepository.GetAllNotesFromUser(idUser);
             List<NoteClient> toSend = notes
@@ -81,7 +80,6 @@ namespace Server.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateNote([FromBody] NoteClient changesMade)
         {
-
             Guid idUser = GetUserIdFromRequest();
             var newNote = await _notesRepository.CreateNote(EntityMapper.MapNoteClientToNoteServer(changesMade), idUser);
             var noteData = new { idNote = newNote.IdNote };
@@ -89,13 +87,11 @@ namespace Server.Controllers
                 noteData,
                 "Note created successfully."
             ));
-
         }
 
         [HttpPost("SendChangesToServer")]
         public async Task<IActionResult> SendChangesToServer([FromBody] List<NoteClient> noteClient)
         {
-
             Guid idUser = GetUserIdFromRequest();
             await _notesRepository.SaveAllChangesFromClient(ConvertListClientToServer(noteClient), idUser);
             return Ok(ApiResponse<object>.SuccessResponse(
@@ -109,6 +105,10 @@ namespace Server.Controllers
         public async Task<IActionResult> DeleteNote(Guid id)
         {
             Guid idUser = GetUserIdFromRequest();
+            if(!_notesRepository.DoseUserHaveAccessToNote(id, idUser))
+            {
+                return BadRequest("You do not have access to this note.");
+            }
             await _notesRepository.DeleteNote(id, idUser);
             return Ok(ApiResponse<object>.SuccessResponse(
                 data: null,
@@ -152,8 +152,12 @@ namespace Server.Controllers
         public async Task<IActionResult> GetAllCharacterByNote(Guid noteId)
         {
             Guid userId = GetUserIdFromRequest();
+            if(_notesRepository.DoseUserHaveAccessToNote(noteId, userId) == false)
+            {
+                return BadRequest("You do not have access to this note.");
+            }
             _notesRepository.SaveNoteUserConnection(noteId, userId);
-            var characters = await _notesRepository.getCRDTCharactersbyIdNote(noteId);
+            var characters = await _notesRepository.getCRDTCharactersbyIdNote(noteId, userId);
             return Ok(ApiResponse<object>.SuccessResponse(
                 data: characters,
                 message: "Characters retrieved successfully."

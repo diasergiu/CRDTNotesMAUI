@@ -24,6 +24,11 @@ namespace Server.ServeRepositories
             _dbContextServer = context;
         }
 
+        public bool DoseUserHaveAccessToNote(Guid userId, Guid noteId)
+        {
+            var noteUser = _dbContextServer.Note_Users.FirstOrDefault(nu => nu.IdNote == noteId && nu.IdUser == userId);
+            return noteUser != null;
+        }
         public async Task<UserServer> getUser(string username, string password)
         {
             UserServer user = await _dbContextServer.Users
@@ -131,7 +136,7 @@ namespace Server.ServeRepositories
 
             // Delete the note itself if there are no users connected to note
             List<Note_UserServer> remainingConnections = _dbContextServer.Note_Users.Where(n => n.IdNote == noteId).ToList();
-            if(remainingConnections.Count == 1)
+            if (remainingConnections.Count == 1)
             {
                 var note = await _dbContextServer.Notes.FirstOrDefaultAsync(n => n.IdNote == noteId);
                 if (note != null)
@@ -158,7 +163,7 @@ namespace Server.ServeRepositories
             foreach (NoteServer note in notesClient)
             {
                 var exists = allNotes.FirstOrDefault(n => n.IdNote == note.IdNote);
-                if(exists == null)
+                if (exists == null)
                 {
                     await CreateNote(note, UserId);
                 }
@@ -172,12 +177,12 @@ namespace Server.ServeRepositories
 
         public async Task<NoteServer> GetNoteById(Guid IdNote, Guid idUser)
         {
-            //var noteAccess = _dbContextServer.Note_Users.FirstOrDefault(n => n.IdUser == idUser && n.IdNote == IdNote);
-            //if(noteAccess != null)
-            //{
+            var noteAccess = _dbContextServer.Note_Users.FirstOrDefault(n => n.IdUser == idUser && n.IdNote == IdNote);
+            if (noteAccess != null)
+            {
                 return _dbContextServer.Notes.FirstOrDefault(n => n.IdNote == IdNote);
-            //}
-            //return null;
+            }
+            return null;
         }
 
         public async Task ManageCRDTCharacters(List<CRDTCharacter> crdtCharacters)
@@ -191,7 +196,7 @@ namespace Server.ServeRepositories
         public async Task saveCRDTChanges(List<CRDTCharacter> changes)
         {
             var changeIds = changes.Select(c => c.IdCharacter).ToList();
-
+            _dbContextServer.ChangeTracker.Clear();
             var existingCharacters = await _dbContextServer.CRDTCharacters
                 .AsNoTracking()
                 .Where(c => changeIds.Contains(c.IdCharacter))
@@ -206,7 +211,7 @@ namespace Server.ServeRepositories
                 {
                     // Update existing - mark as modified
                     //  _dbContextServer.Entry(character).State = EntityState.Modified;
-                    _dbContextServer.CRDTCharacters.Update(character);
+                    _dbContextServer.CRDTCharacters.Update(character); // should i use ExecuteUpdateAsync and save directly in the database
                 }
                 else
                 {
@@ -226,10 +231,13 @@ namespace Server.ServeRepositories
             .ToListAsync();
         }
 
-        public async Task<List<CRDTCharacter>> getCRDTCharactersbyIdNote(Guid noteId)
+        public async Task<List<CRDTCharacter>> getCRDTCharactersbyIdNote(Guid noteId, Guid userId)
         {
-            
-            return await _dbContextServer.CRDTCharacters.Where(n => n.IdNote == noteId).ToListAsync();
+            if (DoseUserHaveAccessToNote(userId, noteId))
+            {
+                return await _dbContextServer.CRDTCharacters.Where(n => n.IdNote == noteId).ToListAsync();
+            }
+            return new List<CRDTCharacter>();  // need a pathern where we verifie user access to Note and return error instead of empty list
         }
 
         public async Task SaveNoteUserConnection(Guid noteId, Guid userId)

@@ -75,7 +75,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\DatabaseLibrary\DatabaseLibrary.csproj" />
+		<ProjectReference Include="..\DatabaseLibrary\DatabaseLibrary.csproj" />
+		<ProjectReference Include="..\CRDTCursor\CRDTCursor.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Allows the test project to exercise internal CRDT merge members (e.g. NoteCursor.MergeCharacter). -->
+		<InternalsVisibleTo Include="MAUIClientUI.Test" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -85,7 +91,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="UserInterface\LoginPopup.xaml">
+		<MauiXaml Update="UserInterface\LoginPopup.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="UserInterface\MainPageNotes.xaml">
@@ -100,6 +106,10 @@
 	  <MauiXaml Update="UserInterface\RegisterPopup.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Cursor\" />
 	</ItemGroup>
 
 </Project>
