@@ -19,21 +19,22 @@ namespace DatabaseLibrary.Entities.Server
         {
             var folder = Environment.SpecialFolder.LocalApplicationData;
             var path = Environment.GetFolderPath(folder);
-            DbPath = System.IO.Path.Join(path, "ServerDatabase.db");
+            DbPath = System.IO.Path.Join(path, "ServerDatabase.mdf");
         }
         public DbContextServer(DbContextOptions<DbContextServer> options)
            : base(options)
         {
             var folder = Environment.SpecialFolder.LocalApplicationData;
             var path = Environment.GetFolderPath(folder);
-            DbPath = System.IO.Path.Join(path, "ServerDatabase.db");
+            DbPath = System.IO.Path.Join(path, "ServerDatabase.mdf");
         }
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
             // Only configure if not already configured by dependency injection
             if (!options.IsConfigured)
             {
-                options.UseSqlServer($"Data Source={DbPath}");
+                string connectionString = $"Data Source=(LocalDb)\\mssqllocaldb;AttachDbFilename={DbPath};Integrated Security=true;";
+                options.UseSqlServer(connectionString);
             }
         }
 
