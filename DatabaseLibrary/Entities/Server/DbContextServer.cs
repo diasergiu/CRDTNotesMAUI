@@ -33,7 +33,7 @@ namespace DatabaseLibrary.Entities.Server
             // Only configure if not already configured by dependency injection
             if (!options.IsConfigured)
             {
-                options.UseSqlite($"Data Source={DbPath}");
+                options.UseSqlServer($"Data Source={DbPath}");
             }
         }
 
