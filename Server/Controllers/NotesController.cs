@@ -3,15 +3,9 @@ using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.Entities.Server;
 using DatabaseLibrary.RequestBody.EntityMappers;
 using DatabaseLibrary.ResponsBody;
-using DatabaseLibrary.WrapperClasses;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Server.ServeRepositories;
-using Server.ServerHub;
-using System.Linq.Expressions;
-using System.Threading.Channels;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+
 
 namespace Server.Controllers
 {
@@ -21,13 +15,11 @@ namespace Server.Controllers
     {
 
         private NotesRepository _notesRepository;
-        private DbContextServer _context;
         private NoteSyncHub _noteSyncHub;
 
 
-        public NotesController(DbContextServer dbContextServer, NotesRepository notesRepository, NoteSyncHub noteSyncHub)
+        public NotesController(NotesRepository notesRepository, NoteSyncHub noteSyncHub)
         {
-            _context = dbContextServer;
             _notesRepository = notesRepository;
             _noteSyncHub = noteSyncHub;
         }

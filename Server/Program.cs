@@ -42,7 +42,6 @@ public partial class Program
 
         builder.Services.AddScoped(provider =>
         new NotesController(
-            provider.GetRequiredService<DbContextServer>(),
             provider.GetRequiredService<NotesRepository>(),
             provider.GetRequiredService<NoteSyncHub>()
             ));

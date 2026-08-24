@@ -132,7 +132,17 @@ public partial class MainPageNotes : ContentPage
         List<CRDTCharacter> result = new List<CRDTCharacter>();
         foreach (var item in toChange)
         {
-            result.Add(new CRDTCharacter(item));
+            result.Add(new CRDTCharacter()
+            {
+                Character = item.Character,
+                IdCharacter = string.IsNullOrEmpty(item.IdCharacter)
+                    ? item.IdCharacter
+                    : CharacterIdProtector.Encrypt(item.IdCharacter),
+                IdNote = item.IdNote,
+                Operation = item.Operation,
+                ClockDateTime = item.ClockDateTime,
+                Tombstone = item.Tombstone
+            });
         }
         return result;
     }

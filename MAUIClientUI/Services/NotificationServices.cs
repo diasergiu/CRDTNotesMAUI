@@ -1,5 +1,6 @@
 ﻿using DatabaseLibrary.Entities;
 using DatabaseLibrary.WrapperClasses;
+using MAUIClientUI.Services.HelperClasses;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Collections.Generic;
@@ -29,7 +30,12 @@ namespace MAUIClientUI.Services
             {
                 try
                 {
-                    
+                    // Server stores/pushes encrypted ids; decrypt before use.
+                    if (data != null)
+                    {
+                        data.IdCharacter = CharacterIdProtector.Decrypt(data.IdCharacter);
+                    }
+
                     NoteUpdated?.Invoke(this, data);
                 }
                 catch (KeyNotFoundException ex)

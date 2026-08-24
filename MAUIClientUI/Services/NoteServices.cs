@@ -96,6 +96,7 @@ namespace MAUIClientUI.Services
                 (async () => await SendRequest<object>
             (HttpMethod.Get, $"{_baseURL}/GetServerChanges", null),
                 nameof(GetAllCharacterByUser));
+            DecryptCharacterIds(result);
             return result;
 
         }
@@ -105,7 +106,19 @@ namespace MAUIClientUI.Services
                 (async () => await SendRequest<object>
             (HttpMethod.Get, $"{_baseURL}/GetAllCharacterByNote/{noteId}", null),
                 nameof(GetAllCharacterByNote));
+            DecryptCharacterIds(result);
             return result;
+        }
+
+        private static void DecryptCharacterIds(ApiResultData<List<CRDTCharacter>> result)
+        {
+            if (result.IsSuccess && result.Data != null)
+            {
+                foreach (var character in result.Data)
+                {
+                    character.IdCharacter = CharacterIdProtector.Decrypt(character.IdCharacter);
+                }
+            }
         }
 
         public Task<ApiResult> GiveNoteAccessToUser(Guid noteId, Guid userId)
