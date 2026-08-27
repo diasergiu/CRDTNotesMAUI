@@ -19,6 +19,6 @@ namespace DatabaseLibrary.Entities.Server
         [Required]
         public string Password { get; set; }
         public List<Note_UserServer>? NotesUser { get; set; }
-        public List<User_Device>? DevicesUser { get; set; }
+        //public List<User_Device>? DevicesUser { get; set; }
     }
 }

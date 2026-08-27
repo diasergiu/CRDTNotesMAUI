@@ -48,7 +48,7 @@ namespace DatabaseLibrary.Entities
         public Guid IdNote { get; set; }
         public char Character { get; set; }
         public string Operation { get; set; }
-        public string ClockDateTime { get; set; }
+        public DateTime ClockDateTime { get; set; }
         public bool Tombstone { get; set; }
     }
 }

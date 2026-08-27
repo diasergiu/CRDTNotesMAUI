@@ -18,8 +18,8 @@ namespace DatabaseLibrary.Entities.Client
         public Guid IdNote { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
-        public string CreationDate { get; set; }
-        public string LastUpdate { get; set; }
+        public DateTime CreationDate { get; set; }
+        public DateTime LastUpdate { get; set; }
 
         public int Version { get; set; }
         public bool DirtyFlagChangesMade { get; set; }

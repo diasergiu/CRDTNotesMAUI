@@ -86,7 +86,7 @@ namespace DatabaseLibrary.Cursor
                 Character = character,
                 IdCharacter = newIdStr,
                 Tombstone = false,
-                ClockDateTime = DateTime.UtcNow.ToString("O"),
+                ClockDateTime = DateTime.UtcNow,
                 Operation = "insert",
                 IsDirtyFlag = true
             };
