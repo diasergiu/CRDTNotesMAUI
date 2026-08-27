@@ -3,6 +3,7 @@ using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.Entities.Server;
 using DatabaseLibrary.RequestBody.EntityMappers;
 using DatabaseLibrary.ResponsBody;
+using DatabaseLibrary.WrapperClasses;
 using Microsoft.AspNetCore.Mvc;
 using Server.ServeRepositories;
 
@@ -28,12 +29,34 @@ namespace Server.Controllers
         public async Task<IActionResult> GetAllNotesFromUser()
         {
             Guid idUser = GetUserIdFromRequest();
-            List<NoteServer> notes = await _notesRepository.GetAllNotesFromUser(idUser);
-            List<NoteClient> toSend = notes
-                .Select(note => EntityMapper.MapNoteServerToNoteClient(note))
-                .ToList();
-            return Ok(ApiResponse<List<NoteClient>>.SuccessResponse(toSend));
+            List<NoteClient> notes = await GetListOfNotesByUser(idUser);
+            return Ok(ApiResponse<List<NoteClient>>.SuccessResponse(notes));
 
+        }
+        //// Get /api/notes/{id}
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetNote(Guid noteId)
+        {
+            Guid idUser = GetUserIdFromRequest();
+            NoteServer note = await _notesRepository.GetNoteById(noteId, idUser);
+            if (note == null)
+            {
+                return BadRequest("Note not found or you do not have access to it.");
+            }
+            return Ok(ApiResponse<object>.SuccessResponse(note));
+        }
+        [HttpGet("GetAllNotesDTOFromUser")]
+        public async Task<IActionResult> GetAllNotesDTOFromUser()
+        {
+            Guid idUser = GetUserIdFromRequest();
+            var CRDTCharacters = await _notesRepository.GetAllCRDTByUser(idUser);
+            var notes = await GetListOfNotesByUser(idUser);
+            NotesDTO toSend = new NotesDTO
+            {
+                NoteClient = notes,
+                CRDTCharacter = CRDTCharacters
+            };  
+            return Ok(ApiResponse<NotesDTO>.SuccessResponse(toSend));
         }
 
         [HttpPut("SendCRDTChangestoServer")]
@@ -54,19 +77,6 @@ namespace Server.Controllers
             Guid idUser = GetUserIdFromRequest();
             var updateNoteWithVersionResult = await _notesRepository.UpdateChanges(EntityMapper.MapNoteClientToNoteServer(note), idUser);
             return Ok(ApiResponse<object>.SuccessResponse(updateNoteWithVersionResult));
-        }
-
-        //// Get /api/notes/{id}
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetNote(Guid noteId)
-        {
-            Guid idUser = GetUserIdFromRequest();
-            NoteServer note = await _notesRepository.GetNoteById(noteId, idUser);
-            if (note == null)
-            {
-                return BadRequest("Note not found or you do not have access to it.");
-            }
-            return Ok(ApiResponse<object>.SuccessResponse(note));
         }
 
         [HttpPost]
@@ -125,6 +135,14 @@ namespace Server.Controllers
                 newList.Add(EntityMapper.MapNoteClientToNoteServer(note));
             }
             return newList;
+        }
+
+        private async Task<List<NoteClient>> GetListOfNotesByUser(Guid userId)
+        {
+            List<NoteServer> notes = await _notesRepository.GetAllNotesFromUser(userId);
+            return notes
+                .Select(note => EntityMapper.MapNoteServerToNoteClient(note))
+                .ToList();
         }
 
 

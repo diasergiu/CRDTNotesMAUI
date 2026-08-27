@@ -25,8 +25,8 @@ public partial class Program
         var path = Environment.GetFolderPath(folder);
         var dbPath = Path.Join(path, "ServerDatabase.db");
 
-        builder.Services.AddDbContext<DbContextServer>(options =>
-            options.UseSqlite($"Data Source={dbPath}")
+        builder.Services.AddDbContextPool<DbContextServer>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
                    .EnableSensitiveDataLogging() // Only for development
                    .EnableDetailedErrors());      // Only for development
 
@@ -61,11 +61,20 @@ public partial class Program
         // ====== INITIALIZE DATABASE ON STARTUP ======
         using (var scope = app.Services.CreateScope())
         {
-            var dbContext = scope.ServiceProvider.GetRequiredService<DbContextServer>();
-
-            // Option A: Ensure database is created (simple, for development)
-            await dbContext.Database.EnsureCreatedAsync();
-
+            var services = scope.ServiceProvider;
+            try
+            {
+                var context = services.GetRequiredService<DbContextServer>();
+                // Checks for pending migrations and applies them
+                context.Database.Migrate();
+            }
+            catch (Exception ex)
+            {
+                var logger = services.GetRequiredService<ILogger<Program>>();
+                logger.LogError(ex, "An error occurred while applying database migrations.");
+                // Optional: Stop the app if migration fails to prevent running with wrong schema
+                // Environment.Exit(1); 
+            }
             // Option B: Apply migrations (recommended for production)
             // await dbContext.Database.MigrateAsync();
         }
