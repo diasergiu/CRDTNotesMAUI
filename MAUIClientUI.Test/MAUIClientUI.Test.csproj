@@ -27,6 +27,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DatabaseLibrary\DatabaseLibrary.csproj" />
     <ProjectReference Include="..\MAUIClientUI\MAUIClientUI.csproj" />
+    <ProjectReference Include="..\CRDTCursor\CRDTCursor.csproj" />
   </ItemGroup>
 
   <ItemGroup>

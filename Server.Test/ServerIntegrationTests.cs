@@ -1,6 +1,5 @@
 using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.Entities.Server;
-using DatabaseLibrary.RequestBody;
 using DatabaseLibrary.ResponsBody;
 using Microsoft.EntityFrameworkCore;
 using Server.Controllers;
@@ -16,7 +15,6 @@ namespace Server.Test
         private readonly NotesRepository _repository;
         private readonly UserRepository _userRepository;
         private readonly UserController _userController;
-        private readonly NotesController _notesController;
 
         public ServerIntegrationTests()
         {
@@ -28,7 +26,6 @@ namespace Server.Test
             _repository = new NotesRepository(_dbContext);
             _userRepository = new UserRepository(_dbContext);
             _userController = new UserController(_userRepository);
-            _notesController = new NotesController(_dbContext, _repository, new  NoteSyncHub(null));
         }
 
         #region User Registration and Login Flow
@@ -107,8 +104,8 @@ namespace Server.Test
                 IdNote = Guid.NewGuid(),
                 Title = "Integration Test Note",
                 Content = "This is test content",
-                CreationDate = DateTime.UtcNow.ToString("O"),
-                LastUpdate = DateTime.UtcNow.ToString("O"),
+                CreationDate =  DateTime.UtcNow,
+                LastUpdate = DateTime.UtcNow,
                 Version = 1,
                 DirtyFlagChangesMade = true
             };
@@ -151,8 +148,8 @@ namespace Server.Test
                 IdNote = Guid.NewGuid(),
                 Title = "First Note",
                 Content = "First content",
-                CreationDate = DateTime.UtcNow.ToString("O"),
-                LastUpdate = DateTime.UtcNow.ToString("O"),
+                CreationDate = DateTime.UtcNow,
+                LastUpdate = DateTime.UtcNow,
                 Version = 1,
                 DirtyFlagChangesMade = true
             };
@@ -162,8 +159,8 @@ namespace Server.Test
                 IdNote = Guid.NewGuid(),
                 Title = "Second Note",
                 Content = "Second content",
-                CreationDate = DateTime.UtcNow.ToString("O"),
-                LastUpdate = DateTime.UtcNow.ToString("O"),
+                CreationDate = DateTime.UtcNow,
+                LastUpdate = DateTime.UtcNow,
                 Version = 1,
                 DirtyFlagChangesMade = true
             };
@@ -221,8 +218,8 @@ namespace Server.Test
                 IdNote = Guid.NewGuid(),
                 Title = "User 1 Note",
                 Content = "Only user 1 should see this",
-                CreationDate = DateTime.UtcNow.ToString("O"),
-                LastUpdate = DateTime.UtcNow.ToString("O"),
+                CreationDate = DateTime.UtcNow,
+                LastUpdate = DateTime.UtcNow,
                 Version = 1,
                 DirtyFlagChangesMade = true
             };
@@ -232,8 +229,8 @@ namespace Server.Test
                 IdNote = Guid.NewGuid(),
                 Title = "User 2 Note",
                 Content = "Only user 2 should see this",
-                CreationDate = DateTime.UtcNow.ToString("O"),
-                LastUpdate = DateTime.UtcNow.ToString("O"),
+                CreationDate = DateTime.UtcNow,
+                LastUpdate = DateTime.UtcNow,
                 Version = 1,
                 DirtyFlagChangesMade = true
             };

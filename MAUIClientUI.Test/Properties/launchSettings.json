@@ -1,6 +1,16 @@
 {
   "$schema": "https://json.schemastore.org/launchsettings.json",
   "profiles": {
+    "E2E Tests (Start Server + Run)": {
+      "commandName": "Executable",
+      "executablePath": "powershell",
+      "commandLineArgs": "-ExecutionPolicy Bypass -File run-e2e-with-server.ps1",
+      "workingDirectory": ".",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "E2E_SERVER_URL": "http://localhost:5266"
+      }
+    },
     "E2E Tests": {
       "commandName": "Executable",
       "executablePath": "dotnet",

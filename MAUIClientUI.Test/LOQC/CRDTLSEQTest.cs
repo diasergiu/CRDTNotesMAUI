@@ -225,14 +225,14 @@ namespace MAUIClientUI.Test.LOQC
             {
                 Character = 'A',
                 IdCharacter = BuilderHelper.GenerateForString( 5, clientId1), 
-                ClockDateTime = DateTime.UtcNow.ToString("O")
+                ClockDateTime = DateTime.UtcNow
             };
 
             var newChar = new CRDTCharacterClient()
             {
                 Character = 'B',
                 IdCharacter = BuilderHelper.GenerateForString(5, clientId2),
-                ClockDateTime = DateTime.UtcNow.AddSeconds(1).ToString("O")
+                ClockDateTime = DateTime.UtcNow.AddSeconds(1)
             };
 
             //var result = idService.ShouldAcceptConflictingInsert(

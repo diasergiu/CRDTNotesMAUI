@@ -108,8 +108,8 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 IdNote = Guid.NewGuid(),
                 Title = noteTitle,
                 Content = noteContent,
-                CreationDate = DateTime.UtcNow.ToString("o"),
-                LastUpdate = DateTime.UtcNow.ToString("o"),
+                CreationDate = DateTime.UtcNow,
+                LastUpdate = DateTime.UtcNow,
                 DirtyFlagChangesMade = true
             };
 
@@ -133,8 +133,8 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                     IdNote = Guid.NewGuid(),
                     Title = $"Retrieve Test Note {i}",
                     Content = $"Content {i}",
-                    CreationDate = DateTime.UtcNow.ToString("o"),
-                    LastUpdate = DateTime.UtcNow.ToString("o"),
+                    CreationDate = DateTime.UtcNow,
+                    LastUpdate = DateTime.UtcNow,
                     DirtyFlagChangesMade = true
                 };
 
@@ -166,8 +166,8 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 IdNote = sharedNoteId,
                 Title = "Concurrent Update Test",
                 Content = originalContent,
-                CreationDate = DateTime.UtcNow.ToString("o"),
-                LastUpdate = DateTime.UtcNow.ToString("o"),
+                CreationDate = DateTime.UtcNow,
+                LastUpdate = DateTime.UtcNow,
                 DirtyFlagChangesMade = true,
                 Version = 1
             };
@@ -182,7 +182,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 Title = "Concurrent Update Test",
                 Content = originalContent + " [Updated by User 1]",
                 CreationDate = note.CreationDate,
-                LastUpdate = DateTime.UtcNow.ToString("o"),
+                LastUpdate = DateTime.UtcNow,
                 DirtyFlagChangesMade = true,
                 Version = 1
             };
@@ -201,7 +201,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 Title = "Concurrent Update Test",
                 Content = originalContent + " [Updated by User 2]",
                 CreationDate = note.CreationDate,
-                LastUpdate = DateTime.UtcNow.AddMilliseconds(100).ToString("o"),
+                LastUpdate = DateTime.UtcNow.AddMilliseconds(100),
                 DirtyFlagChangesMade = true,
                 Version = 1  // User 2 doesn't know server is at version 2 now
             };
@@ -228,8 +228,8 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 IdNote = noteId,
                 Title = "Rapid Update Test",
                 Content = "Version 0",
-                CreationDate = DateTime.UtcNow.ToString("o"),
-                LastUpdate = DateTime.UtcNow.ToString("o"),
+                CreationDate = DateTime.UtcNow,
+                LastUpdate = DateTime.UtcNow,
                 DirtyFlagChangesMade = true,
                 Version = 0
             };
@@ -248,7 +248,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                     Title = "Rapid Update Test",
                     Content = $"Version {nextVersion}",
                     CreationDate = baseNote.CreationDate,
-                    LastUpdate = DateTime.UtcNow.AddMilliseconds(i * 10).ToString("o"),
+                    LastUpdate = DateTime.UtcNow.AddMilliseconds(i * 10),
                     DirtyFlagChangesMade = true,
                     Version = nextVersion
                 };
@@ -277,8 +277,8 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 IdNote = noteId,
                 Title = "Three User Update Test",
                 Content = "Base content",
-                CreationDate = DateTime.UtcNow.ToString("o"),
-                LastUpdate = DateTime.UtcNow.ToString("o"),
+                CreationDate = DateTime.UtcNow,
+                LastUpdate = DateTime.UtcNow,
                 DirtyFlagChangesMade = true
             };
 
@@ -292,7 +292,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 Title = "Three User Update Test",
                 Content = "Updated by User 1",
                 CreationDate = baseNote.CreationDate,
-                LastUpdate = DateTime.UtcNow.ToString("o"),
+                LastUpdate = DateTime.UtcNow,
                 DirtyFlagChangesMade = true,
                 Version = 1
             });
@@ -303,7 +303,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 Title = "Three User Update Test",
                 Content = "Updated by User 2",
                 CreationDate = baseNote.CreationDate,
-                LastUpdate = DateTime.UtcNow.AddMilliseconds(5).ToString("o"),
+                LastUpdate = DateTime.UtcNow.AddMilliseconds(5),
                 DirtyFlagChangesMade = true,
                 Version = 1
             });
@@ -314,7 +314,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 Title = "Three User Update Test",
                 Content = "Updated by User 3",
                 CreationDate = baseNote.CreationDate,
-                LastUpdate = DateTime.UtcNow.AddMilliseconds(10).ToString("o"),
+                LastUpdate = DateTime.UtcNow.AddMilliseconds(10),
                 DirtyFlagChangesMade = true,
                 Version = 1
             });
@@ -341,8 +341,8 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                     IdNote = Guid.NewGuid(),
                     Title = $"User 1 Note {i}",
                     Content = $"User 1 content {i}",
-                    CreationDate = DateTime.UtcNow.ToString("o"),
-                    LastUpdate = DateTime.UtcNow.ToString("o"),
+                    CreationDate = DateTime.UtcNow,
+                    LastUpdate = DateTime.UtcNow,
                     DirtyFlagChangesMade = true,
                     Version = 1,
                 };
@@ -352,8 +352,8 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                     IdNote = Guid.NewGuid(),
                     Title = $"User 2 Note {i}",
                     Content = $"User 2 content {i}",
-                    CreationDate = DateTime.UtcNow.ToString("o"),
-                    LastUpdate = DateTime.UtcNow.ToString("o"),
+                    CreationDate = DateTime.UtcNow,
+                    LastUpdate = DateTime.UtcNow,
                     DirtyFlagChangesMade = true,
                     Version = 1
                 };
@@ -391,8 +391,8 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 IdNote = noteId,
                 Title = "Offline Sync Test",
                 Content = "Initial content",
-                CreationDate = DateTime.UtcNow.ToString("o"),
-                LastUpdate = DateTime.UtcNow.ToString("o"),
+                CreationDate = DateTime.UtcNow,
+                LastUpdate = DateTime.UtcNow,
                 DirtyFlagChangesMade = false
             };
 
@@ -406,7 +406,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 Title = "Offline Sync Test",
                 Content = "Content edited while offline",
                 CreationDate = baseNote.CreationDate,
-                LastUpdate = DateTime.UtcNow.ToString("o"),
+                LastUpdate = DateTime.UtcNow,
                 DirtyFlagChangesMade = true // Marked as dirty for offline sync
             };
 
@@ -432,8 +432,8 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 IdNote = Guid.NewGuid(),
                 Title = "Large Content Test",
                 Content = largeContent.ToString(),
-                CreationDate = DateTime.UtcNow.ToString("o"),
-                LastUpdate = DateTime.UtcNow.ToString("o"),
+                CreationDate = DateTime.UtcNow,
+                LastUpdate = DateTime.UtcNow,
                 DirtyFlagChangesMade = true
             };
 
@@ -455,8 +455,8 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 IdNote = Guid.NewGuid(),
                 Title = "",
                 Content = "",
-                CreationDate = DateTime.UtcNow.ToString("o"),
-                LastUpdate = DateTime.UtcNow.ToString("o"),
+                CreationDate = DateTime.UtcNow,
+                LastUpdate = DateTime.UtcNow,
                 DirtyFlagChangesMade = true
             };
 
@@ -478,8 +478,8 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 IdNote = Guid.NewGuid(),
                 Title = "Special Chars Test",
                 Content = specialContent,
-                CreationDate = DateTime.UtcNow.ToString("o"),
-                LastUpdate = DateTime.UtcNow.ToString("o"),
+                CreationDate = DateTime.UtcNow,
+                LastUpdate = DateTime.UtcNow,
                 DirtyFlagChangesMade = true
             };
 
@@ -505,8 +505,8 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 IdNote = Guid.NewGuid(),
                 Title = "Standalone Note",
                 Content = "Note without explicit user",
-                CreationDate = DateTime.UtcNow.ToString("o"),
-                LastUpdate = DateTime.UtcNow.ToString("o"),
+                CreationDate = DateTime.UtcNow,
+                LastUpdate = DateTime.UtcNow,
                 DirtyFlagChangesMade = true
             };
 
@@ -533,8 +533,8 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 IdNote = noteId,
                 Title = "Multi-Device Note",
                 Content = "Initial content from device 1",
-                CreationDate = DateTime.UtcNow.ToString("o"),
-                LastUpdate = DateTime.UtcNow.ToString("o"),
+                CreationDate = DateTime.UtcNow,
+                LastUpdate = DateTime.UtcNow,
                 DirtyFlagChangesMade = true,
                 Version = 0
             };
@@ -549,7 +549,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 Title = "Multi-Device Note",
                 Content = "Device 1: Updated at " + DateTime.UtcNow.ToString("HH:mm:ss"),
                 CreationDate = baseNote.CreationDate,
-                LastUpdate = DateTime.UtcNow.ToString("o"),
+                LastUpdate = DateTime.UtcNow,
                 DirtyFlagChangesMade = true,
                 Version = 1
             };
@@ -564,7 +564,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 Title = "Multi-Device Note",
                 Content = "Device 2: Updated at " + DateTime.UtcNow.ToString("HH:mm:ss"),
                 CreationDate = baseNote.CreationDate,
-                LastUpdate = DateTime.UtcNow.ToString("o"),
+                LastUpdate = DateTime.UtcNow,
                 DirtyFlagChangesMade = true,
                 Version = 1
             };
@@ -594,8 +594,8 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 IdNote = noteId,
                 Title = "Offline Sync Test",
                 Content = "Initial content",
-                CreationDate = DateTime.UtcNow.ToString("o"),
-                LastUpdate = DateTime.UtcNow.ToString("o"),
+                CreationDate = DateTime.UtcNow,
+                LastUpdate = DateTime.UtcNow,
                 DirtyFlagChangesMade = false,
                 Version = 0
             };
@@ -612,7 +612,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                     Title = "Offline Sync Test",
                     Content = "Device 1 edit 1 - offline",
                     CreationDate = sharedNote.CreationDate,
-                    LastUpdate = DateTime.UtcNow.AddSeconds(-30).ToString("o"),
+                    LastUpdate = DateTime.UtcNow.AddSeconds(-30),
                     DirtyFlagChangesMade = true,
                     Version = 1
                 },
@@ -622,7 +622,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                     Title = "Offline Sync Test",
                     Content = "Device 1 edit 2 - still offline",
                     CreationDate = sharedNote.CreationDate,
-                    LastUpdate = DateTime.UtcNow.AddSeconds(-20).ToString("o"),
+                    LastUpdate = DateTime.UtcNow.AddSeconds(-20),
                     DirtyFlagChangesMade = true,
                     Version = 2
                 }
@@ -635,7 +635,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 Title = "Offline Sync Test",
                 Content = "Device 2 update while device 1 offline",
                 CreationDate = sharedNote.CreationDate,
-                LastUpdate = DateTime.UtcNow.AddSeconds(-10).ToString("o"),
+                LastUpdate = DateTime.UtcNow.AddSeconds(-10),
                 DirtyFlagChangesMade = true,
                 Version = 1
             };
@@ -666,8 +666,8 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 IdNote = noteId,
                 Title = "Conflict Test",
                 Content = "This is the original line that will be edited",
-                CreationDate = DateTime.UtcNow.ToString("o"),
-                LastUpdate = DateTime.UtcNow.ToString("o"),
+                CreationDate = DateTime.UtcNow,
+                LastUpdate = DateTime.UtcNow,
                 DirtyFlagChangesMade = true,
                 Version = 1
             };
@@ -685,7 +685,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 Title = "Conflict Test",
                 Content = "[User 1 Edit] This is the original line that will be edited",
                 CreationDate = baseNote.CreationDate,
-                LastUpdate = conflictTime.ToString("o"),
+                LastUpdate = conflictTime,
                 DirtyFlagChangesMade = true,
                 Version = 1
             });
@@ -696,7 +696,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 Title = "Conflict Test",
                 Content = "[User 2 Edit] This is the original line that will be edited",
                 CreationDate = baseNote.CreationDate,
-                LastUpdate = conflictTime.AddMilliseconds(1).ToString("o"),
+                LastUpdate = conflictTime.AddMilliseconds(1),
                 DirtyFlagChangesMade = true,
                 Version = 2
             });
@@ -723,8 +723,8 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 IdNote = noteId,
                 Title = "Large Document Merge",
                 Content = largeContent,
-                CreationDate = DateTime.UtcNow.ToString("o"),
-                LastUpdate = DateTime.UtcNow.ToString("o"),
+                CreationDate = DateTime.UtcNow,
+                LastUpdate = DateTime.UtcNow,
                 DirtyFlagChangesMade = true,
                 Version = 1
             };
@@ -739,7 +739,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 Title = "Large Document Merge",
                 Content = "DEVICE 1 EDIT AT START\n" + largeContent,
                 CreationDate = baseNote.CreationDate,
-                LastUpdate = DateTime.UtcNow.ToString("o"),
+                LastUpdate = DateTime.UtcNow,
                 DirtyFlagChangesMade = true,
                 Version = 1
             };
@@ -750,7 +750,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 Title = "Large Document Merge",
                 Content = largeContent + "\nDEVICE 2 EDIT AT END",
                 CreationDate = baseNote.CreationDate,
-                LastUpdate = DateTime.UtcNow.AddMilliseconds(50).ToString("o"),
+                LastUpdate = DateTime.UtcNow.AddMilliseconds(50),
                 DirtyFlagChangesMade = true,
                 Version = 1
             };
@@ -777,8 +777,8 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 IdNote = noteId,
                 Title = "Three Device Sync",
                 Content = "Base content",
-                CreationDate = DateTime.UtcNow.ToString("o"),
-                LastUpdate = DateTime.UtcNow.ToString("o"),
+                CreationDate = DateTime.UtcNow,
+                LastUpdate = DateTime.UtcNow,
                 DirtyFlagChangesMade = true,
                 Version = 0
             };
@@ -793,7 +793,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 Title = "Three Device Sync",
                 Content = "Content from Device 1",
                 CreationDate = baseNote.CreationDate,
-                LastUpdate = DateTime.UtcNow.ToString("o"),
+                LastUpdate = DateTime.UtcNow,
                 DirtyFlagChangesMade = true,
                 Version = 1
             });
@@ -804,7 +804,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 Title = "Three Device Sync",
                 Content = "Content from Device 2",
                 CreationDate = baseNote.CreationDate,
-                LastUpdate = DateTime.UtcNow.AddMilliseconds(10).ToString("o"),
+                LastUpdate = DateTime.UtcNow.AddMilliseconds(10),
                 DirtyFlagChangesMade = true,
                 Version = 1
             });
@@ -815,7 +815,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 Title = "Three Device Sync",
                 Content = "Content from Device 3",
                 CreationDate = baseNote.CreationDate,
-                LastUpdate = DateTime.UtcNow.AddMilliseconds(20).ToString("o"),
+                LastUpdate = DateTime.UtcNow.AddMilliseconds(20),
                 DirtyFlagChangesMade = true,
                 Version = 1
             });
