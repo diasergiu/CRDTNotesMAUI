@@ -10,18 +10,21 @@ namespace MAUIClientUI.Platforms.Android
     public class AndroidContentEditorHandler : IContentEditorInputHandler
     {
         private readonly Microsoft.Maui.Controls.Editor _editor;
+        private string _previousText = string.Empty;
 
         public event Action<int, char> CharacterInserted;
         public event Action<int> CharacterDeleted;
+        public event Action<int, string> StringInserted;
+        public event Action<int, int> RangeDeleted;
 
         public AndroidContentEditorHandler(Microsoft.Maui.Controls.Editor editor)
         {
             _editor = editor ?? throw new ArgumentNullException(nameof(editor));
+            _previousText = _editor.Text ?? string.Empty;
         }
         public void HandleKeyPress(object sender, dynamic e)
         {
-            var editor = sender as Microsoft.Maui.Controls.Editor;
-            if (editor is null || e?.Event is null)
+             if (_editor is null || e?.Event is null)
             {
                 e.Handled = false;
                 return;
@@ -30,7 +33,7 @@ namespace MAUIClientUI.Platforms.Android
             int cursorPosition = GetEditorCursorPosition();
 
             // Handle Backspace/Delete key
-            if (e.KeyCode == Keycode.Del)
+            if (e.KeyCode == Keycode.Back)
             {
                 CharacterDeleted?.Invoke(cursorPosition);
                 e.Handled = true;
@@ -51,6 +54,63 @@ namespace MAUIClientUI.Platforms.Android
             e.Handled = false;
         }
 
+        public void HandleTextChanged(string newText)
+        {
+            if (newText == null)
+                newText = string.Empty;
+
+            int cursorPosition = GetEditorCursorPosition();
+            int oldLength = _previousText.Length;
+            int newLength = newText.Length;
+
+            Debug.WriteLine($"Text changed: '{_previousText}' -> '{newText}', Cursor: {cursorPosition}");
+
+            // Text was deleted
+            if (newLength < oldLength)
+            {
+                int deletedCount = oldLength - newLength;
+                int startPos = cursorPosition;
+                int endPos = cursorPosition + deletedCount;
+
+                if (deletedCount == 1)
+                {
+                    CharacterDeleted?.Invoke(cursorPosition);
+                }
+                else
+                {
+                    RangeDeleted?.Invoke(startPos, endPos);
+                }
+            }
+            // Text was inserted
+            else if (newLength > oldLength)
+            {
+                int insertedCount = newLength - oldLength;
+                string insertedText = ExtractInsertedText(newText, _previousText, cursorPosition, insertedCount);
+
+                if (insertedCount == 1)
+                {
+                    CharacterInserted?.Invoke(cursorPosition - 1, insertedText[0]);
+                }
+                else
+                {
+                    StringInserted?.Invoke(cursorPosition - insertedCount, insertedText);
+                    Debug.WriteLine($"String inserted: '{insertedText}' at position {cursorPosition - insertedCount}");
+                }
+            }
+
+            _previousText = newText;
+        }
+
+        private string ExtractInsertedText(string newText, string oldText, int cursorPosition, int insertedCount)
+        {
+            // The inserted text should be before the cursor position
+            int startIndex = cursorPosition - insertedCount;
+            if (startIndex >= 0 && startIndex + insertedCount <= newText.Length)
+            {
+                return newText.Substring(startIndex, insertedCount);
+            }
+            return string.Empty;
+        }
         private int GetEditorCursorPosition()
         {
             try

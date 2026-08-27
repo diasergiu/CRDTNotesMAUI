@@ -11,13 +11,17 @@ namespace MAUIClientUI.Platforms.Windows
     public class WindowsContentEditorHandler : IContentEditorInputHandler
     {
         private readonly Editor _editor;
+        private string _previousText = string.Empty;
 
         public event Action<int, char> CharacterInserted;
         public event Action<int> CharacterDeleted;
+        public event Action<int, string> StringInserted;
+        public event Action<int, int> RangeDeleted;
 
         public WindowsContentEditorHandler(Editor editor)
         {
             _editor = editor ?? throw new ArgumentNullException(nameof(editor));
+            _previousText = _editor.Text ?? string.Empty;
         }
 
 
@@ -47,7 +51,61 @@ namespace MAUIClientUI.Platforms.Windows
                 Debug.WriteLine("Key pressed");
             }
         }
+        public void HandleTextChanged()
+        {
+            string newText = _editor.Text ?? string.Empty;
+            int cursorPosition = GetEditorCurrentPosition();
+            int oldLength = _previousText.Length;
+            int newLength = newText.Length;
 
+            Debug.WriteLine($"Text changed: '{_previousText}' -> '{newText}', Cursor: {cursorPosition}");
+
+            // Text was deleted (backspace, delete, or multi-char selection delete)
+            if (newLength < oldLength)
+            {
+                int deletedCount = oldLength - newLength;
+                int startPos = cursorPosition;
+                int endPos = cursorPosition + deletedCount;
+
+                if (deletedCount == 1)
+                {
+                    CharacterDeleted?.Invoke(cursorPosition);
+                }
+                else
+                {
+                    RangeDeleted?.Invoke(startPos, endPos);
+                }
+            }
+            // Text was inserted (typing, paste, or multi-char selection replace)
+            else if (newLength > oldLength)
+            {
+                int insertedCount = newLength - oldLength;
+                string insertedText = ExtractInsertedText(newText, _previousText, cursorPosition, insertedCount);
+
+                if (insertedCount == 1)
+                {
+                    CharacterInserted?.Invoke(cursorPosition - 1, insertedText[0]);
+                }
+                else
+                {
+                    StringInserted?.Invoke(cursorPosition - insertedCount, insertedText);
+                    Debug.WriteLine($"String inserted: '{insertedText}' at position {cursorPosition - insertedCount}");
+                }
+            }
+
+            _previousText = newText;
+        }
+
+        private string ExtractInsertedText(string newText, string oldText, int cursorPosition, int insertedCount)
+        {
+            // The inserted text should be before the cursor position
+            int startIndex = cursorPosition - insertedCount;
+            if (startIndex >= 0 && startIndex + insertedCount <= newText.Length)
+            {
+                return newText.Substring(startIndex, insertedCount);
+            }
+            return string.Empty;
+        }
         private string GetkeyPressed(dynamic e)
         {
             var keyEvent = e as KeyRoutedEventArgs;
