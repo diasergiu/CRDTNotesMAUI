@@ -21,7 +21,7 @@ namespace MAUIClientUI.Repositories
         public List<NoteClient> GetNoteFromUser(Guid idUser)
         {
             //            return _dbContextUser.Notes.Where(n => n.NoteUser.Any(nu => nu.IdUser == idUser)).ToList();
-            return _dbContextUser.Notes.ToList();
+            return _dbContextUser.Notes.AsNoTracking().ToList();
         }
         public void UpdateListNotes(List<NoteClient> noteClients)
         {
@@ -99,6 +99,7 @@ namespace MAUIClientUI.Repositories
 
         public async Task<List<CRDTCharacterClient>> GetAllCRDTCharacters()
         {
+            _dbContextUser.ChangeTracker.Clear();
             return _dbContextUser.CRDTCharacters
                 .Where(n => n.IsDirtyFlag == true).AsNoTracking().ToList();
         }

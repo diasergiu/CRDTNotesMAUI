@@ -15,6 +15,8 @@ namespace MAUIClientUI.Miscellaneous
         /// Raised when a character deletion (backspace) is requested. Provides the cursor position.
         /// </summary>
         event Action<int> CharacterDeleted;
+        event Action<int, string> StringInserted;
+        event Action<int, int> RangeDeleted;
 
         /// <summary>
         /// Handles key press events for inserting or deleting characters.
