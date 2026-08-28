@@ -1,11 +1,10 @@
 using DatabaseLibrary.WrapperClasses;
-using MAUIClientUI.Services.HelperClasses;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MAUIClientUI.Services
+namespace MAUIClientUI.Services.ServerRequests
 {
     public abstract class ServicesClient
     {

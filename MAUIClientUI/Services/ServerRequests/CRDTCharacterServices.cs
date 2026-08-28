@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MAUIClientUI.Services
+namespace MAUIClientUI.Services.ServerRequests
 {
     public class CRDTCharacterServices : ServicesClient
     {

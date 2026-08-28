@@ -1,8 +1,7 @@
 ﻿using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.WrapperClasses;
-using MAUIClientUI.Services.HelperClasses;
 
-namespace MAUIClientUI.Services
+namespace MAUIClientUI.Services.ServerRequests
 {
 
     public class UserServices : ServicesClient
@@ -17,12 +16,6 @@ namespace MAUIClientUI.Services
                     $"{_baseURL}/login?username={Uri.EscapeDataString(username)}&password={Uri.EscapeDataString(password)}",
                     null),
                 nameof(Login));
-
-            if (result.IsSuccess && result.Data != null)
-            {
-                UserDevice.localUser(result.Data.IdUser);
-            }
-
             return result;
         }
 

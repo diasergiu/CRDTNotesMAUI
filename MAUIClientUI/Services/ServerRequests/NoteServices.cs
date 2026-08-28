@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 using System.Net.Http.Json;
 using System.Text;
 
-namespace MAUIClientUI.Services
+namespace MAUIClientUI.Services.ServerRequests
 {
     public class NoteServices : ServicesClient, INoteServices
     {
