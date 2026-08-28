@@ -6,6 +6,7 @@ using MAUIClientUI.MVVM;
 using MAUIClientUI.Repositories;
 using MAUIClientUI.Services;
 using MAUIClientUI.Services.HelperClasses;
+using MAUIClientUI.Services.ServerRequests;
 using Microsoft.Extensions.Logging;
 using System.IO;
 
@@ -28,7 +29,9 @@ namespace MAUIClientUI
             // Register services with DI container
             builder.Services
                 .AddSingleton(sp => new NotificationServices(BaseURLGetter.getBaseURL()))
+                .AddSingleton<iDialogHelper, DialogHelper>()
                 .AddSingleton<IDatabaseServices>(new DatabaseServices(instanceId))
+                .AddSingleton<INavigationHelper, NavigationHelper>()
                 .AddScoped<DbContextClient>(sp =>
                 {
                     var dbServices = sp.GetRequiredService<IDatabaseServices>();
@@ -109,7 +112,7 @@ namespace MAUIClientUI
                 Guid.TryParse(args[1], out user);
 
             // defautl
-            UserDevice.localUser(user);
+            UserDevice.SetLocalUser(user);
         }
     }
 }

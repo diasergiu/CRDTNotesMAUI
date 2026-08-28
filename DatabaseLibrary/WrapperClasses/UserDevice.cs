@@ -43,13 +43,13 @@ namespace DatabaseLibrary.WrapperClasses
         // not every connection belonging to the same user.
         public static string? HubConnectionId { get; set; }
 
-        public static Guid localUser(Guid user)
+        public static Guid SetLocalUser(Guid user)
         {
             LocalUser = user;
             return LocalUser;
         }
 
-        public static void logout()
+        public static void Logout()
         {
             LocalUser = Guid.Empty;
         }

@@ -21,6 +21,7 @@
                             HorizontalOptions="Center"
                             TextColor="Black" />
                     <Entry x:Name="IdNoteEntry"
+                           Text="{Binding IdNoteRequested}"
                            Placeholder="Enter IdUser"
                            FontSize="16"
                            BackgroundColor="#F5F5F5"
@@ -41,7 +42,7 @@
                                 TextColor="White"
                                 CornerRadius="8"
                                 HeightRequest="50"
-                                Clicked="OnAccessNoteClicked" />
+                                Command="{Binding AccessNoteClickedCommand}"/>
                     </Grid>
                 </VerticalStackLayout>
             </VerticalStackLayout>

@@ -27,6 +27,7 @@
                            FontSize="14"
                            TextColor="#333" />
                     <Entry x:Name="UsernameEntry"
+                           Text="{Binding Username}"
                            Placeholder="Enter username"
                            FontSize="16"
                            BackgroundColor="#F5F5F5"
@@ -39,6 +40,7 @@
                            FontSize="14"
                            TextColor="#333" />
                     <Entry x:Name="PasswordEntry"
+                           Text="{Binding Password}"
                            Placeholder="Enter password"
                            IsPassword="True"
                            FontSize="16"
@@ -48,10 +50,11 @@
 
                 <!-- Status Label -->
                 <Label x:Name="StatusLabel"
+                       Text="{Binding StatusMessage}"
+                       IsVisible="{Binding StatusMessage, Converter={StaticResource StringToBoolConverter}}"
+                       TextColor="{Binding IsError, Converter={StaticResource ErrorColorConverter}}"
                        FontSize="14"
-                       TextColor="Red"
-                       HorizontalOptions="Center"
-                       IsVisible="False" />
+                       HorizontalOptions="Center"/>
 
                 <!-- Buttons -->
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10,0,0">
@@ -65,12 +68,13 @@
 
                     <Button Grid.Column="1"
                             x:Name="LoginSubmitButton"
-                            Text="Login"
+                            Text="{Binding IsLoading, StringFormat='{0:Logging in...,Login}'}"
+                            Command="{Binding LoginCommand}"
+                            IsEnabled="{Binding !IsLoading, Converter={StaticResource InvertedBoolConverter}}"
                             BackgroundColor="#4CAF50"
                             TextColor="White"
                             CornerRadius="8"
-                            HeightRequest="50"
-                            Clicked="OnLoginSubmitClicked" />
+                            HeightRequest="50" />
                 </Grid>
 
                 <!-- Create Account Link -->

@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MAUIClientUI.UserInterface.MainPageNotes"
+             x:Name="NotesPage"
              Title="My Notes">
     <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="10" RowSpacing="10">
         <!-- Header with Title and Login/Sync Buttons -->
@@ -24,9 +25,9 @@
                 FontSize="12"
                 HeightRequest="40"
                 WidthRequest="90"
-                IsEnabled="False"
+                IsEnabled="{Binding IsLoggedIn}"
                 Margin="0,0,10,0"
-                Clicked="OnSyncNotesClicked" />
+                Command="{Binding SyncNotesClickCommand}" />
 
             <Button 
                 x:Name="LoginButton"
@@ -51,7 +52,10 @@
             FontAttributes="Bold"
             HeightRequest="50"
             Margin="0,0,0,10"
-            Clicked="OnCreateNoteClicked" />
+            Command="{Binding CreateNoteCommand}"
+            CommandParameter="{Binding .}"/>    
+            <!-- do i need what is right above -->
+            
 
         <CollectionView 
             Grid.Row="3"
@@ -99,7 +103,7 @@
                                 FontSize="14"
                                 HeightRequest="40"
                                 Margin="0,10,0,0"
-                                Clicked="OnOpenNoteClicked"
+                                Command="{Binding BindingContext.OpenNoteCommand, Source={x:Reference NotesPage}}"
                                 CommandParameter="{Binding .}"/>
                         </VerticalStackLayout>
                     </Frame>

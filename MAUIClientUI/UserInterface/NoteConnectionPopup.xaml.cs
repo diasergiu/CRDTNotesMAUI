@@ -1,57 +1,28 @@
 using DatabaseLibrary.Entities.Client;
+using MAUIClientUI.MVVM;
 using MAUIClientUI.Repositories;
 using MAUIClientUI.Services;
+using MAUIClientUI.Services.HelperClasses;
 
 namespace MAUIClientUI.UserInterface;
 
 public partial class NoteConnectionPopup : ContentPage
 {
-
-	private NoteRepository _noteRepository;
-	private INoteServices _noteServices;
-	private Guid _noteId;
+	private NoteConnectionViewModel _noteConnectionViewModel;
 	public NoteConnectionPopup(INoteServices noteService, Guid IdNote)
 	{
-		_noteRepository = IPlatformApplication.Current.Services.GetService<NoteRepository>(); ;
-		_noteServices = noteService;
-		_noteId = IdNote;
+		var dialogHelper = IPlatformApplication.Current.Services.GetService<iDialogHelper>(); 
+		var navigationHelper = IPlatformApplication.Current.Services.GetService<INavigationHelper>();
+
+		_noteConnectionViewModel = new NoteConnectionViewModel( noteService, dialogHelper, navigationHelper, IdNote);
+
 		InitializeComponent();
-		
+        BindingContext = _noteConnectionViewModel;
 	}
     private async void OnCancelClicked(object sender, EventArgs e)
     {
         await Navigation.PopAsync();
     }
 
-	private async void OnAccessNoteClicked(object sender, EventArgs e)
-	{
-		if (string.IsNullOrWhiteSpace(IdNoteEntry.Text))
-		{
-			await DisplayAlert("Error", "Please enter a Note ID", "OK");
-			return;
-		}
-
-		if (!Guid.TryParse(IdNoteEntry.Text, out var userId))
-		{
-			await DisplayAlert("Error", "Invalid User ID format. Please enter a valid GUID.", "OK");
-			return;
-		}
-
-		try
-		{
-			var result = await _noteServices.GiveNoteAccessToUser(_noteId, userId);
-			if (result.IsSuccess)
-			{
-				await Navigation.PopModalAsync();
-			}
-			else
-			{
-				await DisplayAlert("Error", "Failed to find User. Please check the ID and try again.", "OK");
-			}
-		}
-		catch (Exception ex)
-		{
-			await DisplayAlert("Error", $"An error occurred: {ex.Message}", "OK");
-		}
-	}
+	
 }

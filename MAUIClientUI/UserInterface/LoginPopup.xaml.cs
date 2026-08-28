@@ -1,9 +1,11 @@
 using DatabaseLibrary.Entities;
 using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.WrapperClasses;
+using MAUIClientUI.MVVM;
 using MAUIClientUI.Repositories;
 using MAUIClientUI.Services;
 using MAUIClientUI.Services.HelperClasses;
+using MAUIClientUI.Services.ServerRequests;
 using SlackAPI;
 using System;
 using System.Net.Http;
@@ -14,68 +16,24 @@ namespace MAUIClientUI.UserInterface;
 
 public partial class LoginPopup : ContentPage
 {
-    private UserServices _loginServices; // might delete this
-    //private ClientServices _clientServices;
-    private NoteServices _noteServices;
-    private NoteRepository _noteRepository;
-    private readonly IAuthenticationService _authService;
-
+    private LoginViewModel _loginViewModel;
     public LoginPopup()
     {
         InitializeComponent();
-        _noteRepository = IPlatformApplication.Current.Services.GetService<NoteRepository>(); // should DbContext be singleton
-        _authService = IPlatformApplication.Current.Services.GetService<IAuthenticationService>();
-        _loginServices = new UserServices("/api/user");
-        _noteServices = new NoteServices("/api/notes", _noteRepository);
+       
+        var _authService = IPlatformApplication.Current.Services.GetService<IAuthenticationService>();
+        var userServices = new UserServices("/api/user");
+
+        _loginViewModel = new LoginViewModel(userServices, _authService);
+        _loginViewModel.OnLoginSuccessful += OnLoginSuccess;
+
+        BindingContext = _loginViewModel;
 
     }
-
-    private async void OnLoginSubmitClicked(object sender, EventArgs e)
+    private async void OnLoginSuccess()
     {
-        var username = UsernameEntry.Text?.Trim();
-        var password = PasswordEntry.Text;
-
-        // Validation
-        if (string.IsNullOrWhiteSpace(username))
-        {
-            ShowStatus("Please enter a username", true);
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(password))
-        {
-            ShowStatus("Please enter a password", true);
-            return;
-        }
-        
-        SetLoadingState(false);
-        // Login to the server
-        var result = await _loginServices.Login(username, password);
-        SetLoadingState(true);
-
-        if (result.IsSuccess)
-        {
-         
-
-            // update notes based on changes on the server
-            _authService.OnLoginSuccess(result.Data.IdUser);
-
-            // Login successful - close the popup
-           
-
-
-            ShowStatus("Login successful!", false);
-            
-            await Task.Delay(500); // Brief delay to show success message
-            await Navigation.PopModalAsync();
-        }
-        else
-        {
-            // Display the error message from the service
-            ShowStatus(result.ErrorMessage, true);
-
-        }
-
+        await Task.Delay(500);
+        await Navigation.PopModalAsync();
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)
@@ -88,17 +46,9 @@ public partial class LoginPopup : ContentPage
         await Navigation.PushModalAsync(new RegisterPopup());
     }
 
-    private void ShowStatus(string message, bool isError)
+    protected override void OnDisappearing()
     {
-        StatusLabel.Text = message;
-        StatusLabel.TextColor = isError ? Colors.Red : Colors.Green;
-        StatusLabel.IsVisible = true;
-    }
-
-    private void SetLoadingState(bool isLoading)
-    {
-        LoginSubmitButton.IsEnabled = !isLoading;
-        LoginSubmitButton.Text = isLoading ? "Logging in... " : "Login";
-        StatusLabel.IsVisible = false;
+        base.OnDisappearing();
+        _loginViewModel.OnLoginSuccessful -= OnLoginSuccess;
     }
 }
