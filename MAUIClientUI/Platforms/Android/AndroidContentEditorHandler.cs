@@ -54,10 +54,13 @@ namespace MAUIClientUI.Platforms.Android
             e.Handled = false;
         }
 
-        public void HandleTextChanged(string newText)
+        public void HandleTextChanged(object sender, dynamic e)
         {
-            if (newText == null)
-                newText = string.Empty;
+            if (_editor == null) return;
+
+            string currentText = _editor.Text;
+            string oldText = e.OldTextValue;
+            string newText = e.NewTextValue;
 
             int cursorPosition = GetEditorCursorPosition();
             int oldLength = _previousText.Length;

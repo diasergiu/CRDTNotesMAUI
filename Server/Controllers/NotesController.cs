@@ -3,7 +3,6 @@ using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.Entities.Server;
 using DatabaseLibrary.RequestBody.EntityMappers;
 using DatabaseLibrary.ResponsBody;
-using DatabaseLibrary.WrapperClasses;
 using Microsoft.AspNetCore.Mvc;
 using Server.ServeRepositories;
 
@@ -45,20 +44,6 @@ namespace Server.Controllers
             }
             return Ok(ApiResponse<object>.SuccessResponse(note));
         }
-        [HttpGet("GetAllNotesDTOFromUser")]
-        public async Task<IActionResult> GetAllNotesDTOFromUser()
-        {
-            Guid idUser = GetUserIdFromRequest();
-            var CRDTCharacters = await _notesRepository.GetAllCRDTByUser(idUser);
-            var notes = await GetListOfNotesByUser(idUser);
-            NotesDTO toSend = new NotesDTO
-            {
-                NoteClient = notes,
-                CRDTCharacter = CRDTCharacters
-            };  
-            return Ok(ApiResponse<NotesDTO>.SuccessResponse(toSend));
-        }
-
         [HttpPut("SendCRDTChangestoServer")]
         public async Task<IActionResult> SendCRDTChangestoServer([FromBody] List<CRDTCharacter> changes)
         {

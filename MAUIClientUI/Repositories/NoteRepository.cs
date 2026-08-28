@@ -21,7 +21,7 @@ namespace MAUIClientUI.Repositories
         public List<NoteClient> GetNoteFromUser(Guid idUser)
         {
             //            return _dbContextUser.Notes.Where(n => n.NoteUser.Any(nu => nu.IdUser == idUser)).ToList();
-            return _dbContextUser.Notes.AsNoTracking().ToList();
+            return _dbContextUser.Notes.Include(b => b.CRDTCharacter).AsNoTracking().ToList();
         }
         public void UpdateListNotes(List<NoteClient> noteClients)
         {
@@ -104,7 +104,7 @@ namespace MAUIClientUI.Repositories
                 .Where(n => n.IsDirtyFlag == true).AsNoTracking().ToList();
         }
 
-        internal async Task<List<NoteClient>> GetAllNotes()
+        public async Task<List<NoteClient>> GetAllNotes()
         {
             return _dbContextUser.Notes.Include(b => b.CRDTCharacter).ToList();
         }

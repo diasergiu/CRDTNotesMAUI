@@ -51,7 +51,7 @@ namespace MAUIClientUI.Platforms.Windows
                 Debug.WriteLine("Key pressed");
             }
         }
-        public void HandleTextChanged()
+        public void HandleTextChanged(object sender, dynamic e)
         {
             string newText = _editor.Text ?? string.Empty;
             int cursorPosition = GetEditorCurrentPosition();

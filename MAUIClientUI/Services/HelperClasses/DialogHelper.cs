@@ -16,5 +16,8 @@ namespace MAUIClientUI.Services.HelperClasses
         public Task<bool> ShowConfirmationAsync(string title, string message,
             string accept = "Yes", string cancel = "No")
             => CurrentPage.DisplayAlert(title, message, accept, cancel);
+
+        public Task<string> ShowActionSheetAsync(string title, string cancel, string destruction, params string[] buttons)
+            => CurrentPage.DisplayActionSheet(title, cancel, destruction, buttons);
     }
 }

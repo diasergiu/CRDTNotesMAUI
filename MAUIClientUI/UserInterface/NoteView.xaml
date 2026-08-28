@@ -19,10 +19,10 @@
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                 <Entry 
                     x:Name="TitleEntry"
+                    Text="{Binding Title, Mode=TwoWay}"
                     Grid.Column="0"
                     Placeholder="Enter note title..."
                     FontSize="16"
-                    TextChanged="OnTitleTextChanged" 
                    />
                 <Label 
                     x:Name="WarningIcon"
@@ -30,10 +30,10 @@
                     Text="⚠️"
                     FontSize="24"
                     TextColor="#FF9800"
-                    IsVisible="False"
+                    IsVisible="{Binding WarningVisible}"
                     VerticalOptions="Center">
                     <Label.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnWarningIconTapped" />
+                        <TapGestureRecognizer Command="{Binding WarningTappedCommand}" />
                     </Label.GestureRecognizers>
                 </Label>
 
@@ -63,7 +63,7 @@
                 HeightRequest="50"
                 FontSize="16"
                 FontAttributes="Bold"
-                Clicked="OnNoteGiveAccess"
+                Command="{Binding GiveAccessCommand}"
                 Margin="0,10,0,0" />
 
             <Button 
@@ -75,7 +75,7 @@
                 HeightRequest="50"
                 FontSize="16"
                 FontAttributes="Bold"
-                Clicked="OnDeleteClicked"
+                Command="{Binding DeleteClickedCommand}"
                 Margin="0,10,0,0" />
 
             <Button 
@@ -86,7 +86,7 @@
                 CornerRadius="8"
                 HeightRequest="50"
                 FontSize="16"
-                Clicked="OnCancelClicked" />
+                Command="{Binding CancelCommand}"/>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

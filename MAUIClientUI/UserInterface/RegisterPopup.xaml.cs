@@ -1,4 +1,3 @@
-using MAUIClientUI.Services;
 using MAUIClientUI.Repositories;
 using DatabaseLibrary.Entities;
 using System;
@@ -6,6 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using DatabaseLibrary.Entities.Client;
+using MAUIClientUI.Services.ServerRequests;
 
 namespace MAUIClientUI.UserInterface;
 

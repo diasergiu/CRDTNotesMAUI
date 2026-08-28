@@ -27,5 +27,9 @@ namespace MAUIClientUI.Miscellaneous
         /// Handles key up events.
         /// </summary>
         void HandleKeyUp(object sender, dynamic e);
+        /// <summary>
+        /// Handles text changed events for multiple character changes.
+        /// </summary>
+        void HandleTextChanged(object sender, dynamic e);
     }
 }
