@@ -77,7 +77,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\DatabaseLibrary\DatabaseLibrary.csproj" />
-		<ProjectReference Include="..\CRDTCursor\CRDTCursor.csproj" />
+		<ProjectReference Include="..\CRDTCursor\CRDTLibrary.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

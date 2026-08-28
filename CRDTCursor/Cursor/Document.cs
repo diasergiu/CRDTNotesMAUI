@@ -2,17 +2,17 @@ using DatabaseLibrary.Entities.Client;
 using Microsoft.Extensions.Logging;
 using System.Text;
 
-namespace DatabaseLibrary.Cursor
+namespace CRDTLibrary.Cursor
 {
-    public class NoteCursor
+    public class Document
     {
         private SortedDictionary<string, CRDTCharacterClient> _characterList;
         private SortedList<string, CRDTCharacterClient> _sortedList;
         private readonly CRDTIdService _idService;
         private readonly Guid _clientId;
-        private readonly ILogger<NoteCursor> _logger;
+        private readonly ILogger<Document> _logger;
 
-        public NoteCursor(String initialText, Guid clientId, ILogger<NoteCursor> logger = null)
+        public Document(String initialText, Guid clientId, ILogger<Document> logger = null)
         {
             _clientId = clientId;
             _logger = logger;
@@ -25,10 +25,10 @@ namespace DatabaseLibrary.Cursor
                 InsertCharacter(i, c);
                 ++i;
             }
-            _logger?.LogDebug($"NoteCursor initialized with {_characterList.Count} characters for client {_clientId}");
+            _logger?.LogDebug($"Document initialized with {_characterList.Count} characters for client {_clientId}");
         }
 
-        public NoteCursor(List<CRDTCharacterClient> listFromDataBase, Guid clientId, ILogger<NoteCursor> logger = null)
+        public Document(List<CRDTCharacterClient> listFromDataBase, Guid clientId, ILogger<Document> logger = null)
         {
             _clientId = clientId;
             _logger = logger;
@@ -42,7 +42,7 @@ namespace DatabaseLibrary.Cursor
                     _characterList.Add(character.IdCharacter, character);
                     _sortedList.Add(character.IdCharacter, character);
                 }
-                _logger?.LogDebug($"NoteCursor initialized from database with {listFromDataBase.Count} characters for client {_clientId}");
+                _logger?.LogDebug($"Document initialized from database with {listFromDataBase.Count} characters for client {_clientId}");
             }
         }
 

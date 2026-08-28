@@ -1,7 +1,11 @@
 ﻿using DatabaseLibrary.Entities;
 using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.WrapperClasses;
+using MAUIClientUI.Miscellaneous;
+using MAUIClientUI.MVVM;
+using MAUIClientUI.Repositories;
 using MAUIClientUI.Services;
+using MAUIClientUI.Services.ServerRequests;
 using System.Text;
 using System.Text.Json;
 using Xunit;
@@ -36,8 +40,9 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
         private TestUserContext _user2;
         private TestUserContext _user3;
 
-        public EndToEndNoteServicesTest(Repositories.NoteRepository noteRepository)
+        public EndToEndNoteServicesTest()
         {
+            NoteRepository noteRepository = new NoteRepository(new DbContextClient());
             _httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
             _userService = new UserServices("/api/user");
             _noteService = new NoteServices("/api/notes", noteRepository);
@@ -84,11 +89,14 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
             var loginResult = await _userService.Login(username, TEST_PASSWORD);
             Assert.True(loginResult.IsSuccess, $"Failed to login {displayName}: {loginResult.ErrorMessage}");
 
+            var userId = registerResult.Data.IdUser;
+            UserDevice.SetLocalUser(userId);
+
             return new TestUserContext
             {
                 Username = username,
                 DisplayName = displayName,
-                UserId = registerResult.Data.IdUser,
+                UserId = userId,
                 Password = TEST_PASSWORD,
                 IsLoggedIn = true,
             };
@@ -286,7 +294,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
             Assert.True(createResult.IsSuccess, "Failed to create base note");
 
             // Act - All three users update the note simultaneously
-            var user1Task = _noteService.CreateNewNote(new NoteClient
+            var user1Task = _noteService.UpdateNote(new NoteClient
             {
                 IdNote = noteId,
                 Title = "Three User Update Test",
@@ -297,7 +305,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 Version = 1
             });
 
-            var user2Task = _noteService.CreateNewNote(new NoteClient
+            var user2Task = _noteService.UpdateNote(new NoteClient
             {
                 IdNote = noteId,
                 Title = "Three User Update Test",
@@ -308,7 +316,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 Version = 1
             });
 
-            var user3Task = _noteService.CreateNewNote(new NoteClient
+            var user3Task = _noteService.UpdateNote(new NoteClient
             {
                 IdNote = noteId,
                 Title = "Three User Update Test",
@@ -554,7 +562,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 Version = 1
             };
 
-            var device1UpdateTask = _noteService.CreateNewNote(device1Update);
+            var device1UpdateTask = _noteService.UpdateNote(device1Update);
 
             // Act - Device 2 updates simultaneously (simulate network delay)
             await Task.Delay(100);
@@ -569,7 +577,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 Version = 1
             };
 
-            var device2UpdateTask = _noteService.CreateNewNote(device2Update);
+            var device2UpdateTask = _noteService.UpdateNote(device2Update);
 
             var results = await Task.WhenAll(device1UpdateTask, device2UpdateTask);
 
@@ -640,7 +648,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 Version = 1
             };
 
-            var device2Result = await _noteService.CreateNewNote(device2Update);
+            var device2Result = await _noteService.UpdateNote(device2Update);
             Assert.True(device2Result.IsSuccess, "Device 2 update failed");
 
             // Act - Device 1 comes back online and syncs all changes
@@ -765,69 +773,6 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
 
             var finalState = await _noteService.GetNote(noteId);
             Assert.True(finalState.IsSuccess, "Should retrieve merged state");
-        }
-
-        [Fact]
-        public async Task E2E_ThreeDevicesEditingConcurrently_AllChangesEventuallyVisible()
-        {
-            // Arrange
-            var noteId = Guid.NewGuid();
-            var baseNote = new NoteClient
-            {
-                IdNote = noteId,
-                Title = "Three Device Sync",
-                Content = "Base content",
-                CreationDate = DateTime.UtcNow,
-                LastUpdate = DateTime.UtcNow,
-                DirtyFlagChangesMade = true,
-                Version = 0
-            };
-
-            var createResult = await _noteService.CreateNewNote(baseNote);
-            Assert.True(createResult.IsSuccess, "Failed to create base note");
-
-            // Act - Three devices update simultaneously
-            var device1Task = _noteService.CreateNewNote(new NoteClient
-            {
-                IdNote = noteId,
-                Title = "Three Device Sync",
-                Content = "Content from Device 1",
-                CreationDate = baseNote.CreationDate,
-                LastUpdate = DateTime.UtcNow,
-                DirtyFlagChangesMade = true,
-                Version = 1
-            });
-
-            var device2Task = _noteService.CreateNewNote(new NoteClient
-            {
-                IdNote = noteId,
-                Title = "Three Device Sync",
-                Content = "Content from Device 2",
-                CreationDate = baseNote.CreationDate,
-                LastUpdate = DateTime.UtcNow.AddMilliseconds(10),
-                DirtyFlagChangesMade = true,
-                Version = 1
-            });
-
-            var device3Task = _noteService.CreateNewNote(new NoteClient
-            {
-                IdNote = noteId,
-                Title = "Three Device Sync",
-                Content = "Content from Device 3",
-                CreationDate = baseNote.CreationDate,
-                LastUpdate = DateTime.UtcNow.AddMilliseconds(20),
-                DirtyFlagChangesMade = true,
-                Version = 1
-            });
-
-            var results = await Task.WhenAll(device1Task, device2Task, device3Task);
-
-            // Assert - All updates succeed
-            Assert.True(results.All(r => r.IsSuccess), "All concurrent updates should succeed");
-
-            // Query server for final state
-            var finalState = await _noteService.GetNote(noteId);
-            Assert.True(finalState.IsSuccess, "Should retrieve final merged state");
         }
 
 

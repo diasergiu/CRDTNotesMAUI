@@ -1,7 +1,7 @@
 using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.WrapperClasses;
 using MAUIClientUI.Repositories;
-using MAUIClientUI.Services.HelperClasses;
+using MAUIClientUI.Services.ServerRequests;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,6 +1,6 @@
 ﻿using DatabaseLibrary.Entities;
 using DatabaseLibrary.Entities.Client;
-using DatabaseLibrary.Cursor;
+using CRDTLibrary.Cursor;
 using MAUIClientUI.Test.HelperClasses;
 using System;
 using System.Collections.Generic;
@@ -30,14 +30,14 @@ namespace MAUIClientUI.Test.LOQC
         [InlineData("Welcome", "Welcomem", "E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE", 'm', 9)] // insert outside of the array
         public void TestInsertCharacter(string text, string expected, string userId, char c, int position)
         {
-            NoteCursor noteCursor = new NoteCursor(text, Guid.Parse(userId));
-            CRDTCharacter actual = noteCursor.InsertCharacter(position, c);
-            Assert.Equal(expected, noteCursor.GetString());
+            Document Document = new Document(text, Guid.Parse(userId));
+            CRDTCharacter actual = Document.InsertCharacter(position, c);
+            Assert.Equal(expected, Document.GetString());
         }
         [Fact]
         public void TextConstructWordWith10()
         {
-            NoteCursor cursor = new NoteCursor("adsadasdas", Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
+            Document cursor = new Document("adsadasdas", Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
             Assert.NotNull(cursor);
             Assert.Equal("adsadasdas", cursor.GetString());
         }
@@ -45,7 +45,7 @@ namespace MAUIClientUI.Test.LOQC
         [Fact]
         public void TestInsert10OnEmptyText()
         {
-            NoteCursor cursor = new NoteCursor("", Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
+            Document cursor = new Document("", Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
 
             // Insert 10 characters
             for (int i = 0; i < 10; i++)
@@ -60,7 +60,7 @@ namespace MAUIClientUI.Test.LOQC
         [Fact]
         public void TestInsert10InBetweenText()
         {
-            NoteCursor cursor = new NoteCursor("Welcome", Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
+            Document cursor = new Document("Welcome", Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
 
             // Insert 5 characters at position 3
             for (int i = 0; i < 5; i++)
@@ -76,7 +76,7 @@ namespace MAUIClientUI.Test.LOQC
         [Fact]
         public void TestDeleteCharacter()
         {
-            NoteCursor cursor = new NoteCursor("Hello", Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
+            Document cursor = new Document("Hello", Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
 
             // Delete character to the left of position 2 (which is 'l')
             CRDTCharacterClient deleted = cursor.deleteCharacter(2);
@@ -92,7 +92,7 @@ namespace MAUIClientUI.Test.LOQC
         [Fact]
         public void TestGetVisibleCharactersInOrder()
         {
-            NoteCursor cursor = new NoteCursor("ABC", Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
+            Document cursor = new Document("ABC", Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
 
             //var visibleChars = cursor.GetVisibleCharactersInOrder();
             //Assert.Equal(3, visibleChars.Count);
@@ -104,7 +104,7 @@ namespace MAUIClientUI.Test.LOQC
         //[Fact]
         //public void TestGetAdjacentCharacterIds()
         //{
-        //    NoteCursor cursor = new NoteCursor("ABC", Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
+        //    Document cursor = new Document("ABC", Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
 
         //    //At position 0(before 'A')
         //    var (left0, right0) = cursor.GetAdjacentCharacterIds(0);
@@ -126,7 +126,7 @@ namespace MAUIClientUI.Test.LOQC
         public void TestGetString()
         {
             string initialText = "HelloWorld";
-            NoteCursor cursor = new NoteCursor(initialText, Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
+            Document cursor = new Document(initialText, Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
 
             string result = cursor.GetString();
             Assert.Equal(initialText, result);
@@ -135,7 +135,7 @@ namespace MAUIClientUI.Test.LOQC
         [Fact]
         public void TestInsertBetweenTwoCharactersAtSamePosition()
         {
-            NoteCursor cursor = new NoteCursor("AC", Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
+            Document cursor = new Document("AC", Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
 
             // Insert 'B' between 'A' and 'C'
             CRDTCharacterClient inserted = cursor.InsertCharacter(1, 'B');
@@ -151,7 +151,7 @@ namespace MAUIClientUI.Test.LOQC
         [Fact]
         public void TestMultipleConcurrentInserts()
         {
-            NoteCursor cursor = new NoteCursor("Welcome", Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
+            Document cursor = new Document("Welcome", Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
 
             // Insert multiple characters at the same position
             CRDTCharacterClient first = cursor.InsertCharacter(3, 'X');
@@ -249,7 +249,7 @@ namespace MAUIClientUI.Test.LOQC
         [Fact]
         public void InsertCharacterBetweenTwoCharacterDifferentDepths()
         {
-            NoteCursor cursor = new NoteCursor("Welcome", Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
+            Document cursor = new Document("Welcome", Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
             CRDTCharacterClient actual = cursor.InsertCharacter(3, 'H');
             CRDTCharacterClient second = cursor.InsertCharacter(3, 'e');
             CRDTCharacterClient third = cursor.InsertCharacter(3, 'a');
@@ -263,7 +263,7 @@ namespace MAUIClientUI.Test.LOQC
         [Fact]
         public void InsertCharacterBetweenTwoCharacterDifferentLocations()
         {
-            NoteCursor cursor = new NoteCursor("Welcome", Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
+            Document cursor = new Document("Welcome", Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
             CRDTCharacterClient actual = cursor.InsertCharacter(3, 'H');
             CRDTCharacterClient second = cursor.InsertCharacter(4, 'e');
             CRDTCharacterClient third = cursor.InsertCharacter(4, 'a');
@@ -275,7 +275,7 @@ namespace MAUIClientUI.Test.LOQC
         }
 
         //[Fact]
-        //public void TestNoteCursorConstructorFromList()
+        //public void TestDocumentConstructorFromList()
         //{
         //    var characters = new List<CRDTCharacterClient>()
         //    {
@@ -283,13 +283,13 @@ namespace MAUIClientUI.Test.LOQC
         //        new CRDTCharacterClient() { Character = 'i', IdCharacter = 2, ClientId = Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE") }
         //    };
 
-        //    NoteCursor cursor = new NoteCursor(characters, Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
+        //    Document cursor = new Document(characters, Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
 
         //    Assert.NotNull(cursor);
         //    Assert.Equal(2, cursor.GetCharacterListCount());
         //}
 
-        //private void printCharacterList(NoteCursor cursor)
+        //private void printCharacterList(Document cursor)
         //{
         //    foreach (var character in cursor.GetCharacterListValues())
         //    {

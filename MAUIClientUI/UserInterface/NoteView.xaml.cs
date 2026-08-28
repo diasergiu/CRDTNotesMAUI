@@ -1,11 +1,7 @@
-using DatabaseLibrary.Cursor;
-using DatabaseLibrary.Entities;
+
 using DatabaseLibrary.Entities.Client;
-using DatabaseLibrary.Entities.Server;
-using DatabaseLibrary.WrapperClasses;
 using MAUIClientUI.Miscellaneous;
 using MAUIClientUI.MVVM;
-
 #if ANDROID
 using MAUIClientUI.Platforms.Android;
 #elif WINDOWS
@@ -13,8 +9,6 @@ using MAUIClientUI.Platforms.Windows;
 #endif
 using MAUIClientUI.Repositories;
 using MAUIClientUI.Services;
-using Microsoft.Extensions.Logging;
-using System.Diagnostics;
 
 namespace MAUIClientUI.UserInterface;
 

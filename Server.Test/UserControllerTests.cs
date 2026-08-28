@@ -68,10 +68,11 @@ namespace Server.Test
 
             // The Data should be an anonymous object with idUser property
             Assert.NotNull(apiResponse.Data);
-           
-            // Try to extract using dynamic as a fallback for anonymous types
-            var dataDict = apiResponse.Data as IDictionary<string, object>;
-            Assert.Equal(userId, ((JsonElement)dataDict["idUser"]).GetGuid());
+
+            // Access the anonymous object using dynamic or reflection
+            dynamic data = apiResponse.Data;
+            Guid returnedUserId = data.idUser;
+            Assert.Equal(userId, returnedUserId);
         }
 
         [Fact]

@@ -1,7 +1,7 @@
 ﻿using DatabaseLibrary.Entities;
 using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.WrapperClasses;
-using MAUIClientUI.Services;
+using MAUIClientUI.Services.ServerRequests;
 using System.Text;
 using System.Text.Json;
 using Xunit;

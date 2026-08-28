@@ -3,6 +3,7 @@
     <File Path="Makefile" />
     <File Path="QuestionsRequirements.txt" />
   </Folder>
+  <Project Path="CRDTCursor/CRDTLibrary.csproj" />
   <Project Path="DatabaseLibrary/DatabaseLibrary.csproj" />
   <Project Path="MAUIClientUI.Test/MAUIClientUI.Test.csproj" Id="80a36fc0-eb2a-4b13-a696-63dd1ab43a9c" />
   <Project Path="MAUIClientUI/MAUIClientUI.csproj">

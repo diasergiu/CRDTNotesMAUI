@@ -1,11 +1,10 @@
-using DatabaseLibrary.Entities;
-using DatabaseLibrary.Entities.Client;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace DatabaseLibrary.Cursor
+namespace CRDTLibrary.Cursor
 {
     /// <summary>
     /// (Logoot-like) ID generation with conflict resolution
@@ -51,7 +50,7 @@ namespace DatabaseLibrary.Cursor
             // Find where components differ
             for (int i = 0; i < minLength; i++)
             {
-                if (leftComponents[i].Position != rightComponents[i].Position && !(leftComponents[i].Position - rightComponents[i].Position <= minGapAtDepth))
+                if (leftComponents[i].Position != rightComponents[i].Position && !(rightComponents[i].Position - leftComponents[i].Position <= minGapAtDepth))
                 {
                     // Positions differ at this level - generate new position between them
                     nestingLevel = i;

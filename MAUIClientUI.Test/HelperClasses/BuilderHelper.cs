@@ -19,7 +19,7 @@ namespace MAUIClientUI.Test.HelperClasses
 
         public static string GenerateForString(decimal dec, Guid userId)
         {
-            return $"({dec}),({userId})";
+            return $"({dec},{userId})";
         }
 
 

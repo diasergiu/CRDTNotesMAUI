@@ -1,4 +1,4 @@
-using DatabaseLibrary.Cursor;
+using CRDTLibrary.Cursor;
 using DatabaseLibrary.Entities;
 using DatabaseLibrary.Entities.Client;
 using MAUIClientUI.Repositories;
@@ -15,34 +15,34 @@ namespace MAUIClientUI.Miscellaneous
     /// </summary>
     public class NoteController
     {
-        private readonly NoteCursor _noteCursor;
+        private readonly Document _Document;
         private readonly NoteClient _currentNote;
         private readonly CRDTCharacterRepository _crdtCharacterRepository;
         private readonly NoteRepository _noteRepository;
         private readonly INoteServices _noteServices;
 
         public NoteController(NoteClient currentNote, NoteRepository noteRepository,
-            INoteServices noteServices, ILogger<NoteCursor> cursorLogger = null)
+            INoteServices noteServices, ILogger<Document> cursorLogger = null)
         {
             _currentNote = currentNote ?? throw new ArgumentNullException(nameof(currentNote));
             _noteRepository = noteRepository ?? throw new ArgumentNullException(nameof(noteRepository));
             _noteServices = noteServices ?? throw new ArgumentNullException(nameof(noteServices));
             _crdtCharacterRepository = IPlatformApplication.Current.Services.GetService<CRDTCharacterRepository>()
                 ?? throw new InvalidOperationException($"{nameof(CRDTCharacterRepository)} is not registered.");
-            _noteCursor = new NoteCursor(_currentNote.CRDTCharacter, Guid.NewGuid(), cursorLogger);
+            _Document = new Document(_currentNote.CRDTCharacter, Guid.NewGuid(), cursorLogger);
         }
 
         /// <summary>
         /// Returns the current text of the note as reconstructed from the CRDT model.
         /// </summary>
-        public string GetText() => _noteCursor.GetString();
+        public string GetText() => _Document.GetString();
 
         /// <summary>
         /// Inserts a character at the given cursor position and propagates the change.
         /// </summary>
         public void InsertCharacter(int cursorPosition, char typedChar)
         {
-            var newCharacter = _noteCursor.InsertCharacter(cursorPosition, typedChar);
+            var newCharacter = _Document.InsertCharacter(cursorPosition, typedChar);
             newCharacter.IdNote = _currentNote.IdNote;
             _crdtCharacterRepository.SaveNewCrdtCharacter(newCharacter);
             _ = SendChangeToServerAsync(newCharacter);
@@ -58,7 +58,7 @@ namespace MAUIClientUI.Miscellaneous
             var newCharacters = new List<CRDTCharacter>();
             foreach (char c in text)
             {
-                var newCharacter = _noteCursor.InsertCharacter(cursorPosition++, c);
+                var newCharacter = _Document.InsertCharacter(cursorPosition++, c);
                 newCharacter.IdNote = _currentNote.IdNote;
                 newCharacters.Add(newCharacter);
                 _crdtCharacterRepository.SaveNewCrdtCharacter(newCharacter);
@@ -71,7 +71,7 @@ namespace MAUIClientUI.Miscellaneous
         /// </summary>
         public void DeleteCharacter(int cursorPosition)
         {
-            var leftCharacter = _noteCursor.deleteCharacter(cursorPosition + 1);
+            var leftCharacter = _Document.deleteCharacter(cursorPosition + 1);
             if (leftCharacter != null)
             {
                 _crdtCharacterRepository.UpdateCharacter(leftCharacter);
@@ -91,7 +91,7 @@ namespace MAUIClientUI.Miscellaneous
             // Delete from end to start to avoid position shifting issues
             for (int i = endPosition; i > startPosition; i--)
             {
-                var deletedCharacter = _noteCursor.deleteCharacter(i);
+                var deletedCharacter = _Document.deleteCharacter(i);
                 if (deletedCharacter != null)
                 {
                     deletedCharacters.Add(deletedCharacter);
@@ -113,7 +113,7 @@ namespace MAUIClientUI.Miscellaneous
 
             var clientCharacter = new CRDTCharacterClient(character);
             await _noteRepository.SaveCRDTChanges(new List<CRDTCharacterClient> { clientCharacter });
-            _noteCursor.MergeCharacter(clientCharacter);
+            _Document.MergeCharacter(clientCharacter);
             return true;
         }
 

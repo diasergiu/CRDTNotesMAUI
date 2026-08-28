@@ -1,5 +1,5 @@
 using DatabaseLibrary.Entities.Client;
-using DatabaseLibrary.Cursor;
+using CRDTLibrary.Cursor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +26,7 @@ namespace MAUIClientUI.Test.LOQC
         /// </summary>
         private static List<CRDTCharacterClient> ProduceOperations(string text, Guid clientId)
         {
-            var cursor = new NoteCursor("", clientId);
+            var cursor = new Document("", clientId);
             var produced = new List<CRDTCharacterClient>();
             for (int i = 0; i < text.Length; i++)
             {
@@ -41,7 +41,7 @@ namespace MAUIClientUI.Test.LOQC
         /// </summary>
         private static string ApplyToFreshReplica(IEnumerable<CRDTCharacterClient> operations, Guid replicaOwner)
         {
-            var cursor = new NoteCursor(new List<CRDTCharacterClient>(), replicaOwner);
+            var cursor = new Document(new List<CRDTCharacterClient>(), replicaOwner);
             foreach (var op in operations)
             {
                 cursor.MergeCharacter(op);
@@ -81,7 +81,7 @@ namespace MAUIClientUI.Test.LOQC
         [Fact]
         public void TC_02_CommutativityHoldsWithInterleavedDeletions()
         {
-            var cursor = new NoteCursor("", ClientA);
+            var cursor = new Document("", ClientA);
             var operations = new List<CRDTCharacterClient>();
 
             const string text = "abcdefghij";
@@ -111,7 +111,7 @@ namespace MAUIClientUI.Test.LOQC
         {
             var operations = ProduceOperations("idempotence", ClientA);
 
-            var cursor = new NoteCursor(new List<CRDTCharacterClient>(), ClientB);
+            var cursor = new Document(new List<CRDTCharacterClient>(), ClientB);
             foreach (var op in operations)
             {
                 cursor.MergeCharacter(op);
@@ -131,7 +131,7 @@ namespace MAUIClientUI.Test.LOQC
         {
             var operations = ProduceOperations("AB", ClientA);
 
-            var cursor = new NoteCursor(new List<CRDTCharacterClient>(), ClientB);
+            var cursor = new Document(new List<CRDTCharacterClient>(), ClientB);
             foreach (var op in operations)
             {
                 cursor.MergeCharacter(op);
@@ -156,8 +156,8 @@ namespace MAUIClientUI.Test.LOQC
             // Two replicas start from the same shared prefix.
             var shared = ProduceOperations("HI", ClientA);
 
-            var replicaA = new NoteCursor(shared.Select(c => c).ToList(), ClientA);
-            var replicaB = new NoteCursor(shared.Select(c => new CRDTCharacterClient
+            var replicaA = new Document(shared.Select(c => c).ToList(), ClientA);
+            var replicaB = new Document(shared.Select(c => new CRDTCharacterClient
             {
                 IdCharacter = c.IdCharacter,
                 Character = c.Character,
@@ -184,10 +184,10 @@ namespace MAUIClientUI.Test.LOQC
         {
             var shared = ProduceOperations("HI", ClientA);
 
-            var producerA = new NoteCursor(shared.ToList(), ClientA);
+            var producerA = new Document(shared.ToList(), ClientA);
             var fromA = producerA.InsertCharacter(1, 'X');
 
-            var producerB = new NoteCursor(shared.Select(c => new CRDTCharacterClient
+            var producerB = new Document(shared.Select(c => new CRDTCharacterClient
             {
                 IdCharacter = c.IdCharacter,
                 Character = c.Character,
@@ -212,7 +212,7 @@ namespace MAUIClientUI.Test.LOQC
         [Fact]
         public void TC_07_DeletedCharacterIsTombstonedAndExcludedFromText()
         {
-            var cursor = new NoteCursor("AB", ClientA);
+            var cursor = new Document("AB", ClientA);
 
             var deleted = cursor.deleteCharacter(2);
 
@@ -225,7 +225,7 @@ namespace MAUIClientUI.Test.LOQC
         {
             var operations = ProduceOperations("AB", ClientA);
 
-            var cursor = new NoteCursor(new List<CRDTCharacterClient>(), ClientB);
+            var cursor = new Document(new List<CRDTCharacterClient>(), ClientB);
             foreach (var op in operations)
             {
                 cursor.MergeCharacter(op);
@@ -252,7 +252,7 @@ namespace MAUIClientUI.Test.LOQC
         [Fact]
         public void TC_12_ReconstructionFiltersTombstonesAndSortsByIdCharacter()
         {
-            var cursor = new NoteCursor("HELLO", ClientA);
+            var cursor = new Document("HELLO", ClientA);
 
             cursor.deleteCharacter(1); // remove 'H'
             cursor.deleteCharacter(5); // remove 'O'
@@ -280,7 +280,7 @@ namespace MAUIClientUI.Test.LOQC
                 ClockDateTime = operations[1].ClockDateTime
             };
 
-            var cursor = new NoteCursor(new List<CRDTCharacterClient>(), ClientB);
+            var cursor = new Document(new List<CRDTCharacterClient>(), ClientB);
             cursor.MergeCharacter(tombstonedB);          // delete first
             cursor.MergeCharacter(operations[0]);        // then the inserts
             cursor.MergeCharacter(operations[2]);
@@ -298,8 +298,8 @@ namespace MAUIClientUI.Test.LOQC
         {
             var shared = ProduceOperations("BASE", ClientA);
 
-            var replicaA = new NoteCursor(shared.ToList(), ClientA);
-            var replicaB = new NoteCursor(shared.Select(c => new CRDTCharacterClient
+            var replicaA = new Document(shared.ToList(), ClientA);
+            var replicaB = new Document(shared.Select(c => new CRDTCharacterClient
             {
                 IdCharacter = c.IdCharacter,
                 Character = c.Character,
@@ -335,12 +335,12 @@ namespace MAUIClientUI.Test.LOQC
         {
             var shared = ProduceOperations("HI", ClientA);
 
-            var producerA = new NoteCursor(shared.ToList(), ClientA);
+            var producerA = new Document(shared.ToList(), ClientA);
             var fromA = producerA.InsertCharacter(1, 'X');
             // Device A's clock runs one hour ahead.
             fromA.ClockDateTime = DateTime.UtcNow.AddHours(1);
 
-            var producerB = new NoteCursor(shared.Select(c => new CRDTCharacterClient
+            var producerB = new Document(shared.Select(c => new CRDTCharacterClient
             {
                 IdCharacter = c.IdCharacter,
                 Character = c.Character,
@@ -370,11 +370,11 @@ namespace MAUIClientUI.Test.LOQC
             var shared = ProduceOperations("HI", ClientA);
             DateTime sameClock = DateTime.UtcNow;
 
-            var producerA = new NoteCursor(shared.ToList(), ClientA);
+            var producerA = new Document(shared.ToList(), ClientA);
             var fromA = producerA.InsertCharacter(1, 'X');
             fromA.ClockDateTime = sameClock;
 
-            var producerB = new NoteCursor(shared.Select(c => new CRDTCharacterClient
+            var producerB = new Document(shared.Select(c => new CRDTCharacterClient
             {
                 IdCharacter = c.IdCharacter,
                 Character = c.Character,

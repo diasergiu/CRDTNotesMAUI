@@ -1,10 +1,7 @@
-using DatabaseLibrary.Cursor;
+using CRDTLibrary.Cursor;
 using MAUIClientUI.Test.HelperClasses;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Xunit;
+
 
 namespace MAUIClientUI.Test.LOQC
 {
@@ -419,7 +416,7 @@ namespace MAUIClientUI.Test.LOQC
             // The algorithm generates a midpoint at the second level where positions differ
             // Between (1,id1)(2,id2) and (1,id1)(5,id2), it generates (1,id1)(3.5,id3)
             // But the current implementation simplifies to just (3.5,id3)
-            Assert.Equal(3.5m, parsed[0].Position);
+            Assert.Equal(3.5m, parsed[parsed.Count - 1].Position);
         }
 
         #endregion
@@ -692,8 +689,7 @@ namespace MAUIClientUI.Test.LOQC
         [MemberData(nameof(DecimalData))]
         public void TestGenerateIdBetweenCompositeTestNumerals(decimal[] left, decimal[] right, decimal[] expected)
         {
-            Guid userId;
-            Guid.TryParse("66d89b0b-eaae-4853-90c3-238d4531bd1a", out userId);
+            Guid userId = Guid.Parse("66d89b0b-eaae-4853-90c3-238d4531bd1a");
 
             string leftStr = BuilderHelper.GenerateForString(left, userId);
             string rightStr = BuilderHelper.GenerateForString(right, userId);
@@ -703,7 +699,6 @@ namespace MAUIClientUI.Test.LOQC
 
             Assert.Equal(expectedStr, service.GenerateIdBetweenComposite(leftStr, rightStr, userId));
         }
-
         public static IEnumerable<object[]> DecimalData()
         {
             yield return new object[]

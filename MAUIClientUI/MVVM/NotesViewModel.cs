@@ -67,7 +67,7 @@ namespace MAUIClientUI.MVVM
 
             var loggerFactory = IPlatformApplication.Current.Services.GetService<ILoggerFactory>();
             _logger = loggerFactory?.CreateLogger<NoteView>();
-            var cursorLogger = loggerFactory?.CreateLogger<DatabaseLibrary.Cursor.NoteCursor>();
+            var cursorLogger = loggerFactory?.CreateLogger<CRDTLibrary.Cursor.Document>();
 
             _noteController = new NoteController(_currentNote, _noteRepository, _noteServices, cursorLogger);
 

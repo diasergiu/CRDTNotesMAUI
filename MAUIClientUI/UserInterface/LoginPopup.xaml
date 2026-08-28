@@ -68,7 +68,7 @@
 
                     <Button Grid.Column="1"
                             x:Name="LoginSubmitButton"
-                            Text="{Binding IsLoading, StringFormat='{0:Logging in...,Login}'}"
+                            Text="Loogin"
                             Command="{Binding LoginCommand}"
                             IsEnabled="{Binding !IsLoading, Converter={StaticResource InvertedBoolConverter}}"
                             BackgroundColor="#4CAF50"
