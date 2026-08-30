@@ -38,7 +38,6 @@ namespace Server.Test
             {
                 IdNote = noteId1,
                 Title = "Note 1",
-                Content = "Content 1",
                 CreationDate = DateTime.UtcNow,
                 LastUpdate = DateTime.UtcNow,
                 Version = 1
@@ -48,7 +47,6 @@ namespace Server.Test
             {
                 IdNote = noteId2,
                 Title = "Note 2",
-                Content = "Content 2",
                 CreationDate = DateTime.UtcNow,
                 LastUpdate = DateTime.UtcNow,
                 Version
@@ -98,7 +96,6 @@ namespace Server.Test
             {
                 IdNote = noteId1,
                 Title = "User 1 Note",
-                Content = "Content 1",
                 CreationDate = DateTime.UtcNow,
                 LastUpdate = DateTime.UtcNow,
                 Version = 1
@@ -108,7 +105,6 @@ namespace Server.Test
             {
                 IdNote = noteId2,
                 Title = "User 2 Note",
-                Content = "Content 2",
                 CreationDate = DateTime.UtcNow,
                 LastUpdate = DateTime.UtcNow,
                 Version = 1
@@ -143,7 +139,6 @@ namespace Server.Test
             {
                 IdNote = Guid.NewGuid(),
                 Title = "New Note",
-                Content = "Content",
                 CreationDate = DateTime.UtcNow,
                 LastUpdate = DateTime.UtcNow,
                 Version = 1
@@ -154,7 +149,6 @@ namespace Server.Test
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(noteServer.Content, result.Content);
 
             var noteInDb = await _dbContext.Notes.FirstOrDefaultAsync(n => n.IdNote == result.IdNote);
             Assert.NotNull(noteInDb);

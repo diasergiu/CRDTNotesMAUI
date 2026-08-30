@@ -103,7 +103,6 @@ namespace Server.Test
             {
                 IdNote = Guid.NewGuid(),
                 Title = "Integration Test Note",
-                Content = "This is test content",
                 CreationDate =  DateTime.UtcNow,
                 LastUpdate = DateTime.UtcNow,
                 Version = 1,
@@ -116,7 +115,6 @@ namespace Server.Test
             // Assert - Note was created
             Assert.NotNull(createdNote);
             Assert.Equal(noteServer.Title, createdNote.Title);
-            Assert.Equal(noteServer.Content, createdNote.Content);
 
             // Act - Retrieve user notes
             var userNotes = await _repository.GetAllNotesFromUser(userId);
@@ -147,7 +145,6 @@ namespace Server.Test
             {
                 IdNote = Guid.NewGuid(),
                 Title = "First Note",
-                Content = "First content",
                 CreationDate = DateTime.UtcNow,
                 LastUpdate = DateTime.UtcNow,
                 Version = 1,
@@ -158,7 +155,6 @@ namespace Server.Test
             {
                 IdNote = Guid.NewGuid(),
                 Title = "Second Note",
-                Content = "Second content",
                 CreationDate = DateTime.UtcNow,
                 LastUpdate = DateTime.UtcNow,
                 Version = 1,
@@ -217,7 +213,6 @@ namespace Server.Test
             {
                 IdNote = Guid.NewGuid(),
                 Title = "User 1 Note",
-                Content = "Only user 1 should see this",
                 CreationDate = DateTime.UtcNow,
                 LastUpdate = DateTime.UtcNow,
                 Version = 1,
@@ -228,7 +223,6 @@ namespace Server.Test
             {
                 IdNote = Guid.NewGuid(),
                 Title = "User 2 Note",
-                Content = "Only user 2 should see this",
                 CreationDate = DateTime.UtcNow,
                 LastUpdate = DateTime.UtcNow,
                 Version = 1,
