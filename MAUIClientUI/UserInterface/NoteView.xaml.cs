@@ -23,7 +23,6 @@ public partial class NoteView : ContentPage
     : this(new NoteClient()
     {
         Title = "",
-        Content = "",
         CreationDate = DateTime.Now,
         LastUpdate = DateTime.Now,
         Version = 1
@@ -86,26 +85,26 @@ public partial class NoteView : ContentPage
         _inputHandler = new WindowsContentEditorHandler(ContentEditor);
         _inputHandler.CharacterInserted += _notesViewModel.NoteController.InsertCharacter;
         _inputHandler.CharacterDeleted += _notesViewModel.NoteController.DeleteCharacter;
-        _inputHandler.StringInserted += _notesViewModel.NoteController.InsertString;     
-        _inputHandler.RangeDeleted += _notesViewModel.NoteController.DeleteCharacterRange;
+        //_inputHandler.StringInserted += _notesViewModel.NoteController.InsertString;     
+        //_inputHandler.RangeDeleted += _notesViewModel.NoteController.DeleteCharacterRange;
         var platformView = (Microsoft.UI.Xaml.Controls.TextBox)editor.Handler.PlatformView;
         if (platformView != null)
         {
             platformView.KeyDown += _inputHandler.HandleKeyPress;
             platformView.KeyUp += _inputHandler.HandleKeyUp;
-            platformView.TextChanged += _inputHandler.HandleTextChanged;
+            //platformView.TextChanged += _inputHandler.HandleTextChanged;
         }
 #elif ANDROID
             _inputHandler = new AndroidContentEditorHandler(ContentEditor);
             _inputHandler.CharacterInserted += _notesViewModel.NoteController.InsertCharacter;
             _inputHandler.CharacterDeleted += _notesViewModel.NoteController.DeleteCharacter;
-            _inputHandler.StringInserted += _notesViewModel.NoteController.InsertString;
-            _inputHandler.RangeDeleted += _notesViewModel.NoteController.DeleteCharacterRange;
+            //_inputHandler.StringInserted += _notesViewModel.NoteController.InsertString;
+            //_inputHandler.RangeDeleted += _notesViewModel.NoteController.DeleteCharacterRange;
             var platformView = (Android.Widget.EditText)editor.Handler.PlatformView;
         if (platformView != null)
         {
             platformView.KeyPress += _inputHandler.HandleKeyPress;
-            platformView.TextChanged += _inputHandler.HandleTextChanged;    
+        //    platformView.TextChanged += _inputHandler.HandleTextChanged;    
         }
 #endif
 

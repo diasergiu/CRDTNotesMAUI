@@ -1,4 +1,3 @@
-using DatabaseLibrary.Entities.Client;
 using Microsoft.Extensions.Logging;
 using System.Text;
 
@@ -6,8 +5,8 @@ namespace CRDTLibrary.Cursor
 {
     public class Document
     {
-        private SortedDictionary<string, CRDTCharacterClient> _characterList;
-        private SortedList<string, CRDTCharacterClient> _sortedList;
+        private SortedDictionary<string, CRDTCharacterPayload> _characterList;
+        private SortedList<string, CRDTCharacterPayload> _sortedList;
         private readonly CRDTIdService _idService;
         private readonly Guid _clientId;
         private readonly ILogger<Document> _logger;
@@ -17,8 +16,8 @@ namespace CRDTLibrary.Cursor
             _clientId = clientId;
             _logger = logger;
             _idService = new CRDTIdService(clientId);
-            _characterList = new SortedDictionary<string, CRDTCharacterClient>(new CompositeIdComparator(_idService));
-            _sortedList = new SortedList<string, CRDTCharacterClient>(new CompositeIdComparator(_idService));
+            _characterList = new SortedDictionary<string, CRDTCharacterPayload>(new CompositeIdComparator(_idService));
+            _sortedList = new SortedList<string, CRDTCharacterPayload>(new CompositeIdComparator(_idService));
             int i = 0;
             foreach (Char c in initialText)
             {
@@ -28,16 +27,16 @@ namespace CRDTLibrary.Cursor
             _logger?.LogDebug($"Document initialized with {_characterList.Count} characters for client {_clientId}");
         }
 
-        public Document(List<CRDTCharacterClient> listFromDataBase, Guid clientId, ILogger<Document> logger = null)
+        public Document(List<CRDTCharacterPayload> listFromDataBase, Guid clientId, ILogger<Document> logger = null)
         {
             _clientId = clientId;
             _logger = logger;
             _idService = new CRDTIdService(clientId);
-            _sortedList = new SortedList<string, CRDTCharacterClient>(new CompositeIdComparator(_idService));
-            _characterList = new SortedDictionary<string, CRDTCharacterClient>(new CompositeIdComparator(_idService));
+            _sortedList = new SortedList<string, CRDTCharacterPayload>(new CompositeIdComparator(_idService));
+            _characterList = new SortedDictionary<string, CRDTCharacterPayload>(new CompositeIdComparator(_idService));
             if (listFromDataBase != null)
             {
-                foreach (CRDTCharacterClient character in listFromDataBase)
+                foreach (CRDTCharacterPayload character in listFromDataBase)
                 {
                     _characterList.Add(character.IdCharacter, character);
                     _sortedList.Add(character.IdCharacter, character);
@@ -46,11 +45,10 @@ namespace CRDTLibrary.Cursor
             }
         }
 
-        public CRDTCharacterClient deleteCharacter(int cursorPosition)
+        public CRDTCharacterPayload deleteCharacter(int cursorPosition)
         {
-            var (leftId, rightId) = GetAdjacentCharacterIds(cursorPosition);
+           var (leftId, rightId) = GetAdjacentCharacterIds(cursorPosition);
             _characterList[leftId].Tombstone = true;
-            _characterList[leftId].IsDirtyFlag = true;
             _logger?.LogDebug($"Deleted character at cursor position {cursorPosition}");
             return _characterList[leftId];
         }
@@ -59,7 +57,7 @@ namespace CRDTLibrary.Cursor
         /// Insert character at cursor position with conflict resolution
         /// When collision on string ID occurs with equal boundaries, generates composite ID format: (pos,site)(pos,site)...
         /// </summary>
-        public CRDTCharacterClient InsertCharacter(int atPosition, char character)
+        public CRDTCharacterPayload InsertCharacter(int atPosition, char character)
         {
             if(atPosition > _sortedList.Count)
             {
@@ -81,14 +79,11 @@ namespace CRDTLibrary.Cursor
                     throw new Exception($"Composite ID collision: {newIdStr}. This is extremely unlikely and indicates a system error.");       
             }
 
-            var newCharacter = new CRDTCharacterClient()
+            var newCharacter = new CRDTCharacterPayload
             {
                 Character = character,
                 IdCharacter = newIdStr,
-                Tombstone = false,
-                ClockDateTime = DateTime.UtcNow,
-                Operation = "insert",
-                IsDirtyFlag = true
+                Tombstone = false
             };
 
             _characterList.Add(newIdStr, newCharacter);
@@ -144,7 +139,7 @@ namespace CRDTLibrary.Cursor
         public string GetString()
         {
             StringBuilder builder = new StringBuilder();
-            foreach (KeyValuePair<string, CRDTCharacterClient> character in _sortedList)
+            foreach (KeyValuePair<string, CRDTCharacterPayload> character in _sortedList)
             {
                 if (!character.Value.Tombstone)
                 {
@@ -154,8 +149,9 @@ namespace CRDTLibrary.Cursor
 
             return builder.ToString();
         }
+        
 
-        public void MergeCharacter(CRDTCharacterClient c)
+        public void MergeCharacter(CRDTCharacterPayload c)
         {
             if (!_characterList.ContainsKey(c.IdCharacter))
             {

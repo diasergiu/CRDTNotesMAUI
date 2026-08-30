@@ -1,4 +1,5 @@
 ﻿using DatabaseLibrary.Entities.Client;
+using DatabaseLibrary.WrapperClasses;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,7 +8,8 @@ namespace MAUIClientUI.Services.ServerRequests
 {
     public class CRDTCharacterServices : ServicesClient
     {
-        public CRDTCharacterServices(string URLModifier) : base(URLModifier)
+        public CRDTCharacterServices(string URLModifier, IUserContext? userContext = null) 
+            : base(URLModifier, userContext)
         {
         }
 

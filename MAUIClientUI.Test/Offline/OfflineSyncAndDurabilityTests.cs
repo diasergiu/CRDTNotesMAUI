@@ -60,7 +60,7 @@ namespace MAUIClientUI.Test.Offline
             IdCharacter = id,
             IdNote = _noteId,
             Character = value,
-            Operation = "insert",
+           
             Tombstone = false,
             ClockDateTime = DateTime.UtcNow,
             IsDirtyFlag = true
@@ -72,7 +72,6 @@ namespace MAUIClientUI.Test.Offline
             {
                 IdNote = _noteId,
                 Title = "Offline note",
-                Content = "",
                 CreationDate = DateTime.UtcNow,
                 LastUpdate = DateTime.UtcNow,
                 Version = 1
@@ -139,7 +138,18 @@ namespace MAUIClientUI.Test.Offline
             Assert.Equal(2, (await repository.GetAllCRDTCharacters()).Count);
 
             // Simulate the server acknowledging the batch.
-            await repository.ClearDirtyFlag(queuedOperations);
+            // Create a NoteClient with the CRDT characters to pass to ClearDirtyFlag
+            var noteToClear = new NoteClient
+            {
+                IdNote = _noteId,
+                Title = "Offline note",
+                CreationDate = DateTime.UtcNow,
+                LastUpdate = DateTime.UtcNow,
+                Version = 1,
+                DirtyFlagChangesMade = true,
+                CRDTCharacter = queuedOperations
+            };
+            await repository.ClearDirtyFlag(new List<NoteClient> { noteToClear });
 
             using var verifyContext = NewContext();
             var verifyRepository = new NoteRepository(verifyContext);
@@ -242,7 +252,18 @@ namespace MAUIClientUI.Test.Offline
 
                 if (result.IsSuccess)
                 {
-                    await repository.ClearDirtyFlag(queuedOperations);
+                    // Create a NoteClient with the CRDT characters to pass to ClearDirtyFlag
+                    var noteToClear = new NoteClient
+                    {
+                        IdNote = _noteId,
+                        Title = "Offline note",
+                        CreationDate = DateTime.UtcNow,
+                        LastUpdate = DateTime.UtcNow,
+                        Version = 1,
+                        DirtyFlagChangesMade = true,
+                        CRDTCharacter = queuedOperations
+                    };
+                    await repository.ClearDirtyFlag(new List<NoteClient> { noteToClear });
                     break;
                 }
 
@@ -329,7 +350,19 @@ namespace MAUIClientUI.Test.Offline
                 await SeedNoteAsync(context);
                 var repository = new NoteRepository(context);
                 await repository.SaveCRDTChanges(operations);
-                await repository.ClearDirtyFlag(operations);
+
+                // Create a NoteClient with the CRDT characters to pass to ClearDirtyFlag
+                var noteToClear = new NoteClient
+                {
+                    IdNote = _noteId,
+                    Title = "Offline note",
+                    CreationDate = DateTime.UtcNow,
+                    LastUpdate = DateTime.UtcNow,
+                    Version = 1,
+                    DirtyFlagChangesMade = true,
+                    CRDTCharacter = operations
+                };
+                await repository.ClearDirtyFlag(new List<NoteClient> { noteToClear });
             }
 
             using var restarted = NewContext();
@@ -354,7 +387,19 @@ namespace MAUIClientUI.Test.Offline
                 DirtyChar("(2),(a)", 'L')
             };
             await repository.SaveCRDTChanges(alreadySynced);
-            await repository.ClearDirtyFlag(alreadySynced);
+
+            // Create a NoteClient with the CRDT characters to pass to ClearDirtyFlag
+            var noteToClear = new NoteClient
+            {
+                IdNote = _noteId,
+                Title = "Offline note",
+                CreationDate = DateTime.UtcNow,
+                LastUpdate = DateTime.UtcNow,
+                Version = 1,
+                DirtyFlagChangesMade = true,
+                CRDTCharacter = alreadySynced
+            };
+            await repository.ClearDirtyFlag(new List<NoteClient> { noteToClear });
 
             // A new offline edit arrives after the previous batch was acknowledged.
             await repository.SaveCRDTChanges(new List<CRDTCharacterClient>

@@ -13,7 +13,7 @@ namespace MAUIClientUI.Test.LOQC
     public class CRDTLSEQTest
     {
 
-        private void AssertCharacterEquality(CRDTCharacterClient expected, CRDTCharacterClient actual)
+        private void AssertCharacterEquality(CRDTCharacterPayload expected, CRDTCharacterPayload actual)
         {
             Assert.Equal(expected.Character, actual.Character);
             Assert.Equal(expected.IdCharacter, actual.IdCharacter);
@@ -31,7 +31,7 @@ namespace MAUIClientUI.Test.LOQC
         public void TestInsertCharacter(string text, string expected, string userId, char c, int position)
         {
             Document Document = new Document(text, Guid.Parse(userId));
-            CRDTCharacter actual = Document.InsertCharacter(position, c);
+            var actual = Document.InsertCharacter(position, c);
             Assert.Equal(expected, Document.GetString());
         }
         [Fact]
@@ -79,7 +79,7 @@ namespace MAUIClientUI.Test.LOQC
             Document cursor = new Document("Hello", Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
 
             // Delete character to the left of position 2 (which is 'l')
-            CRDTCharacterClient deleted = cursor.deleteCharacter(2);
+            var deleted = cursor.deleteCharacter(2);
 
             Assert.Equal('e', deleted.Character);
             Assert.True(deleted.Tombstone);
@@ -138,7 +138,7 @@ namespace MAUIClientUI.Test.LOQC
             Document cursor = new Document("AC", Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
 
             // Insert 'B' between 'A' and 'C'
-            CRDTCharacterClient inserted = cursor.InsertCharacter(1, 'B');
+            var inserted = cursor.InsertCharacter(1, 'B');
 
             Assert.Equal('B', inserted.Character);
             //Assert.NotNull(inserted.IdLeftCharacter);
@@ -154,9 +154,9 @@ namespace MAUIClientUI.Test.LOQC
             Document cursor = new Document("Welcome", Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
 
             // Insert multiple characters at the same position
-            CRDTCharacterClient first = cursor.InsertCharacter(3, 'X');
-            CRDTCharacterClient second = cursor.InsertCharacter(3, 'Y');
-            CRDTCharacterClient third = cursor.InsertCharacter(3, 'Z');
+            var first = cursor.InsertCharacter(3, 'X');
+            var second = cursor.InsertCharacter(3, 'Y');
+            var third = cursor.InsertCharacter(3, 'Z');
 
             // All should have unique IDs
             Assert.NotEqual(first.IdCharacter, second.IdCharacter);
@@ -221,18 +221,16 @@ namespace MAUIClientUI.Test.LOQC
             var clientId2 = Guid.Parse("A11A3ADE-11DC-4B23-8A8B-8DD8D6F886FE");
 
             // Create two characters with the same ID
-            var existingChar = new CRDTCharacterClient()
+            var existingChar = new CRDTCharacterPayload()
             {
                 Character = 'A',
                 IdCharacter = BuilderHelper.GenerateForString( 5, clientId1), 
-                ClockDateTime = DateTime.UtcNow
             };
 
-            var newChar = new CRDTCharacterClient()
+            var newChar = new CRDTCharacterPayload()
             {
                 Character = 'B',
                 IdCharacter = BuilderHelper.GenerateForString(5, clientId2),
-                ClockDateTime = DateTime.UtcNow.AddSeconds(1)
             };
 
             //var result = idService.ShouldAcceptConflictingInsert(
@@ -250,11 +248,11 @@ namespace MAUIClientUI.Test.LOQC
         public void InsertCharacterBetweenTwoCharacterDifferentDepths()
         {
             Document cursor = new Document("Welcome", Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
-            CRDTCharacterClient actual = cursor.InsertCharacter(3, 'H');
-            CRDTCharacterClient second = cursor.InsertCharacter(3, 'e');
-            CRDTCharacterClient third = cursor.InsertCharacter(3, 'a');
-            CRDTCharacterClient fourth = cursor.InsertCharacter(3, 'V');
-            CRDTCharacterClient fifth = cursor.InsertCharacter(3, 'T');
+            var actual = cursor.InsertCharacter(3, 'H');
+            var second = cursor.InsertCharacter(3, 'e');
+            var third = cursor.InsertCharacter(3, 'a');
+            var fourth = cursor.InsertCharacter(3, 'V');
+            var fifth = cursor.InsertCharacter(3, 'T');
 
             var result = cursor.GetString();
             Assert.NotEmpty(result);
@@ -264,11 +262,11 @@ namespace MAUIClientUI.Test.LOQC
         public void InsertCharacterBetweenTwoCharacterDifferentLocations()
         {
             Document cursor = new Document("Welcome", Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
-            CRDTCharacterClient actual = cursor.InsertCharacter(3, 'H');
-            CRDTCharacterClient second = cursor.InsertCharacter(4, 'e');
-            CRDTCharacterClient third = cursor.InsertCharacter(4, 'a');
-            CRDTCharacterClient fourth = cursor.InsertCharacter(5, 'V');
-            CRDTCharacterClient fifth = cursor.InsertCharacter(6, 'T');
+            var actual = cursor.InsertCharacter(3, 'H');
+            var second = cursor.InsertCharacter(4, 'e');
+            var third = cursor.InsertCharacter(4, 'a');
+            var fourth = cursor.InsertCharacter(5, 'V');
+            var fifth = cursor.InsertCharacter(6, 'T');
 
             var result = cursor.GetString();
             Assert.NotEmpty(result);
@@ -277,10 +275,10 @@ namespace MAUIClientUI.Test.LOQC
         //[Fact]
         //public void TestDocumentConstructorFromList()
         //{
-        //    var characters = new List<CRDTCharacterClient>()
+        //    var characters = new List<var>()
         //    {
-        //        new CRDTCharacterClient() { Character = 'H', IdCharacter = 1, ClientId = Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE") },
-        //        new CRDTCharacterClient() { Character = 'i', IdCharacter = 2, ClientId = Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE") }
+        //        new var() { Character = 'H', IdCharacter = 1, ClientId = Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE") },
+        //        new var() { Character = 'i', IdCharacter = 2, ClientId = Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE") }
         //    };
 
         //    Document cursor = new Document(characters, Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));

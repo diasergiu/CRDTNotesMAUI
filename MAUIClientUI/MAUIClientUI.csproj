@@ -71,6 +71,7 @@
 		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.71" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.9" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+		<PackageReference Include="protobuf-net" Version="3.4.19" />
 		<PackageReference Include="SlackAPI" Version="1.1.14" />
 		<PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.3" />
 	</ItemGroup>
@@ -109,8 +110,14 @@
 	  </MauiXaml>
 	</ItemGroup>
 
+  <ItemGroup>
+    <Protobuf Include="Miscellaneous/CRDTCharacter.proto" />
+  </ItemGroup>
+
+
 	<ItemGroup>
 	  <Folder Include="Cursor\" />
+	  <Folder Include="Services\Converters\" />
 	</ItemGroup>
 
 </Project>

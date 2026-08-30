@@ -8,7 +8,6 @@ namespace DatabaseLibrary.Entities.Client
     public class DbContextClient : DbContext
     {
         public DbSet<NoteClient> Notes { get; set; }
-        public DbSet<Note_UserClient> NoteUsers { get; set; }
         public DbSet<UserClient> Users { get; set; }
         public DbSet<CRDTCharacterClient> CRDTCharacters { get; set; }
 

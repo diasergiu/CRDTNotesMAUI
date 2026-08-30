@@ -1,8 +1,10 @@
 using CRDTLibrary.Cursor;
 using DatabaseLibrary.Entities;
 using DatabaseLibrary.Entities.Client;
+using DatabaseLibrary.WrapperClasses;
 using MAUIClientUI.Repositories;
 using MAUIClientUI.Services;
+using MAUIClientUI.Services.HelperClasses;
 using Microsoft.Extensions.Logging;
 
 namespace MAUIClientUI.Miscellaneous
@@ -20,16 +22,21 @@ namespace MAUIClientUI.Miscellaneous
         private readonly CRDTCharacterRepository _crdtCharacterRepository;
         private readonly NoteRepository _noteRepository;
         private readonly INoteServices _noteServices;
+        private readonly ILogger<NoteController>? _logger;
 
         public NoteController(NoteClient currentNote, NoteRepository noteRepository,
-            INoteServices noteServices, ILogger<Document> cursorLogger = null)
+            INoteServices noteServices,  CRDTCharacterRepository characterRepository, ILogger<Document> cursorLogger = null, ILogger<NoteController> logger = null)
         {
             _currentNote = currentNote ?? throw new ArgumentNullException(nameof(currentNote));
             _noteRepository = noteRepository ?? throw new ArgumentNullException(nameof(noteRepository));
             _noteServices = noteServices ?? throw new ArgumentNullException(nameof(noteServices));
-            _crdtCharacterRepository = IPlatformApplication.Current.Services.GetService<CRDTCharacterRepository>()
-                ?? throw new InvalidOperationException($"{nameof(CRDTCharacterRepository)} is not registered.");
-            _Document = new Document(_currentNote.CRDTCharacter, Guid.NewGuid(), cursorLogger);
+            _crdtCharacterRepository = characterRepository ?? throw new ArgumentNullException(nameof(characterRepository));
+            _logger = logger;
+
+            // Convert CRDTCharacterClient list to CRDTCharacterPayload list for Document
+            var payloads = currentNote.CRDTCharacter?.Select(c => UnwrapClientAsPayload(c)).ToList()
+                ?? new List<CRDTCharacterPayload>();
+            _Document = new Document(payloads, Guid.NewGuid(), cursorLogger);
         }
 
         /// <summary>
@@ -42,10 +49,17 @@ namespace MAUIClientUI.Miscellaneous
         /// </summary>
         public void InsertCharacter(int cursorPosition, char typedChar)
         {
+            // Get payload from Document (pure CRDT logic)
             var newCharacter = _Document.InsertCharacter(cursorPosition, typedChar);
-            newCharacter.IdNote = _currentNote.IdNote;
-            _crdtCharacterRepository.SaveNewCrdtCharacter(newCharacter);
-            _ = SendChangeToServerAsync(newCharacter);
+
+            // Wrap in client object with application-level metadata (idNote, isDirtyFlag, etc.)
+            var clientCharacter = WrapPayloadAsClient(newCharacter);
+
+            // Persist locally
+            _crdtCharacterRepository.SaveNewCrdtCharacter(clientCharacter);
+
+            // Send to server (payload used for encryption, conversion handled inside)
+            SendChangeToServerSafely(newCharacter);
         }
         /// <summary>
         /// Inserts multiple characters (e.g., from paste operation) at the given cursor position.
@@ -55,27 +69,37 @@ namespace MAUIClientUI.Miscellaneous
             if (string.IsNullOrEmpty(text))
                 return;
 
-            var newCharacters = new List<CRDTCharacter>();
+            var newPayloads = new List<CRDTCharacterPayload>();
             foreach (char c in text)
             {
-                var newCharacter = _Document.InsertCharacter(cursorPosition++, c);
-                newCharacter.IdNote = _currentNote.IdNote;
-                newCharacters.Add(newCharacter);
-                _crdtCharacterRepository.SaveNewCrdtCharacter(newCharacter);
+                // Get payload from Document
+                var payload = _Document.InsertCharacter(cursorPosition++, c);
+
+                // Wrap in client object for persistence
+                var clientCharacter = WrapPayloadAsClient(payload);
+                _crdtCharacterRepository.SaveNewCrdtCharacter(clientCharacter);
+
+                newPayloads.Add(payload);
             }
 
-            _ = SendChangesToServerAsync(newCharacters);
+            // Send batch of payloads to server
+            SendChangesToServerSafely(newPayloads);
         }
         /// <summary>
         /// Deletes the character to the left of the given cursor position and propagates the change.
         /// </summary>
         public void DeleteCharacter(int cursorPosition)
         {
-            var leftCharacter = _Document.deleteCharacter(cursorPosition + 1);
-            if (leftCharacter != null)
+            // Get payload from Document
+            var payload = _Document.deleteCharacter(cursorPosition + 1);
+            if (payload != null)
             {
-                _crdtCharacterRepository.UpdateCharacter(leftCharacter);
-                _ = SendChangeToServerAsync(leftCharacter);
+                // Wrap in client object for persistence
+                var clientCharacter = WrapPayloadAsClient(payload);
+                _crdtCharacterRepository.UpdateCharacter(clientCharacter);
+
+                // Send to server
+                SendChangeToServerSafely(payload);
             }
         }
 
@@ -87,41 +111,179 @@ namespace MAUIClientUI.Miscellaneous
             if (startPosition >= endPosition)
                 return;
 
-            var deletedCharacters = new List<CRDTCharacter>();
+            var deletedPayloads = new List<CRDTCharacterPayload>();
             // Delete from end to start to avoid position shifting issues
             for (int i = endPosition; i > startPosition; i--)
             {
-                var deletedCharacter = _Document.deleteCharacter(i);
-                if (deletedCharacter != null)
+                // Get payload from Document
+                var payload = _Document.deleteCharacter(i);
+                if (payload != null)
                 {
-                    deletedCharacters.Add(deletedCharacter);
-                    _crdtCharacterRepository.UpdateCharacter(deletedCharacter);
+                    // Wrap in client object for persistence
+                    var clientCharacter = WrapPayloadAsClient(payload);
+                    _crdtCharacterRepository.UpdateCharacter(clientCharacter);
+
+                    deletedPayloads.Add(payload);
                 }
             }
 
-            _ = SendChangesToServerAsync(deletedCharacters);
+            // Send batch of payloads to server
+            SendChangesToServerSafely(deletedPayloads);
         }
 
         /// <summary>
-        /// Persists a character received from another user/device and merges it into the CRDT model.
-        /// Returns true when the change belongs to this note and was applied.
+        /// Persists multiple characters received from another user/device and merges them into the CRDT model.
+        /// Returns true when all changes belong to this note and were applied.
         /// </summary>
-        public async Task<bool> ApplyRemoteChangeAsync(CRDTCharacter character)
+        public async Task<bool> ApplyRemoteChangesAsync(CRDTChangePayload payload)
         {
-            if (character.IdNote != _currentNote.IdNote)
-                return false;
+            if (payload != null && !string.IsNullOrEmpty(payload.Payload))
+            {
+                // Decode the encrypted payload to get the list of CRDT character changes
+                var decodedCharacters = CharacterSerializer.Decode(payload.Payload);
 
-            var clientCharacter = new CRDTCharacterClient(character);
-            await _noteRepository.SaveCRDTChanges(new List<CRDTCharacterClient> { clientCharacter });
-            _Document.MergeCharacter(clientCharacter);
+                var characters = decodedCharacters.Select(c => new CRDTCharacterClient
+                {
+                    IdCharacter = c.IdCharacter,
+                    IdNote = payload.IdNote, // Ensure the correct note ID is set
+                    Character = c.Character,
+                    Tombstone = c.Tombstone,
+                    IsDirtyFlag = false, // Received changes are not dirty
+                    ClockDateTime = DateTime.UtcNow // Set to current time for local tracking
+                }).ToList();
+
+                // Persist all changes
+                await _noteRepository.SaveCRDTChanges(characters);
+
+                // Convert to payloads and merge into CRDT model
+                foreach (var character in decodedCharacters)
+                {
+                    _Document.MergeCharacter(character);
+                }
+            }
             return true;
+
         }
 
-        private Task SendChangeToServerAsync(CRDTCharacter change)
-            => _noteServices.SendCRDTChangestoServer(new List<CRDTCharacter> { change });
+        private Task<ApiResult> SendChangeToServerAsync(CRDTCharacterPayload payload)
+        {
+            // Wrap payload in a list for encoding
+            var encodedPayload = CharacterSerializer.Encode(new List<CRDTCharacterClient> { UnwrapPayloadAsClient(payload) });
+            var changePayload = new CRDTChangePayload(_currentNote.IdNote, encodedPayload);
+            return _noteServices.SendCRDTChangestoServer(changePayload);
+        }
 
-        private Task SendChangesToServerAsync(List<CRDTCharacter> changes)
-            => _noteServices.SendCRDTChangestoServer(changes);
+        private Task<ApiResult> SendChangesToServerAsync(List<CRDTCharacterPayload> payloads)
+        {
+            // Convert payloads to client objects for encoding
+            var clientCharacters = payloads.Select(p => UnwrapPayloadAsClient(p)).ToList();
+            var encodedPayload = CharacterSerializer.Encode(clientCharacters);
+            var changePayload = new CRDTChangePayload(_currentNote.IdNote, encodedPayload);
+            return _noteServices.SendCRDTChangestoServer(changePayload);
+        }
+
+        /// <summary>
+        /// Wraps a CRDTCharacterPayload in a CRDTCharacterClient with application metadata.
+        /// </summary>
+        private CRDTCharacterClient WrapPayloadAsClient(CRDTCharacterPayload payload)
+        {
+            return new CRDTCharacterClient
+            {
+                IdCharacter = payload.IdCharacter,
+                Character = payload.Character,
+                Tombstone = payload.Tombstone,
+                IdNote = _currentNote.IdNote,
+                IsDirtyFlag = true,
+                ClockDateTime = DateTime.UtcNow
+            };
+        }
+
+        /// <summary>
+        /// Safely sends multiple changes to the server without blocking, properly handling errors.
+        /// This method wraps the async send operation with error logging.
+        /// </summary>
+        private void SendChangesToServerSafely(List<CRDTCharacterPayload> payloads)
+        {
+            _ = SendChangesToServerSafelyAsync(payloads);
+        }
+
+        /// <summary>
+        /// Async implementation that properly handles errors from batch server sends.
+        /// </summary>
+        private async Task SendChangesToServerSafelyAsync(List<CRDTCharacterPayload> payloads)
+        {
+            try
+            {
+                var result = await SendChangesToServerAsync(payloads);
+
+                if (!result.IsSuccess)
+                {
+                    _logger?.LogWarning("Failed to send {Count} character changes to server: {ErrorMessage}", payloads.Count, result.ErrorMessage);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Exception occurred while sending {Count} character changes to server", payloads.Count);
+            }
+        }
+
+        /// <summary>
+        /// Safely sends changes to the server without blocking, properly handling errors.
+        /// This method wraps the async send operation with error logging.
+        /// </summary>
+        private void SendChangeToServerSafely(CRDTCharacterPayload payload)
+        {
+            _ = SendChangeToServerSafelyAsync(payload);
+        }
+
+        /// <summary>
+        /// Async implementation that properly handles errors from server sends.
+        /// </summary>
+        private async Task SendChangeToServerSafelyAsync(CRDTCharacterPayload payload)
+        {
+            try
+            {
+                var result = await SendChangeToServerAsync(payload);
+
+                if (!result.IsSuccess)
+                {
+                    _logger?.LogWarning("Failed to send character change to server: {ErrorMessage}", result.ErrorMessage);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Exception occurred while sending character change to server");
+            }
+        }
+
+        /// <summary>
+        /// Unwraps a CRDTCharacterClient back to a pure CRDTCharacterPayload for CRDT operations.
+        /// </summary>
+        private CRDTCharacterPayload UnwrapClientAsPayload(CRDTCharacterClient client)
+        {
+            return new CRDTCharacterPayload
+            {
+                IdCharacter = client.IdCharacter,
+                Character = client.Character,
+                Tombstone = client.Tombstone
+            };
+        }
+
+        /// <summary>
+        /// Converts a CRDTCharacterPayload to CRDTCharacterClient for encoding/transmission.
+        /// </summary>
+        private CRDTCharacterClient UnwrapPayloadAsClient(CRDTCharacterPayload payload)
+        {
+            return new CRDTCharacterClient
+            {
+                IdCharacter = payload.IdCharacter,
+                Character = payload.Character,
+                Tombstone = payload.Tombstone,
+                IdNote = _currentNote.IdNote,
+                IsDirtyFlag = false,  // Doesn't matter for encoding
+                ClockDateTime = DateTime.UtcNow
+            };
+        }
     }
 }
 

@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package CRDTNotesMAUI;
+
+message CRDTCharacterClient {
+    string id_character = 1;      // Composite ID for conflict resolution
+    string character = 2;         // Single character as string
+    bool tombstone = 3;           // Deleted flag
+}
+
+message CRDTCharacterList {
+    repeated CRDTCharacterMessage characters = 1;
+}

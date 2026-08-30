@@ -6,6 +6,7 @@ using DatabaseLibrary.WrapperClasses;
 using MAUIClientUI.Repositories;
 using MAUIClientUI.Services.HelperClasses;
 using Newtonsoft.Json;
+using System;
 using System.Net.Http.Json;
 using System.Text;
 
@@ -14,14 +15,15 @@ namespace MAUIClientUI.Services.ServerRequests
     public class NoteServices : ServicesClient, INoteServices
     {
         private NoteRepository _notesRepository;
-        public NoteServices(string URLModifier, NoteRepository noteRepository) : base(URLModifier)
+        public NoteServices(string URLModifier, NoteRepository noteRepository, IUserContext? userContext = null) 
+            : base(URLModifier, userContext)
         {
             _notesRepository = noteRepository;    
         }
-        public async Task<ApiResult> SendChangesToServer(List<NoteClient> noteClient)
+        public async Task<ApiResult> SendChangesToServer(List<DToSendChanges> changes)
         {
              return await ExceptionHandlingHelper.ExecuteAsync(
-                async () => await SendRequest<List<NoteClient>>(HttpMethod.Post, $"{_baseURL}/SendChangesToServer", noteClient),
+                async () => await SendRequest<List<DToSendChanges>>(HttpMethod.Post, $"{_baseURL}/SendChangesToServer", changes),
                 nameof(SendChangesToServer)
             );
         }
@@ -35,11 +37,11 @@ namespace MAUIClientUI.Services.ServerRequests
             return result;
         }
 
-        public async Task<ApiResultData<List<NoteClient>>> GetAllCharacterByUser(Guid IdUser)
+        public async Task<ApiResultData<List<DToSendChanges>>> GetServerChanges()
         {
-            var result = await ExceptionHandlingHelper.ExecuteAsyncWithDataExtraction<List<NoteClient>>(
-                async () => await SendRequest<Object>(HttpMethod.Get, $"{_baseURL}/GetAllNotesFromUser", null),
-                nameof(GetAllCharacterByUser)
+            var result = await ExceptionHandlingHelper.ExecuteAsyncWithDataExtraction<List<DToSendChanges>>(
+                async () => await SendRequest<Object>(HttpMethod.Get, $"{_baseURL}/GetServerChanges", null),
+                nameof(GetServerChanges)
             );
             return result;
         }
@@ -76,50 +78,24 @@ namespace MAUIClientUI.Services.ServerRequests
                 nameof(DeleteNote)
             );
         }
-        public async Task<ApiResult> SendCRDTChangestoServer(List<CRDTCharacter> characters)
+        public async Task<ApiResult> SendCRDTChangestoServer(CRDTChangePayload payload)
         {
             var result = await ExceptionHandlingHelper.ExecuteAsync(
-                async () => await SendRequest<List<CRDTCharacter>>(
-                HttpMethod.Put, $"{_baseURL}/SendCRDTChangestoServer", characters),
+                async () => await SendRequest<CRDTChangePayload>(
+                HttpMethod.Put, $"{_baseURL}/SendCRDTChangestoServer", payload),
                 nameof(SendCRDTChangestoServer));
 
-            if (result.IsSuccess)
-            {
-                await _notesRepository.ClearDirtyFlag(characters.Select(a => new CRDTCharacterClient(a)).ToList());
-            }
-
             return result;
         }
-        public async Task<ApiResultData<List<CRDTCharacter>>> GetAllCharacterByUser()
+        public async Task<ApiResultData<List<DToSendChanges>>> GetServerChangesByNote(Guid noteId)
         {
-            var result = await ExceptionHandlingHelper.ExecuteAsyncWithDataExtraction<List<CRDTCharacter>>
-                (async () => await SendRequest<object>
-            (HttpMethod.Get, $"{_baseURL}/GetServerChanges", null),
-                nameof(GetAllCharacterByUser));
-            DecryptCharacterIds(result);
-            return result;
-
-        }
-        public async Task<ApiResultData<List<CRDTCharacter>>> GetAllCharacterByNote(Guid noteId)
-        {
-            var result = await ExceptionHandlingHelper.ExecuteAsyncWithDataExtraction<List<CRDTCharacter>>
-                (async () => await SendRequest<object>
-            (HttpMethod.Get, $"{_baseURL}/GetAllCharacterByNote/{noteId}", null),
-                nameof(GetAllCharacterByNote));
-            DecryptCharacterIds(result);
+            var result = await ExceptionHandlingHelper.ExecuteAsyncWithDataExtraction<List<DToSendChanges>>(
+                async () => await SendRequest<Object>(HttpMethod.Get, $"{_baseURL}/GetAllCharacterByNote/{noteId}", null),
+                nameof(GetServerChangesByNote)
+            );
             return result;
         }
 
-        private static void DecryptCharacterIds(ApiResultData<List<CRDTCharacter>> result)
-        {
-            if (result.IsSuccess && result.Data != null)
-            {
-                foreach (var character in result.Data)
-                {
-                    character.IdCharacter = CharacterIdProtector.Decrypt(character.IdCharacter);
-                }
-            }
-        }
 
         public Task<ApiResult> GiveNoteAccessToUser(Guid noteId, Guid userId)
         {

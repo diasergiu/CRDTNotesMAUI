@@ -18,7 +18,5 @@ namespace DatabaseLibrary.Entities.Client
         public string Username { get; set; }
         [Required]
         public string Password { get; set; }
-        [JsonIgnore]
-        public List<Note_UserClient>? NotesUsers { get; set; }
     }
 }

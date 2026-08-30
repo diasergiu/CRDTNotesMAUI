@@ -1,4 +1,5 @@
 using MAUIClientUI.Services.HelperClasses;
+using System.Text;
 using Xunit;
 
 namespace MAUIClientUI.Test.Security
@@ -18,7 +19,7 @@ namespace MAUIClientUI.Test.Security
             var plainText = "test-id-12345";
 
             // Act
-            var encrypted = CharacterIdProtector.Encrypt(plainText);
+            var encrypted = CharacterIdProtector.Encrypt(Encoding.UTF8.GetBytes(plainText));
 
             // Assert
             Assert.NotNull(encrypted);
@@ -33,10 +34,10 @@ namespace MAUIClientUI.Test.Security
             string plainText = null;
 
             // Act
-            var encrypted = CharacterIdProtector.Encrypt(plainText);
+            var encrypted = CharacterIdProtector.Encrypt(null);
 
             // Assert
-            Assert.Null(encrypted);
+            Assert.Empty(encrypted);
         }
 
         [Fact]
@@ -46,7 +47,7 @@ namespace MAUIClientUI.Test.Security
             var plainText = string.Empty;
 
             // Act
-            var encrypted = CharacterIdProtector.Encrypt(plainText);
+            var encrypted = CharacterIdProtector.Encrypt(Encoding.UTF8.GetBytes(plainText));
 
             // Assert
             Assert.Empty(encrypted);
@@ -59,7 +60,7 @@ namespace MAUIClientUI.Test.Security
             var plainText = "   ";
 
             // Act
-            var encrypted = CharacterIdProtector.Encrypt(plainText);
+            var encrypted = CharacterIdProtector.Encrypt(Encoding.UTF8.GetBytes(plainText));
 
             // Assert
             Assert.NotNull(encrypted);
@@ -74,7 +75,7 @@ namespace MAUIClientUI.Test.Security
             var plainText = "id-with-special-!@#$%^&*()_+-=[]{}|;':\",./<>?";
 
             // Act
-            var encrypted = CharacterIdProtector.Encrypt(plainText);
+            var encrypted = CharacterIdProtector.Encrypt(Encoding.UTF8.GetBytes(plainText));
 
             // Assert
             Assert.NotNull(encrypted);
@@ -89,7 +90,7 @@ namespace MAUIClientUI.Test.Security
             var plainText = "id-with-unicode-🔒🔐✨";
 
             // Act
-            var encrypted = CharacterIdProtector.Encrypt(plainText);
+            var encrypted = CharacterIdProtector.Encrypt(Encoding.UTF8.GetBytes(plainText));
 
             // Assert
             Assert.NotNull(encrypted);
@@ -104,7 +105,7 @@ namespace MAUIClientUI.Test.Security
             var plainText = new string('a', 1000);
 
             // Act
-            var encrypted = CharacterIdProtector.Encrypt(plainText);
+            var encrypted = CharacterIdProtector.Encrypt(Encoding.UTF8.GetBytes(plainText));
 
             // Assert
             Assert.NotNull(encrypted);
@@ -179,7 +180,7 @@ namespace MAUIClientUI.Test.Security
             var plainText = "simple-id";
 
             // Act
-            var encrypted = CharacterIdProtector.Encrypt(plainText);
+            var encrypted = CharacterIdProtector.Encrypt(Encoding.UTF8.GetBytes(plainText));
             var decrypted = CharacterIdProtector.Decrypt(encrypted);
 
             // Assert
@@ -193,7 +194,7 @@ namespace MAUIClientUI.Test.Security
             var plainText = "(1,11111111-1111-1111-1111-111111111111)(2,22222222-2222-2222-2222-222222222222)";
 
             // Act
-            var encrypted = CharacterIdProtector.Encrypt(plainText);
+            var encrypted = CharacterIdProtector.Encrypt(Encoding.UTF8.GetBytes(plainText));
             var decrypted = CharacterIdProtector.Decrypt(encrypted);
 
             // Assert
@@ -207,7 +208,7 @@ namespace MAUIClientUI.Test.Security
             var plainText = "id!@#$%^&*()_+-=[]{}|;':\",./<>?";
 
             // Act
-            var encrypted = CharacterIdProtector.Encrypt(plainText);
+            var encrypted = CharacterIdProtector.Encrypt(Encoding.UTF8.GetBytes(plainText));
             var decrypted = CharacterIdProtector.Decrypt(encrypted);
 
             // Assert
@@ -221,7 +222,7 @@ namespace MAUIClientUI.Test.Security
             var plainText = "id-🔒🔐✨-unicode";
 
             // Act
-            var encrypted = CharacterIdProtector.Encrypt(plainText);
+            var encrypted = CharacterIdProtector.Encrypt(Encoding.UTF8.GetBytes(plainText));
             var decrypted = CharacterIdProtector.Decrypt(encrypted);
 
             // Assert
@@ -235,7 +236,7 @@ namespace MAUIClientUI.Test.Security
             var plainText = new string('x', 1000);
 
             // Act
-            var encrypted = CharacterIdProtector.Encrypt(plainText);
+            var encrypted = CharacterIdProtector.Encrypt(Encoding.UTF8.GetBytes(plainText));
             var decrypted = CharacterIdProtector.Decrypt(encrypted);
 
             // Assert
@@ -249,7 +250,7 @@ namespace MAUIClientUI.Test.Security
             var plainText = string.Empty;
 
             // Act
-            var encrypted = CharacterIdProtector.Encrypt(plainText);
+            var encrypted = CharacterIdProtector.Encrypt(Encoding.UTF8.GetBytes(plainText));
             var decrypted = CharacterIdProtector.Decrypt(encrypted);
 
             // Assert
@@ -257,17 +258,15 @@ namespace MAUIClientUI.Test.Security
         }
 
         [Fact]
-        public void Encrypt_ThenDecrypt_WithNull_ReturnsNull()
+        public void Encrypt_ThenDecrypt_WithNull_ReturnsEmpty()
         {
-            // Arrange
-            string plainText = null;
-
+ 
             // Act
-            var encrypted = CharacterIdProtector.Encrypt(plainText);
+            var encrypted = CharacterIdProtector.Encrypt(null);
             var decrypted = CharacterIdProtector.Decrypt(encrypted);
 
             // Assert
-            Assert.Null(decrypted);
+            Assert.Empty(decrypted);
         }
 
         #endregion
@@ -281,9 +280,9 @@ namespace MAUIClientUI.Test.Security
             var plainText = "deterministic-id";
 
             // Act
-            var encrypted1 = CharacterIdProtector.Encrypt(plainText);
-            var encrypted2 = CharacterIdProtector.Encrypt(plainText);
-            var encrypted3 = CharacterIdProtector.Encrypt(plainText);
+            var encrypted1 = CharacterIdProtector.Encrypt(Encoding.UTF8.GetBytes(plainText));
+            var encrypted2 = CharacterIdProtector.Encrypt(Encoding.UTF8.GetBytes(plainText));
+            var encrypted3 = CharacterIdProtector.Encrypt(Encoding.UTF8.GetBytes(plainText));
 
             // Assert - same plaintext should always produce same ciphertext (deterministic encryption)
             Assert.Equal(encrypted1, encrypted2);
@@ -298,8 +297,8 @@ namespace MAUIClientUI.Test.Security
             var plainText2 = "id-2";
 
             // Act
-            var encrypted1 = CharacterIdProtector.Encrypt(plainText1);
-            var encrypted2 = CharacterIdProtector.Encrypt(plainText2);
+            var encrypted1 = CharacterIdProtector.Encrypt(Encoding.UTF8.GetBytes(plainText1));
+            var encrypted2 = CharacterIdProtector.Encrypt(Encoding.UTF8.GetBytes(plainText2));
 
             // Assert
             Assert.NotEqual(encrypted1, encrypted2);
@@ -319,7 +318,7 @@ namespace MAUIClientUI.Test.Security
             // Act
             for (int i = 0; i < 5; i++)
             {
-                var encrypted = CharacterIdProtector.Encrypt(plainText);
+                var encrypted = CharacterIdProtector.Encrypt(Encoding.UTF8.GetBytes(plainText));
                 var decrypted = CharacterIdProtector.Decrypt(encrypted);
                 results.Add(decrypted);
             }
@@ -336,7 +335,7 @@ namespace MAUIClientUI.Test.Security
         public void Encrypt_ThenDecrypt_WithVariousInputs_ReturnsOriginal(string plainText)
         {
             // Act
-            var encrypted = CharacterIdProtector.Encrypt(plainText);
+            var encrypted = CharacterIdProtector.Encrypt(Encoding.UTF8.GetBytes(plainText));
             var decrypted = CharacterIdProtector.Decrypt(encrypted);
 
             // Assert
@@ -365,7 +364,7 @@ namespace MAUIClientUI.Test.Security
         {
             // Arrange
             var plaintextId = "plaintext-id";
-            var encryptedPlaintextId = CharacterIdProtector.Encrypt("encrypted-id");
+            var encryptedPlaintextId = CharacterIdProtector.Encrypt(Encoding.UTF8.GetBytes("encrypted-id"));
 
             // Act
             var decryptedPlaintext = CharacterIdProtector.Decrypt(plaintextId);
@@ -387,11 +386,11 @@ namespace MAUIClientUI.Test.Security
             var plainText = "(1,11111111-1111-1111-1111-111111111111)(2,22222222-2222-2222-2222-222222222222)(3,33333333-3333-3333-3333-333333333333)";
 
             // Act
-            var encrypted = CharacterIdProtector.Encrypt(plainText);
+            var encrypted = CharacterIdProtector.Encrypt(Encoding.UTF8.GetBytes(plainText));
             var decrypted = CharacterIdProtector.Decrypt(encrypted);
 
             // Assert - encryption should be bijective for same plaintext -> same ciphertext
-            var reencrypted = CharacterIdProtector.Encrypt(plainText);
+            var reencrypted = CharacterIdProtector.Encrypt(Encoding.UTF8.GetBytes(plainText));
             Assert.Equal(encrypted, reencrypted);
             Assert.Equal(plainText, decrypted);
         }
@@ -401,11 +400,11 @@ namespace MAUIClientUI.Test.Security
         {
             // Arrange - simulate CRDT ID being used as dictionary key
             var originalId = "(1,11111111-1111-1111-1111-111111111111)";
-            var encryptedId = CharacterIdProtector.Encrypt(originalId);
+            var encryptedId = CharacterIdProtector.Encrypt(Encoding.UTF8.GetBytes(originalId));
             var idDictionary = new Dictionary<string, string> { { encryptedId, "data" } };
 
             // Act - encrypt the same id again and try to lookup
-            var lookupEncrypted = CharacterIdProtector.Encrypt(originalId);
+            var lookupEncrypted = CharacterIdProtector.Encrypt(Encoding.UTF8.GetBytes(originalId));
             var found = idDictionary.TryGetValue(lookupEncrypted, out var value);
 
             // Assert - deterministic encryption allows same key to be looked up

@@ -3,6 +3,7 @@ using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.Entities.Server;
 using DatabaseLibrary.RequestBody.EntityMappers;
 using DatabaseLibrary.ResponsBody;
+using DatabaseLibrary.WrapperClasses;
 using Microsoft.AspNetCore.Mvc;
 using Server.ServeRepositories;
 
@@ -24,7 +25,7 @@ namespace Server.Controllers
             _noteSyncHub = noteSyncHub;
         }
 
-        [HttpGet("GetAllNotesFromUser")] // iActionResult can sent json back to the client (look more into this)
+        [HttpGet("GetAllNotesFromUser")] 
         public async Task<IActionResult> GetAllNotesFromUser()
         {
             Guid idUser = GetUserIdFromRequest();
@@ -44,8 +45,51 @@ namespace Server.Controllers
             }
             return Ok(ApiResponse<object>.SuccessResponse(note));
         }
+
+
+        [HttpGet("GetServerChanges")]
+        public async Task<IActionResult> GetServerChanges()
+        {
+            Guid userId = GetUserIdFromRequest();
+            var serverChanges = await _notesRepository.GetAllCRDTByUser(userId);
+
+            // Convert CRDTCharacterServer to DToSendChanges for client
+            var dtoChanges = serverChanges.Select(sc => new DToSendChanges
+            {
+                NoteServer = sc.NoteServer,
+                Payload = sc.Payload
+            }).ToList();
+
+            return Ok(ApiResponse<object>.SuccessResponse(
+                data: dtoChanges,
+                message: "Server changes retrieved successfully."
+            ));
+        }
+        [HttpGet("GetAllCharacterByNote")]
+        public async Task<IActionResult> GetAllCharacterByNote(Guid noteId)
+        {
+            Guid userId = GetUserIdFromRequest();
+            if (_notesRepository.DoseUserHaveAccessToNote(noteId, userId) == false)
+            {
+                return BadRequest("You do not have access to this note.");
+            }
+            _notesRepository.SaveNoteUserConnection(noteId, userId);
+            var serverChanges = await _notesRepository.getCRDTCharactersbyIdNote(noteId, userId);
+
+            // Convert CRDTCharacterServer to DToSendChanges for client
+            var dtoChanges = serverChanges.Select(sc => new DToSendChanges
+            {
+                NoteServer = sc.NoteServer,
+                Payload = sc.Payload
+            }).ToList();
+
+            return Ok(ApiResponse<object>.SuccessResponse(
+                data: dtoChanges,
+                message: "Characters retrieved successfully."
+            ));
+        }
         [HttpPut("SendCRDTChangestoServer")]
-        public async Task<IActionResult> SendCRDTChangestoServer([FromBody] List<CRDTCharacter> changes)
+        public async Task<IActionResult> SendCRDTChangestoServer([FromBody] CRDTChangePayload changes)
         {
             Guid idUser = GetUserIdFromRequest();
             await _notesRepository.saveCRDTChanges(changes);
@@ -77,15 +121,25 @@ namespace Server.Controllers
         }
 
         [HttpPost("SendChangesToServer")]
-        public async Task<IActionResult> SendChangesToServer([FromBody] List<NoteClient> noteClient)
+        public async Task<IActionResult> SendChangesToServer([FromBody] List<DToSendChanges> noteClient)
         {
             Guid idUser = GetUserIdFromRequest();
-            await _notesRepository.SaveAllChangesFromClient(ConvertListClientToServer(noteClient), idUser);
+            await _notesRepository.SaveAllChangesFromClient(noteClient, idUser);
             return Ok(ApiResponse<object>.SuccessResponse(
                 data: null,
                 message: "Changes synced successfully."
             ));
 
+        }
+        [HttpPost("GiveNoteAccessToUser")]
+        public async Task<IActionResult> GiveNoteAccessToUser(Guid userId, Guid noteId)
+        {
+            //Guid userId = GetUserIdFromRequest();
+            await _notesRepository.SaveNoteUserConnection(noteId, userId);
+            return Ok(ApiResponse<object>.SuccessResponse(
+                data: null,
+                message: "Note access granted successfully."
+            ));
         }
 
         [HttpDelete("{id}")]
@@ -130,44 +184,6 @@ namespace Server.Controllers
                 .ToList();
         }
 
-
-        [HttpGet("GetServerChanges")]
-        public async Task<IActionResult> GetServerChanges()
-        {
-            Guid userId = GetUserIdFromRequest();
-            var changes = await _notesRepository.GetAllCRDTByUser(userId);
-            return Ok(ApiResponse<object>.SuccessResponse(
-                data: changes,
-                message: "Server changes retrieved successfully."
-            ));
-        }
-
-
-        [HttpGet("GetAllCharacterByNote")]
-        public async Task<IActionResult> GetAllCharacterByNote(Guid noteId)
-        {
-            Guid userId = GetUserIdFromRequest();
-            if(_notesRepository.DoseUserHaveAccessToNote(noteId, userId) == false)
-            {
-                return BadRequest("You do not have access to this note.");
-            }
-            _notesRepository.SaveNoteUserConnection(noteId, userId);
-            var characters = await _notesRepository.getCRDTCharactersbyIdNote(noteId, userId);
-            return Ok(ApiResponse<object>.SuccessResponse(
-                data: characters,
-                message: "Characters retrieved successfully."
-            ));
-        }
-
-        [HttpPost("GiveNoteAccessToUser")]
-        public async Task<IActionResult> GiveNoteAccessToUser(Guid userId, Guid noteId)
-        {
-            //Guid userId = GetUserIdFromRequest();
-            await _notesRepository.SaveNoteUserConnection(noteId, userId);
-            return Ok(ApiResponse<object>.SuccessResponse(
-                data: null,
-                message: "Note access granted successfully."
-            ));
-        }
+        
     }
 }

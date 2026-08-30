@@ -1,10 +1,12 @@
 using DatabaseLibrary.Entities.Client;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace DatabaseLibrary.Entities.Server
 {
@@ -14,12 +16,13 @@ namespace DatabaseLibrary.Entities.Server
         [Key]
         public Guid IdNote { get; set; }
         public string Title { get; set; }
-        public string Content { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime LastUpdate { get; set; }
         public bool DirtyFlagChangesMade { get; set; }
         public int Version { get; set; }
         public List<Note_UserServer>? NoteUser { get; set; }
-        public List<CRDTCharacter>? CRDTCharacter { get; set; }
+        [Newtonsoft.Json.JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
+        public List<CRDTCharacterServer>? CRDTCharacter { get; set; }
     }
 }

@@ -21,7 +21,6 @@ namespace DatabaseLibrary.Entities
             this.Character = characterClient.Character;
             this.IdNote = characterClient.IdNote;
             this.Tombstone = characterClient.Tombstone;
-            this.Operation = characterClient.Operation;
             this.ClockDateTime = characterClient.ClockDateTime;
         }
         public CRDTCharacter(CRDTCharacter characterClient)
@@ -30,7 +29,6 @@ namespace DatabaseLibrary.Entities
             this.Character = characterClient.Character;
             this.IdNote = characterClient.IdNote;
             this.Tombstone = characterClient.Tombstone;
-            this.Operation = characterClient.Operation;
             this.ClockDateTime = characterClient.ClockDateTime;
         }
         public CRDTCharacter(char character, string IdCharacter)
@@ -47,7 +45,6 @@ namespace DatabaseLibrary.Entities
 
         public Guid IdNote { get; set; }
         public char Character { get; set; }
-        public string Operation { get; set; }
         public DateTime ClockDateTime { get; set; }
         public bool Tombstone { get; set; }
     }

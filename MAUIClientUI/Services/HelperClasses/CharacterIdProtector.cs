@@ -1,3 +1,4 @@
+using DatabaseLibrary.WrapperClasses;
 using System;
 using System.Security.Cryptography;
 using System.Text;
@@ -21,12 +22,10 @@ namespace MAUIClientUI.Services.HelperClasses
         private static readonly byte[] Key = Encoding.UTF8.GetBytes("crdt-notes-idchar-key-32byteslen");   // 32 bytes
         private static readonly byte[] Iv = new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10 }; // Exactly 16 bytes
 
-        public static string Encrypt(string plainText)
+        public static string Encrypt(byte[] plainBytes)
         {
-            if (string.IsNullOrEmpty(plainText))
-            {
-                return plainText;
-            }
+            if (plainBytes == null || plainBytes.Length == 0)
+                return new string("");
 
             using var aes = Aes.Create();
             aes.Key = Key;
@@ -35,8 +34,7 @@ namespace MAUIClientUI.Services.HelperClasses
             aes.Padding = PaddingMode.PKCS7;
 
             using var encryptor = aes.CreateEncryptor();
-            byte[] input = Encoding.UTF8.GetBytes(plainText);
-            byte[] cipher = encryptor.TransformFinalBlock(input, 0, input.Length);
+            byte[] cipher = encryptor.TransformFinalBlock(plainBytes, 0, plainBytes.Length);
             return Convert.ToBase64String(cipher);
         }
 
@@ -59,11 +57,12 @@ namespace MAUIClientUI.Services.HelperClasses
 
                 using var decryptor = aes.CreateDecryptor();
                 byte[] plain = decryptor.TransformFinalBlock(cipher, 0, cipher.Length);
+
                 return Encoding.UTF8.GetString(plain);
             }
             catch (Exception ex) when (ex is FormatException || ex is CryptographicException)
             {
-                // Value was not encrypted (e.g. legacy plaintext) - return as-is.
+                // Value was not encrypted - return as-is.
                 return cipherText;
             }
         }

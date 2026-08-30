@@ -3,18 +3,15 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DatabaseLibrary.Entities;
 using DatabaseLibrary.Entities.Client;
+using DatabaseLibrary.RequestBody.EntityMappers;
 using DatabaseLibrary.WrapperClasses;
 using MAUIClientUI.Repositories;
 using MAUIClientUI.Services;
 using MAUIClientUI.Services.HelperClasses;
 using MAUIClientUI.Services.ServerRequests;
 using MAUIClientUI.UserInterface;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace MAUIClientUI.MVVM
@@ -79,14 +76,11 @@ namespace MAUIClientUI.MVVM
             isLoggedIn = true; // this shuold change syncButton to enabled
 
             var clientChanges = _noteRepository.GetNoteFromUser(userId);
-            var result = _noteServices.SendChangesToServer(clientChanges);
-
-            var offlineChanges = await _noteRepository.GetAllCRDTCharacters();
-
-            var crdtChangesResult = await _noteServices.SendCRDTChangestoServer(prepperCRDTForServer(offlineChanges));
-            if (crdtChangesResult.IsSuccess)
+            var prepareToSend = PrepareChanges(clientChanges);
+            var result = await _noteServices.SendChangesToServer(prepareToSend);
+            if (result.IsSuccess)
             {
-                await _noteRepository.ClearDirtyFlag(offlineChanges);
+                await _noteRepository.ClearDirtyFlag(clientChanges);
 
             }
 
@@ -111,47 +105,71 @@ namespace MAUIClientUI.MVVM
         }
         private async void GetChangesFromServer()
         {
-            var notesResult = await _noteServices.GetAllNotesFromUser(UserDevice.LocalUser);
-
-
-            var charResults = await _noteServices.GetAllCharacterByUser();
-            if (notesResult.IsSuccess)
+            try
             {
-                // Update the local repository with the notes from the server
-                _noteRepository.UpdateListNotes(notesResult.Data);
+                var notesResult = await _noteServices.GetAllNotesFromUser(UserDevice.LocalUser);
+                var serverChangesResult = await _noteServices.GetServerChanges();
 
+                if (notesResult.IsSuccess)
+                {
+                    // Update the local repository with the notes from the server
+                    _noteRepository.UpdateListNotes(notesResult.Data);
+
+                }
+
+                if (serverChangesResult.IsSuccess && serverChangesResult.Data != null)
+                {
+                    // Decode CRDT changes from payloads
+                    var decodedChanges = new List<CRDTCharacterClient>();
+                    foreach (var change in serverChangesResult.Data)
+                    {
+                        var decodedCharacters = CharacterSerializer.Decode(change.Payload);
+             
+                        foreach (var character in decodedCharacters)
+                        {
+                            decodedChanges.Add(new CRDTCharacterClient
+                            {
+                                IdCharacter = character.IdCharacter,
+                                Character = character.Character,
+                                Tombstone = character.Tombstone,
+                                IdNote = change.NoteServer.IdNote,
+                                IsDirtyFlag = true,
+                            });
+
+                        }
+
+                    }
+
+                    // Update the local repository with decoded CRDT changes
+                    await _noteRepository.SaveCRDTChanges(decodedChanges);
+
+                }
+                else if (!serverChangesResult.IsSuccess)
+                {
+                    await _dialogHelper.ShowAlertAsync("Error", "Failed to sync notes from server.", "OK");
+                }
                 await _dialogHelper.ShowAlertAsync("Success", "Notes synced from server!", "OK");
+
+                await LoadNotesAsync();
             }
-            if (charResults.IsSuccess && notesResult.IsSuccess)
+            catch (Exception ex)
             {
-                // Update the local repository with the notes from the server
-                await _noteRepository.SaveCRDTChanges(charResults.Data.Select(a => new CRDTCharacterClient(a)).ToList());
+                await _dialogHelper.ShowAlertAsync("Error", $"An error occurred while syncing notes: {ex.Message}", "OK");
             }
-            else
-            {
-                await _dialogHelper.ShowAlertAsync("Error", "Failed to sync notes from server.", "OK");
-            }
-            await LoadNotesAsync();
         }
 
-        private List<CRDTCharacter> prepperCRDTForServer(List<CRDTCharacterClient> toChange)
+        private List<DToSendChanges> PrepareChanges(List<NoteClient> listNoteChanges)
         {
-            List<CRDTCharacter> result = new List<CRDTCharacter>();
-            foreach (var item in toChange)
+            List<DToSendChanges> changes = new List<DToSendChanges>();
+            foreach (var note in listNoteChanges)
             {
-                result.Add(new CRDTCharacter()
+                changes.Add(new DToSendChanges
                 {
-                    Character = item.Character,
-                    IdCharacter = string.IsNullOrEmpty(item.IdCharacter)
-                        ? item.IdCharacter
-                        : CharacterIdProtector.Encrypt(item.IdCharacter),
-                    IdNote = item.IdNote,
-                    Operation = item.Operation,
-                    ClockDateTime = item.ClockDateTime,
-                    Tombstone = item.Tombstone
+                    NoteServer = EntityMapper.MapNoteClientToNoteServer(note),
+                    Payload = CharacterSerializer.Encode(note.CRDTCharacter)
                 });
             }
-            return result;
+            return changes;
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

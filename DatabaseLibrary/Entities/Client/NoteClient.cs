@@ -17,14 +17,10 @@ namespace DatabaseLibrary.Entities.Client
         [Key]
         public Guid IdNote { get; set; }
         public string Title { get; set; }
-        public string Content { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime LastUpdate { get; set; }
-
         public int Version { get; set; }
         public bool DirtyFlagChangesMade { get; set; }
-        [JsonIgnore]
-        public List<Note_UserClient>? NoteUser { get; set; }
         [JsonIgnore]
         public List<CRDTCharacterClient>? CRDTCharacter { get; set; }
 

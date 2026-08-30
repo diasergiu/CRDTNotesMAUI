@@ -12,7 +12,7 @@ namespace DatabaseLibrary.Entities.Server
         public DbSet<UserServer> Users { get; set; }
         public DbSet<Note_UserServer> Note_Users { get; set; }
         //public DbSet<User_Device> User_Devices { get; set; }
-        public DbSet<CRDTCharacter> CRDTCharacters { get; set; }
+        public DbSet<CRDTCharacterServer> CRDTCharacters { get; set; }
         public string DbPath { get; }
         //Probably Delete
         public DbContextServer()
@@ -33,7 +33,7 @@ namespace DatabaseLibrary.Entities.Server
             // Only configure if not already configured by dependency injection
             if (!options.IsConfigured)
             {
-                string connectionString = $"server=localhost;database={DbPath};Trusted_Connection=True;TrustServerCertificate=True;";
+                string connectionString = "server=localhost;database=NotesDatabase;Trusted_Connection=True;TrustServerCertificate=True;";
                 options.UseSqlServer(connectionString);
             }
         }

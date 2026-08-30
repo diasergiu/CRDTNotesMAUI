@@ -6,7 +6,8 @@ namespace MAUIClientUI.Services.ServerRequests
 
     public class UserServices : ServicesClient
     {
-        public UserServices(string baseUrl) : base(baseUrl) { }
+        public UserServices(string baseUrl, IUserContext? userContext = null) 
+            : base(baseUrl, userContext) { }
 
         public async Task<ApiResultData<UserClient>> Login(string username, string password)
         {

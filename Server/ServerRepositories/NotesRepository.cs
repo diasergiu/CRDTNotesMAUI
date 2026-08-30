@@ -2,6 +2,7 @@ using DatabaseLibrary.Entities;
 using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.Entities.Server;
 using DatabaseLibrary.Migrations;
+using DatabaseLibrary.WrapperClasses;
 using Microsoft.EntityFrameworkCore;
 
 namespace Server.ServeRepositories
@@ -79,7 +80,6 @@ namespace Server.ServeRepositories
 
                 // Versions match - safe to update
                 existingNote.Title = note.Title;
-                existingNote.Content = note.Content;
                 existingNote.LastUpdate = note.LastUpdate;
                 existingNote.Version++;  // Increment version for next update
 
@@ -138,6 +138,47 @@ namespace Server.ServeRepositories
             _dbContextServer.CRDTCharacters.Where(n => n.IdNote == noteId).ExecuteDelete();
 
         }
+        public async Task SaveAllChangesFromClient(List<DToSendChanges> changes, Guid idUser)
+        {
+            if (changes == null || changes.Count == 0)
+                return;
+
+            // Clear change tracker to avoid conflicts with detached entities from client
+            _dbContextServer.ChangeTracker.Clear();
+
+            // Get all existing note IDs in one query (avoid N+1 query problem)
+            var existingNoteIds = await _dbContextServer.Notes
+                .Select(n => n.IdNote)
+                .ToListAsync();
+
+            foreach (var item in changes)
+            {
+                if (!existingNoteIds.Contains(item.NoteServer.IdNote))
+                {
+                    // New note
+                    _dbContextServer.Notes.Add(item.NoteServer);
+                    _dbContextServer.Note_Users.Add(new Note_UserServer()
+                    {
+                        IdNote = item.NoteServer.IdNote,
+                        IdUser = idUser
+                    });
+                }
+                else
+                {
+                    // Existing note - attach and update
+                    _dbContextServer.Notes.Update(item.NoteServer);
+                }
+
+                // Add the CRDT payload
+                _dbContextServer.CRDTCharacters.Add(new CRDTCharacterServer()
+                {
+                    Payload = item.Payload,
+                    IdNote = item.NoteServer.IdNote
+                });
+            }
+
+            await _dbContextServer.SaveChangesAsync();
+        }
 
         public async Task SaveAllChangesFromClient(List<NoteServer> notesClient, Guid UserId)
         {
@@ -169,7 +210,7 @@ namespace Server.ServeRepositories
             return null;
         }
 
-        public async Task ManageCRDTCharacters(List<CRDTCharacter> crdtCharacters)
+        public async Task ManageCRDTCharacters(List<CRDTCharacterServer> crdtCharacters)
         {
             if (crdtCharacters == null || crdtCharacters.Count == 0)
                 return;
@@ -177,51 +218,36 @@ namespace Server.ServeRepositories
             _dbContextServer.CRDTCharacters.AddRange(crdtCharacters);
             await _dbContextServer.SaveChangesAsync();
         }
-        public async Task saveCRDTChanges(List<CRDTCharacter> changes)
+        public async Task saveCRDTChanges(CRDTChangePayload changes)
         {
-            var changeIds = changes.Select(c => c.IdCharacter).ToList();
-            _dbContextServer.ChangeTracker.Clear();
-            var existingCharacters = await _dbContextServer.CRDTCharacters
-                .AsNoTracking()
-                .Where(c => changeIds.Contains(c.IdCharacter))
-                .ToListAsync();
-
-            var existingLookup = existingCharacters
-                .ToDictionary(c => (c.IdCharacter, c.IdNote));
-
-            foreach (var character in changes)
+            _dbContextServer.CRDTCharacters.Add(new CRDTCharacterServer()
             {
-                if (existingLookup.TryGetValue((character.IdCharacter, character.IdNote), out var existing))
-                {
-                    // Update existing - mark as modified
-                    //  _dbContextServer.Entry(character).State = EntityState.Modified;
-                    _dbContextServer.CRDTCharacters.Update(character); // should i use ExecuteUpdateAsync and save directly in the database
-                }
-                else
-                {
-                    // New entity - mark as added
-                    //_dbContextServer.Entry(character).State = EntityState.Added;
-                    _dbContextServer.CRDTCharacters.Add(character);
-                }
-            }
+                IdNote = changes.IdNote,
+                Payload = changes.Payload
+            });
             await _dbContextServer.SaveChangesAsync();
         }
 
-        public async Task<List<CRDTCharacter>> GetAllCRDTByUser(Guid userId) // dont forget to make the connecction of note with the client
+        public async Task<List<CRDTCharacterServer>> GetAllCRDTByUser(Guid userId) // dont forget to make the connecction of note with the client
         {
             return await _dbContextServer.CRDTCharacters
+            .Include(c => c.NoteServer)
+            .AsNoTracking()
             .Where(c => _dbContextServer.Note_Users
                 .Any(nu => nu.IdUser == userId && nu.IdNote == c.IdNote))
             .ToListAsync();
         }
 
-        public async Task<List<CRDTCharacter>> getCRDTCharactersbyIdNote(Guid noteId, Guid userId)
+        public async Task<List<CRDTCharacterServer>> getCRDTCharactersbyIdNote(Guid noteId, Guid userId)
         {
             if (DoseUserHaveAccessToNote(userId, noteId))
             {
-                return await _dbContextServer.CRDTCharacters.Where(n => n.IdNote == noteId).ToListAsync();
+                return await _dbContextServer.CRDTCharacters
+                    .Include(c => c.NoteServer)
+                    .AsNoTracking()
+                    .Where(n => n.IdNote == noteId).ToListAsync();
             }
-            return new List<CRDTCharacter>();  // need a pathern where we verifie user access to Note and return error instead of empty list
+            return new List<CRDTCharacterServer>();  // need a pathern where we verifie user access to Note and return error instead of empty list
         }
 
         public async Task SaveNoteUserConnection(Guid noteId, Guid userId)

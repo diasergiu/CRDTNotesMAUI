@@ -68,8 +68,9 @@ namespace MAUIClientUI.MVVM
             var loggerFactory = IPlatformApplication.Current.Services.GetService<ILoggerFactory>();
             _logger = loggerFactory?.CreateLogger<NoteView>();
             var cursorLogger = loggerFactory?.CreateLogger<CRDTLibrary.Cursor.Document>();
+            var characterRepository = IPlatformApplication.Current.Services.GetService<CRDTCharacterRepository>();
 
-            _noteController = new NoteController(_currentNote, _noteRepository, _noteServices, cursorLogger);
+            _noteController = new NoteController(_currentNote, _noteRepository, _noteServices, characterRepository, cursorLogger);
 
             //LoadNoteData();
         }
@@ -139,10 +140,10 @@ namespace MAUIClientUI.MVVM
         /// <summary>
         /// Handles updates from other users editing the same note.
         /// </summary>
-        private async void OnRemoteNoteUpdated(object sender, CRDTCharacter e)
+        private async void OnRemoteNoteUpdated(object sender, CRDTChangePayload e)
         {
             // Filter + persist + merge is handled by the controller; skip UI update if not our note.
-            if (!await _noteController.ApplyRemoteChangeAsync(e))
+            if (!await _noteController.ApplyRemoteChangesAsync(e))
                 return;
 
             ContentRefreshRequested?.Invoke(_noteController.GetText());
@@ -239,20 +240,20 @@ namespace MAUIClientUI.MVVM
                 {
                     _currentNote.Version = updateResult.Data.ServerNote.Version;
                 }
-                // CONFLICT DETECTED - Version mismatch
-                else if (updateResult.Data?.IsVersionConflict == true)
-                {
-                    await ShowConflictDialog(updateResult.Data.ServerNote);
-                    return;  // DO NOT save locally, exit here
-                }
+                //// CONFLICT DETECTED - Version mismatch
+                //else if (updateResult.Data?.IsVersionConflict == true)
+                //{
+                //    await ShowConflictDialog(updateResult.Data.ServerNote);
+                //    return;  // DO NOT save locally, exit here
+                //}
 
-                // Other errors (not conflict)
-                if (!updateResult.IsSuccess)
-                {
-                    if (!silent)
-                        await _dialogHelper.ShowAlertAsync("Error", updateResult.ErrorMessage, "OK");
-                    return;  // DO NOT save locally on error
-                }
+                //// Other errors (not conflict)
+                //if (!updateResult.IsSuccess)
+                //{
+                //    if (!silent)
+                //        await _dialogHelper.ShowAlertAsync("Error", updateResult.ErrorMessage, "OK");
+                //    return;  // DO NOT save locally on error
+                //}
 
                 // TRUE SUCCESS - Only save to local DB when server update succeeds
                 _noteRepository.UpdateNote(_currentNote);
@@ -262,88 +263,88 @@ namespace MAUIClientUI.MVVM
                 await _dialogHelper.ShowAlertAsync("Success", "Note saved successfully!", "OK");
         }
 
-        /// <summary>
-        /// Shows conflict resolution dialog when server update fails due to version mismatch.
-        /// Does NOT save to local DB - user must choose an action first.
-        /// </summary>
-        private async Task ShowConflictDialog(NoteServer serverNote)
-        {
-            var action = await _dialogHelper.ShowActionSheetAsync(
-                "Note Conflict",
-                "Cancel",
-                null,
-                "Use Server Version",
-                "View Differences",
-                "Manual Merge");
+        //    /// <summary>
+        //    /// Shows conflict resolution dialog when server update fails due to version mismatch.
+        //    /// Does NOT save to local DB - user must choose an action first.
+        //    /// </summary>
+        //    private async Task ShowConflictDialog(NoteServer serverNote)
+        //    {
+        //        var action = await _dialogHelper.ShowActionSheetAsync(
+        //            "Note Conflict",
+        //            "Cancel",
+        //            null,
+        //            "Use Server Version",
+        //            "View Differences",
+        //            "Manual Merge");
 
-            if (action == "Cancel")
-            {
-                // User cancels - do nothing, stay in edit view. Note is NOT saved anywhere.
-                return;
-            }
-            else if (action == "Use Server Version")
-            {
-                ApplyServerVersion(serverNote);
-                await _dialogHelper.ShowAlertAsync("Success", "Updated to server Version. Note saved locally.", "OK");
-                await _navigationHelper.PopAsync();
-            }
-            else if (action == "View Differences")
-            {
-                await ShowDetailedComparison(serverNote);
-            }
-            else if (action == "Manual Merge")
-            {
-                await _dialogHelper.ShowAlertAsync(
-                    "Manual Merge",
-                    $"Server has:\n" +
-                    $"Title: {serverNote.Title}\n\n" +
-                    $"Content:\n{serverNote.Content}\n\n" +
-                    $"You can manually edit your Version and try saving again.",
-                    "OK");
-                // Stay in editor, update version so retry works
-                _currentNote.Version = serverNote.Version;
-            }
-        }
+        //        if (action == "Cancel")
+        //        {
+        //            // User cancels - do nothing, stay in edit view. Note is NOT saved anywhere.
+        //            return;
+        //        }
+        //        else if (action == "Use Server Version")
+        //        {
+        //            ApplyServerVersion(serverNote);
+        //            await _dialogHelper.ShowAlertAsync("Success", "Updated to server Version. Note saved locally.", "OK");
+        //            await _navigationHelper.PopAsync();
+        //        }
+        //        else if (action == "View Differences")
+        //        {
+        //            await ShowDetailedComparison(serverNote);
+        //        }
+        //        else if (action == "Manual Merge")
+        //        {
+        //            await _dialogHelper.ShowAlertAsync(
+        //                "Manual Merge",
+        //                $"Server has:\n" +
+        //                $"Title: {serverNote.Title}\n\n" +
+        //           //     $"Content:\n{serverNote.Content}\n\n" +
+        //                $"You can manually edit your Version and try saving again.",
+        //                "OK");
+        //            // Stay in editor, update version so retry works
+        //            _currentNote.Version = serverNote.Version;
+        //        }
+        //    }
 
-        /// <summary>
-        /// Shows detailed side-by-side comparison of server version vs client version.
-        /// </summary>
-        private async Task ShowDetailedComparison(NoteServer serverNote)
-        {
-            var action = await _dialogHelper.ShowActionSheetAsync(
-                "Version Comparison",
-                "Back",
-                null,
-                "Use Server Version",
-                "Keep My Changes");
+        //    /// <summary>
+        //    /// Shows detailed side-by-side comparison of server version vs client version.
+        //    /// </summary>
+        //    private async Task ShowDetailedComparison(NoteServer serverNote)
+        //    {
+        //        var action = await _dialogHelper.ShowActionSheetAsync(
+        //            "Version Comparison",
+        //            "Back",
+        //            null,
+        //            "Use Server Version",
+        //            "Keep My Changes");
 
-            if (action == "Use Server Version")
-            {
-                ApplyServerVersion(serverNote);
-                await _dialogHelper.ShowAlertAsync("Success", "Updated to server Version. Note saved locally.", "OK");
-                await _navigationHelper.PopAsync();
-            }
-            else if (action == "Keep My Changes")
-            {
-                // Let user keep editing and retry with server version number
-                _currentNote.Version = serverNote.Version;
-                await _dialogHelper.ShowAlertAsync("Info", "Updated to match server Version. Try saving again.", "OK");
-            }
-        }
+        //        if (action == "Use Server Version")
+        //        {
+        //            ApplyServerVersion(serverNote);
+        //            await _dialogHelper.ShowAlertAsync("Success", "Updated to server Version. Note saved locally.", "OK");
+        //            await _navigationHelper.PopAsync();
+        //        }
+        //        else if (action == "Keep My Changes")
+        //        {
+        //            // Let user keep editing and retry with server version number
+        //            _currentNote.Version = serverNote.Version;
+        //            await _dialogHelper.ShowAlertAsync("Info", "Updated to match server Version. Try saving again.", "OK");
+        //        }
+        //    }
 
-        private void ApplyServerVersion(NoteServer serverNote)
-        {
-            _currentNote.Title = serverNote.Title;
-            _currentNote.Content = serverNote.Content;
-            _currentNote.LastUpdate = serverNote.LastUpdate;
-            _currentNote.Version = serverNote.Version;
+        //    private void ApplyServerVersion(NoteServer serverNote)
+        //    {
+        //        _currentNote.Title = serverNote.Title;
+        //        _currentNote.Content = serverNote.Content;
+        //        _currentNote.LastUpdate = serverNote.LastUpdate;
+        //        _currentNote.Version = serverNote.Version;
 
-            // Reflect server version in the UI
-            Title = _currentNote.Title;
-            ContentRefreshRequested?.Invoke(_currentNote.Content);
+        //        // Reflect server version in the UI
+        //        Title = _currentNote.Title;
+        //        ContentRefreshRequested?.Invoke(_currentNote.Content);
 
-            _noteRepository.UpdateNote(_currentNote);
-        }
+        //        _noteRepository.UpdateNote(_currentNote);
+        //    }
         #endregion
     }
 }

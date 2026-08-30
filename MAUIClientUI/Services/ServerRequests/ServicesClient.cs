@@ -10,8 +10,9 @@ namespace MAUIClientUI.Services.ServerRequests
     {
         protected string _baseURL { get; set; }
         protected HttpClient _httpClient;
+        protected IUserContext _userContext;
 
-        protected ServicesClient(string URLModifier)
+        protected ServicesClient(string URLModifier, IUserContext? userContext = null)
         {
             _baseURL = BaseURLGetter.getBaseURL() + URLModifier;
             _httpClient = new HttpClient()
@@ -19,19 +20,21 @@ namespace MAUIClientUI.Services.ServerRequests
                 BaseAddress = new Uri(_baseURL),
                 Timeout = TimeSpan.FromSeconds(30)
             };
+            // Use provided context or fall back to static UserDevice for backward compatibility
+            _userContext = userContext ?? new DefaultUserContextAdapter();
         }
-
 
         protected HttpRequestMessage GetRequestWithIdHeader(HttpMethod method, string url)
         {
             var request = new HttpRequestMessage(method, url);
-            request.Headers.Add("X-User-Id", UserDevice.LocalUser.ToString());
-            if (!string.IsNullOrEmpty(UserDevice.HubConnectionId))
+            request.Headers.Add("X-User-Id", _userContext.LocalUser.ToString());
+            if (!string.IsNullOrEmpty(_userContext.HubConnectionId))
             {
-                request.Headers.Add("X-Connection-Id", UserDevice.HubConnectionId);
+                request.Headers.Add("X-Connection-Id", _userContext.HubConnectionId);
             }
             return request;
         }
+
         protected async Task<HttpResponseMessage> SendRequest<T>(HttpMethod method, String url, T? data)
         {
             var request = GetRequestWithIdHeader(method, url);
@@ -46,6 +49,24 @@ namespace MAUIClientUI.Services.ServerRequests
             }
             var result = await _httpClient.SendAsync(request);
             return result;
+        }
+    }
+
+    /// <summary>
+    /// Adapter to use static UserDevice as the default IUserContext for backward compatibility.
+    /// </summary>
+    internal class DefaultUserContextAdapter : IUserContext
+    {
+        public Guid LocalUser 
+        { 
+            get => UserDevice.LocalUser; 
+            set => UserDevice.LocalUser = value; 
+        }
+
+        public string? HubConnectionId 
+        { 
+            get => UserDevice.HubConnectionId; 
+            set => UserDevice.HubConnectionId = value; 
         }
     }
 }

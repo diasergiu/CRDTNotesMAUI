@@ -2,6 +2,7 @@
 using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.RequestBody.EntityMappers;
 using DatabaseLibrary.WrapperClasses;
+using MAUIClientUI.Services.HelperClasses;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,7 +11,7 @@ namespace MAUIClientUI.Services
 {
     public class DummyNoteServices : INoteServices
     {
-        public async Task<ApiResult> SendChangesToServer(List<NoteClient> noteClient)
+        public async Task<ApiResult> SendChangesToServer(List<DToSendChanges> noteClient)
         {
             return ApiResult.Success();
         }
@@ -20,9 +21,9 @@ namespace MAUIClientUI.Services
             return ApiResultData<List<NoteClient>>.Success(new List<NoteClient>());
         }
 
-        public async Task<ApiResultData<List<NoteClient>>> GetAllCharacterByUser(Guid IdUser)
+        public async Task<ApiResultData<List<DToSendChanges>>> GetServerChanges()
         {
-            return ApiResultData<List<NoteClient>>.Success(new List<NoteClient>());
+            return ApiResultData<List<DToSendChanges>>.Success(new List<DToSendChanges>());
         }
 
         public async Task<ApiResult> CreateNewNote(NoteClient currentNote)
@@ -40,19 +41,14 @@ namespace MAUIClientUI.Services
             return ApiResult.Success();
         }
 
-        public async Task<ApiResult> SendCRDTChangestoServer(List<CRDTCharacter> characters)
+        public async Task<ApiResult> SendCRDTChangestoServer(CRDTChangePayload payload)
         {
             return ApiResult.Success();
         }
 
-        public async Task<ApiResultData<List<CRDTCharacter>>> GetAllCharacterByUser()
+        public async Task<ApiResultData<List<DToSendChanges>>> GetServerChangesByNote(Guid noteId)
         {
-            return ApiResultData<List<CRDTCharacter>>.Success(new List<CRDTCharacter>());
-        }
-
-        public async Task<ApiResultData<List<CRDTCharacter>>> GetAllCharacterByNote(Guid noteId)
-        {
-            return ApiResultData<List<CRDTCharacter>>.Success(new List<CRDTCharacter>());
+            return ApiResultData<List<DToSendChanges>>.Success(new List<DToSendChanges>());
         }
 
         public async Task<ApiResultData<NoteClient>> GetNote(Guid noteId)

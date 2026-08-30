@@ -1,4 +1,5 @@
-﻿using DatabaseLibrary.Entities;
+﻿
+using DatabaseLibrary.Entities;
 using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.WrapperClasses;
 using MAUIClientUI.Miscellaneous;
@@ -8,7 +9,6 @@ using MAUIClientUI.Services;
 using MAUIClientUI.Services.HelperClasses;
 using MAUIClientUI.Services.ServerRequests;
 using Microsoft.Extensions.Logging;
-using System.IO;
 
 namespace MAUIClientUI
 {
@@ -40,7 +40,7 @@ namespace MAUIClientUI
                 .AddScoped<IAuthenticationService, AuthenticationService>()
                 .AddScoped<NoteRepository>()
                 .AddScoped<CRDTCharacterRepository>();
-                //.AddScoped<NotesViewModel>();
+            //.AddScoped<NotesViewModel>();
 
             // Configure logging
             string logsDir = Path.Combine(
@@ -56,9 +56,9 @@ namespace MAUIClientUI
 #if DEBUG
             builder.Logging.SetMinimumLevel(LogLevel.Debug);
 #else
-            builder.Logging.SetMinimumLevel(LogLevel.Information);
+        builder.Logging.SetMinimumLevel(LogLevel.Information);
 #endif
-           // GetLocalUserFromEnviVariable();
+            // GetLocalUserFromEnviVariable();
             var app = builder.Build();
 
             // Register ILoggerFactory in DI container

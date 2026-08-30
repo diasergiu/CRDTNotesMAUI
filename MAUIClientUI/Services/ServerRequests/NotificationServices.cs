@@ -1,4 +1,5 @@
 ﻿using DatabaseLibrary.Entities;
+using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.WrapperClasses;
 using MAUIClientUI.Services.HelperClasses;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -13,7 +14,7 @@ namespace MAUIClientUI.Services
         private HubConnection _hubConnection;
         private bool _isConnected = false;
 
-        public event EventHandler<CRDTCharacter> NoteUpdated;
+        public event EventHandler<CRDTChangePayload> NoteUpdated;
         public event EventHandler<string> ConnectionStatusChanged;
 
         public NotificationServices(string serverUrl)
@@ -26,21 +27,19 @@ namespace MAUIClientUI.Services
                 .WithAutomaticReconnect(new[] { TimeSpan.Zero, TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(10) })
                 .Build();
             
-            _hubConnection.On<CRDTCharacter>("NoteUpdated", (data) =>
+            _hubConnection.On<CRDTChangePayload>("NoteUpdated", (payload) =>
             {
                 try
                 {
-                    // Server stores/pushes encrypted ids; decrypt before use.
-                    if (data != null)
-                    {
-                        data.IdCharacter = CharacterIdProtector.Decrypt(data.IdCharacter);
-                    }
-
-                    NoteUpdated?.Invoke(this, data);
+                    if (payload != null)  
+      
+                    NoteUpdated?.Invoke(this, payload);
+                        
+                    
                 }
-                catch (KeyNotFoundException ex)
+                catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Missing property in NoteUpdated message: {ex.Message}");
+                    System.Diagnostics.Debug.WriteLine($"Error decoding NoteUpdated payload: {ex.Message}");
                 }
             });
 

@@ -20,8 +20,8 @@ namespace MAUIClientUI.Repositories
 
         public List<NoteClient> GetNoteFromUser(Guid idUser)
         {
-            //            return _dbContextUser.Notes.Where(n => n.NoteUser.Any(nu => nu.IdUser == idUser)).ToList();
-            return _dbContextUser.Notes.Include(b => b.CRDTCharacter).AsNoTracking().ToList();
+            return _dbContextUser.Notes.Where(b => b.DirtyFlagChangesMade == true).Include(c => c.CRDTCharacter)
+                .Where(c => c.DirtyFlagChangesMade == true).AsNoTracking().ToList();
         }
         public void UpdateListNotes(List<NoteClient> noteClients)
         {
@@ -109,50 +109,80 @@ namespace MAUIClientUI.Repositories
             return _dbContextUser.Notes.Include(b => b.CRDTCharacter).ToList();
         }
 
-        public async Task ClearDirtyFlag(List<CRDTCharacterClient> offlineChanges)
+        public async Task ClearDirtyFlag(List<NoteClient> offlineChanges)
         {
-            foreach (var character in offlineChanges)
+            foreach (NoteClient note in offlineChanges)
             {
-                character.IsDirtyFlag = false;
+                foreach (var character in note.CRDTCharacter)
+                {
+                    character.IsDirtyFlag = false;
+                }
+                note.DirtyFlagChangesMade = false;
+                _dbContextUser.ChangeTracker.Clear();
+                _dbContextUser.CRDTCharacters.UpdateRange(note.CRDTCharacter);
+                _dbContextUser.Notes.Update(note);
             }
-            _dbContextUser.ChangeTracker.Clear();
-            _dbContextUser.CRDTCharacters.UpdateRange(offlineChanges);
-            _dbContextUser.SaveChangesAsync();
+            await _dbContextUser.SaveChangesAsync();
             _dbContextUser.ChangeTracker.Clear();
 
         }
 
-        public async Task SaveCRDTChanges(List<CRDTCharacterClient> changes)
+        public virtual async Task SaveCRDTChanges(List<CRDTCharacterClient> changes)
         {
+            if (changes == null || changes.Count == 0)
+                return;
+
+            // Clear change tracker to prevent conflicts
+            _dbContextUser.ChangeTracker.Clear();
+
+            // De-duplicate the input list by keeping only the last occurrence of each character
+            var deduplicatedChanges = changes
+                .GroupBy(c => (c.IdCharacter, c.IdNote))
+                .Select(g => g.Last())
+                .ToList();
+
             // Get all IDs from the list
-            var changeIds = changes.Select(c => c.IdCharacter).ToList();
+            var changeIds = deduplicatedChanges.Select(c => c.IdCharacter).ToHashSet();
             var existingCharacters = await _dbContextUser.CRDTCharacters
                 .AsNoTracking()
                 .Where(c => changeIds.Contains(c.IdCharacter))
-                .ToListAsync();
+                .ToDictionaryAsync(c => (c.IdCharacter, c.IdNote));
 
+            var toAdd = new List<CRDTCharacterClient>();
+            var toUpdate = new List<CRDTCharacterClient>();
 
-            // Create lookup for O(1) access
-            var existingLookup = existingCharacters
-                .ToDictionary(c => (c.IdCharacter, c.IdNote));
-
-            foreach (var character in changes)
+            foreach (var character in deduplicatedChanges)
             {
-                if (existingLookup.TryGetValue((character.IdCharacter, character.IdNote), out var existing))
+                var key = (character.IdCharacter, character.IdNote);
+                if (existingCharacters.ContainsKey(key))
                 {
-                    // Update existing - mark as modified
-                    //  _dbContextServer.Entry(character).State = EntityState.Modified;
-                    _dbContextUser.CRDTCharacters.Update(character);
+                    toUpdate.Add(character);
                 }
                 else
                 {
-                    // New entity - mark as added
-                    //_dbContextServer.Entry(character).State = EntityState.Added;
-                    _dbContextUser.CRDTCharacters.Add(character);
+                    toAdd.Add(character);
                 }
             }
 
-            await _dbContextUser.SaveChangesAsync();
+            // Add new entities
+            if (toAdd.Any())
+            {
+                _dbContextUser.CRDTCharacters.AddRange(toAdd);
+            }
+
+            // Update existing entities
+            if (toUpdate.Any())
+            {
+                _dbContextUser.CRDTCharacters.UpdateRange(toUpdate);
+            }
+
+            if (toAdd.Any() || toUpdate.Any())
+            {
+                await _dbContextUser.SaveChangesAsync();
+            }
+
+            // Clear tracker after saving to avoid tracking issues in future operations
+            _dbContextUser.ChangeTracker.Clear();
         }
 
         public async Task DeleteCharacterByNoteId(Guid noteId)

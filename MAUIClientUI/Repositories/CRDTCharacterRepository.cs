@@ -1,10 +1,5 @@
-﻿using DatabaseLibrary.Entities;
-using DatabaseLibrary.Entities.Client;
+﻿using DatabaseLibrary.Entities.Client;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace MAUIClientUI.Repositories
 {
@@ -27,7 +22,7 @@ namespace MAUIClientUI.Repositories
                 .ToList();
         }
 
-        public void SaveNewCrdtCharacter(CRDTCharacterClient newCharacter)
+        public virtual void SaveNewCrdtCharacter(CRDTCharacterClient newCharacter)
         {
             // Check if character exists using AsNoTracking to avoid tracking conflicts
             var existing = _dbContext.CRDTCharacters
@@ -39,14 +34,14 @@ namespace MAUIClientUI.Repositories
                 UpdateCharacter(newCharacter);
                 return;
             }
-            
+
             _dbContext.CRDTCharacters.Add(newCharacter);
             _dbContext.SaveChanges();
             _dbContext.ChangeTracker.Clear();
 
         }
 
-        public void UpdateCharacter(CRDTCharacterClient updateCharacter)
+        public virtual void UpdateCharacter(CRDTCharacterClient updateCharacter)
         {
             _dbContext.CRDTCharacters.Update(updateCharacter);
             _dbContext.SaveChanges();

@@ -17,7 +17,6 @@ namespace DatabaseLibrary.RequestBody.EntityMappers
             {
                 IdNote = noteClient.IdNote,
                 Title = noteClient.Title,
-                Content = noteClient.Content,
                 LastUpdate = noteClient.LastUpdate,
                 CreationDate = noteClient.CreationDate,
                 Version = noteClient.Version,
@@ -35,7 +34,6 @@ namespace DatabaseLibrary.RequestBody.EntityMappers
                 IdNote = noteServer.IdNote,
                 Title = noteServer.Title,
                 CreationDate = noteServer.CreationDate,
-                Content = noteServer.Content,
                 LastUpdate = noteServer.LastUpdate,
                 Version = noteServer.Version,
                 DirtyFlagChangesMade = noteServer.DirtyFlagChangesMade,

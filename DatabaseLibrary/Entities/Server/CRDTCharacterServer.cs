@@ -1,31 +1,29 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace DatabaseLibrary.Entities.Server
 {
-    public class CRDTCharacterServer: CRDTCharacter
+    [PrimaryKey(nameof(Version), nameof(IdNote))]
+    public class CRDTCharacterServer
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Version { get; set; }
+        public string Payload { get; set; }
+        public Guid IdNote { get; set; }
         [ForeignKey("IdNote")]
-        [JsonIgnore]
+        [Newtonsoft.Json.JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
         public NoteServer NoteServer { get; set; }
         public CRDTCharacterServer()
         {
         }
-
-        public CRDTCharacterServer(CRDTCharacter character)
-        {
-            this.IdCharacter = character.IdCharacter;
-            this.IdNote = character.IdNote;
-            this.Character = character.Character;
-            this.Operation = character.Operation;
-            this.ClockDateTime = character.ClockDateTime;
-            this.Tombstone = character.Tombstone;
-        }
-
-        public CRDTCharacterServer(CRDTCharacter character, NoteServer noteServer) : this(character)
+        public CRDTCharacterServer(NoteServer noteServer) : this()
         {
             this.NoteServer = noteServer;
         }

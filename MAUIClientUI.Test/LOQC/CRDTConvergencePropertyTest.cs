@@ -24,10 +24,10 @@ namespace MAUIClientUI.Test.LOQC
         /// Builds a set of operations by typing <paramref name="text"/> into a cursor
         /// owned by <paramref name="clientId"/>, then returns the resulting characters.
         /// </summary>
-        private static List<CRDTCharacterClient> ProduceOperations(string text, Guid clientId)
+        private static List<CRDTCharacterPayload> ProduceOperations(string text, Guid clientId)
         {
             var cursor = new Document("", clientId);
-            var produced = new List<CRDTCharacterClient>();
+            var produced = new List<CRDTCharacterPayload>();
             for (int i = 0; i < text.Length; i++)
             {
                 produced.Add(cursor.InsertCharacter(i, text[i]));
@@ -39,9 +39,9 @@ namespace MAUIClientUI.Test.LOQC
         /// Applies a set of operations to a fresh replica in the given order and returns
         /// the reconstructed text. Merging is order-independent by design.
         /// </summary>
-        private static string ApplyToFreshReplica(IEnumerable<CRDTCharacterClient> operations, Guid replicaOwner)
+        private static string ApplyToFreshReplica(IEnumerable<CRDTCharacterPayload> operations, Guid replicaOwner)
         {
-            var cursor = new Document(new List<CRDTCharacterClient>(), replicaOwner);
+            var cursor = new Document(new List<CRDTCharacterPayload>(), replicaOwner);
             foreach (var op in operations)
             {
                 cursor.MergeCharacter(op);
@@ -82,7 +82,7 @@ namespace MAUIClientUI.Test.LOQC
         public void TC_02_CommutativityHoldsWithInterleavedDeletions()
         {
             var cursor = new Document("", ClientA);
-            var operations = new List<CRDTCharacterClient>();
+            var operations = new List<CRDTCharacterPayload>();
 
             const string text = "abcdefghij";
             for (int i = 0; i < text.Length; i++)
@@ -111,7 +111,7 @@ namespace MAUIClientUI.Test.LOQC
         {
             var operations = ProduceOperations("idempotence", ClientA);
 
-            var cursor = new Document(new List<CRDTCharacterClient>(), ClientB);
+            var cursor = new Document(new List<CRDTCharacterPayload>(), ClientB);
             foreach (var op in operations)
             {
                 cursor.MergeCharacter(op);
@@ -131,7 +131,7 @@ namespace MAUIClientUI.Test.LOQC
         {
             var operations = ProduceOperations("AB", ClientA);
 
-            var cursor = new Document(new List<CRDTCharacterClient>(), ClientB);
+            var cursor = new Document(new List<CRDTCharacterPayload>(), ClientB);
             foreach (var op in operations)
             {
                 cursor.MergeCharacter(op);
@@ -157,13 +157,12 @@ namespace MAUIClientUI.Test.LOQC
             var shared = ProduceOperations("HI", ClientA);
 
             var replicaA = new Document(shared.Select(c => c).ToList(), ClientA);
-            var replicaB = new Document(shared.Select(c => new CRDTCharacterClient
+            var replicaB = new Document(shared.Select(c => new CRDTCharacterPayload
             {
                 IdCharacter = c.IdCharacter,
                 Character = c.Character,
                 Tombstone = c.Tombstone,
-                Operation = c.Operation,
-                ClockDateTime = c.ClockDateTime
+
             }).ToList(), ClientB);
 
             // Both insert at the same logical position, concurrently.
@@ -187,17 +186,16 @@ namespace MAUIClientUI.Test.LOQC
             var producerA = new Document(shared.ToList(), ClientA);
             var fromA = producerA.InsertCharacter(1, 'X');
 
-            var producerB = new Document(shared.Select(c => new CRDTCharacterClient
+            var producerB = new Document(shared.Select(c => new CRDTCharacterPayload
             {
                 IdCharacter = c.IdCharacter,
                 Character = c.Character,
                 Tombstone = c.Tombstone,
-                Operation = c.Operation,
-                ClockDateTime = c.ClockDateTime
+
             }).ToList(), ClientB);
             var fromB = producerB.InsertCharacter(1, 'Y');
 
-            var all = new List<CRDTCharacterClient>(shared) { fromA, fromB };
+            var all = new List<CRDTCharacterPayload>(shared) { fromA, fromB };
 
             string forward = ApplyToFreshReplica(all, ClientA);
             string reversed = ApplyToFreshReplica(Enumerable.Reverse(all), ClientA);
@@ -225,7 +223,7 @@ namespace MAUIClientUI.Test.LOQC
         {
             var operations = ProduceOperations("AB", ClientA);
 
-            var cursor = new Document(new List<CRDTCharacterClient>(), ClientB);
+            var cursor = new Document(new List<CRDTCharacterPayload>(), ClientB);
             foreach (var op in operations)
             {
                 cursor.MergeCharacter(op);
@@ -236,13 +234,11 @@ namespace MAUIClientUI.Test.LOQC
             Assert.Equal("A", cursor.GetString());
 
             // A stale replica re-sends the original (non-tombstoned) insert for that character.
-            var staleInsert = new CRDTCharacterClient
+            var staleInsert = new CRDTCharacterPayload
             {
                 IdCharacter = operations[1].IdCharacter,
                 Character = operations[1].Character,
                 Tombstone = false,
-                Operation = "insert",
-                ClockDateTime = operations[1].ClockDateTime
             };
             cursor.MergeCharacter(staleInsert);
 
@@ -271,16 +267,14 @@ namespace MAUIClientUI.Test.LOQC
 
             // Simulate the delete of 'B' arriving as a tombstoned character before the
             // replica has ever seen 'B'.
-            var tombstonedB = new CRDTCharacterClient
+            var tombstonedB = new CRDTCharacterPayload
             {
                 IdCharacter = operations[1].IdCharacter,
                 Character = operations[1].Character,
                 Tombstone = true,
-                Operation = "delete",
-                ClockDateTime = operations[1].ClockDateTime
             };
 
-            var cursor = new Document(new List<CRDTCharacterClient>(), ClientB);
+            var cursor = new Document(new List<CRDTCharacterPayload>(), ClientB);
             cursor.MergeCharacter(tombstonedB);          // delete first
             cursor.MergeCharacter(operations[0]);        // then the inserts
             cursor.MergeCharacter(operations[2]);
@@ -299,22 +293,21 @@ namespace MAUIClientUI.Test.LOQC
             var shared = ProduceOperations("BASE", ClientA);
 
             var replicaA = new Document(shared.ToList(), ClientA);
-            var replicaB = new Document(shared.Select(c => new CRDTCharacterClient
+            var replicaB = new Document(shared.Select(c => new CRDTCharacterPayload
             {
                 IdCharacter = c.IdCharacter,
                 Character = c.Character,
                 Tombstone = c.Tombstone,
-                Operation = c.Operation,
-                ClockDateTime = c.ClockDateTime
+
             }).ToList(), ClientB);
 
-            var aOps = new List<CRDTCharacterClient>
+            var aOps = new List<CRDTCharacterPayload>
             {
                 replicaA.InsertCharacter(4, '1'),
                 replicaA.InsertCharacter(5, '2')
             };
 
-            var bOps = new List<CRDTCharacterClient>
+            var bOps = new List<CRDTCharacterPayload>
             {
                 replicaB.InsertCharacter(0, '9'),
                 replicaB.InsertCharacter(1, '8')
@@ -338,21 +331,19 @@ namespace MAUIClientUI.Test.LOQC
             var producerA = new Document(shared.ToList(), ClientA);
             var fromA = producerA.InsertCharacter(1, 'X');
             // Device A's clock runs one hour ahead.
-            fromA.ClockDateTime = DateTime.UtcNow.AddHours(1);
 
-            var producerB = new Document(shared.Select(c => new CRDTCharacterClient
+
+            var producerB = new Document(shared.Select(c => new CRDTCharacterPayload
             {
                 IdCharacter = c.IdCharacter,
                 Character = c.Character,
                 Tombstone = c.Tombstone,
-                Operation = c.Operation,
-                ClockDateTime = c.ClockDateTime
+
             }).ToList(), ClientB);
             var fromB = producerB.InsertCharacter(1, 'Y');
             // Device B's clock runs one hour behind.
-            fromB.ClockDateTime = DateTime.UtcNow.AddHours(-1);
 
-            var all = new List<CRDTCharacterClient>(shared) { fromA, fromB };
+            var all = new List<CRDTCharacterPayload>(shared) { fromA, fromB };
 
             string order1 = ApplyToFreshReplica(all, ClientA);
             string order2 = ApplyToFreshReplica(Enumerable.Reverse(all), ClientA);
@@ -372,20 +363,17 @@ namespace MAUIClientUI.Test.LOQC
 
             var producerA = new Document(shared.ToList(), ClientA);
             var fromA = producerA.InsertCharacter(1, 'X');
-            fromA.ClockDateTime = sameClock;
 
-            var producerB = new Document(shared.Select(c => new CRDTCharacterClient
+            var producerB = new Document(shared.Select(c => new CRDTCharacterPayload
             {
                 IdCharacter = c.IdCharacter,
                 Character = c.Character,
                 Tombstone = c.Tombstone,
-                Operation = c.Operation,
-                ClockDateTime = c.ClockDateTime
+
             }).ToList(), ClientB);
             var fromB = producerB.InsertCharacter(1, 'Y');
-            fromB.ClockDateTime = sameClock;
 
-            var all = new List<CRDTCharacterClient>(shared) { fromA, fromB };
+            var all = new List<CRDTCharacterPayload>(shared) { fromA, fromB };
 
             Assert.Equal(
                 ApplyToFreshReplica(all, ClientA),
