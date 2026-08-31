@@ -49,7 +49,7 @@ namespace MAUIClientUI.Services.ServerRequests
         public async Task<ApiResultData<NoteClient>> GetNote(Guid noteId)
         {
             return await ExceptionHandlingHelper.ExecuteAsyncWithDataExtraction<NoteClient>(
-                async () => await SendRequest<Object>(HttpMethod.Get, $"{_baseURL}/{noteId}", null),
+                async () => await SendRequest<Object>(HttpMethod.Get, $"{_baseURL}/{noteId}", null, noteId),
                 nameof(GetNote)
             );
         }
@@ -65,7 +65,7 @@ namespace MAUIClientUI.Services.ServerRequests
         public async Task<ApiResultData<NoteConflictResult>> UpdateNote(NoteClient updatedNote)
         { 
             var result = await ExceptionHandlingHelper.ExecuteAsyncWithDataExtraction<NoteConflictResult>(
-                async () => await SendRequest<NoteClient>(HttpMethod.Put, $"{_baseURL}/{updatedNote.IdNote}", updatedNote),
+                async () => await SendRequest<NoteClient>(HttpMethod.Put, $"{_baseURL}/{updatedNote.IdNote}", updatedNote, updatedNote.IdNote),
                 nameof(UpdateNote)
             );
             return result;
@@ -74,7 +74,7 @@ namespace MAUIClientUI.Services.ServerRequests
         public async Task<ApiResult> DeleteNote(Guid noteId)
         {
             return await ExceptionHandlingHelper.ExecuteAsync(
-                async () => await SendRequest<object>(HttpMethod.Delete, $"{_baseURL}/{noteId}", null),
+                async () => await SendRequest<object>(HttpMethod.Delete, $"{_baseURL}/{noteId}", null, noteId),
                 nameof(DeleteNote)
             );
         }
@@ -90,17 +90,17 @@ namespace MAUIClientUI.Services.ServerRequests
         public async Task<ApiResultData<List<DToSendChanges>>> GetServerChangesByNote(Guid noteId)
         {
             var result = await ExceptionHandlingHelper.ExecuteAsyncWithDataExtraction<List<DToSendChanges>>(
-                async () => await SendRequest<Object>(HttpMethod.Get, $"{_baseURL}/GetAllCharacterByNote/{noteId}", null),
+                async () => await SendRequest<Object>(HttpMethod.Get, $"{_baseURL}/GetAllCharacterByNote/{noteId}", null, noteId),
                 nameof(GetServerChangesByNote)
             );
             return result;
         }
 
 
-        public Task<ApiResult> GiveNoteAccessToUser(Guid noteId, Guid userId)
+        public async Task<ApiResult> GiveNoteAccessToUser(Guid noteId, string userName)
         {
-            var result = ExceptionHandlingHelper.ExecuteAsync(
-                async () => await SendRequest<object>(HttpMethod.Post, $"{_baseURL}/GiveNoteAccessToUser?userId={userId}&noteId={noteId}", null),
+            var result = await ExceptionHandlingHelper.ExecuteAsync(
+                async () => await SendRequest<object>(HttpMethod.Post, $"{_baseURL}/GiveNoteAccessToUser/{noteId}?userName={userName}", null, noteId),
                 nameof(GiveNoteAccessToUser));
             return result;
         }

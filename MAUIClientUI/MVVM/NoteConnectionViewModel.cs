@@ -15,9 +15,9 @@ namespace MAUIClientUI.MVVM
 
         #region Properties
         [ObservableProperty]
-        private string idNoteRequested;
+        private string userName;
         [ObservableProperty]
-        private Guid _noteId;
+        private Guid noteId;
         #endregion
 
         #region Services/Repositories
@@ -38,27 +38,27 @@ namespace MAUIClientUI.MVVM
             _dialogHelper = iDialogHelper;
             _navigationHelper = navigationHelper;   
 
-            _noteId = IdNote;
+            NoteId = IdNote;
         }
 
         [RelayCommand]
         private async Task AccessNoteClicked()
         {
-            if (string.IsNullOrWhiteSpace(idNoteRequested))
+            if (string.IsNullOrWhiteSpace(UserName))
             {
-                await _dialogHelper.ShowAlertAsync("Error", "Please enter a Note ID", "OK");
+                await _dialogHelper.ShowAlertAsync("Error", "Please enter a Username", "OK");
                 return;
             }
 
-            if (!Guid.TryParse(idNoteRequested, out var userId))
-            {
-                await _dialogHelper.ShowAlertAsync("Error", "Invalid User ID format. Please enter a valid GUID.", "OK");
-                return;
-            }
+            //if (!Guid.TryParse(idNoteRequested, out var userId))
+            //{
+            //    await _dialogHelper.ShowAlertAsync("Error", "Invalid User ID format. Please enter a valid GUID.", "OK");
+            //    return;
+            //}
 
             try
             {
-                var result = await _noteServices.GiveNoteAccessToUser(_noteId, userId);
+                var result = await _noteServices.GiveNoteAccessToUser(NoteId, UserName);
                 if (result.IsSuccess)
                 {
                     await _navigationHelper.PopAsync(); 

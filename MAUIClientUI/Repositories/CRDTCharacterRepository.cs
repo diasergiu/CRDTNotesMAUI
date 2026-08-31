@@ -38,7 +38,6 @@ namespace MAUIClientUI.Repositories
             _dbContext.CRDTCharacters.Add(newCharacter);
             _dbContext.SaveChanges();
             _dbContext.ChangeTracker.Clear();
-
         }
 
         public virtual void UpdateCharacter(CRDTCharacterClient updateCharacter)

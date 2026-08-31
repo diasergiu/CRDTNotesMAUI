@@ -21,8 +21,8 @@
                             HorizontalOptions="Center"
                             TextColor="Black" />
                     <Entry x:Name="IdNoteEntry"
-                           Text="{Binding IdNoteRequested}"
-                           Placeholder="Enter IdUser"
+                           Text="{Binding UserName}"
+                           Placeholder="Enter Username"
                            FontSize="16"
                            BackgroundColor="#F5F5F5"
                            TextColor="Black" />
@@ -37,7 +37,7 @@
 
                         <Button Grid.Column="1"
                                 x:Name="AccessNoteButton"
-                                Text="Access Note"
+                                Text="Give Note"
                                 BackgroundColor="#4CAF50"
                                 TextColor="White"
                                 CornerRadius="8"

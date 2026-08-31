@@ -56,7 +56,7 @@
 
             <Button 
                 x:Name="GiveAccessButton"
-                Text="Give Access To Person"
+                Text="Share Note"
                 BackgroundColor="#2196F3"
                 TextColor="White"
                 CornerRadius="8"

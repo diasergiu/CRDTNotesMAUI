@@ -73,7 +73,7 @@ namespace MAUIClientUI.MVVM
         private async void OnLoginSucceeded(object? sender, Guid userId) // need to do this before testing SyncData
         {
             this._noteServices = new NoteServices("/api/notes", _noteRepository); // because of this
-            isLoggedIn = true; // this shuold change syncButton to enabled
+            IsLoggedIn = true; // this shuold change syncButton to enabled
 
             var clientChanges = _noteRepository.GetNoteFromUser(userId);
             var prepareToSend = PrepareChanges(clientChanges);

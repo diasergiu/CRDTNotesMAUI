@@ -19,6 +19,6 @@ namespace MAUIClientUI.Services
         Task<ApiResult> SendCRDTChangestoServer(CRDTChangePayload payload);
         Task<ApiResultData<List<DToSendChanges>>> GetServerChangesByNote(Guid noteId);
         Task<ApiResultData<NoteClient>> GetNote(Guid noteId);
-        Task<ApiResult> GiveNoteAccessToUser(Guid noteId, Guid userId);
+        Task<ApiResult> GiveNoteAccessToUser(Guid noteId, string userId);
     }
 }

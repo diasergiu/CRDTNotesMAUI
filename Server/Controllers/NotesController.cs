@@ -5,6 +5,7 @@ using DatabaseLibrary.RequestBody.EntityMappers;
 using DatabaseLibrary.ResponsBody;
 using DatabaseLibrary.WrapperClasses;
 using Microsoft.AspNetCore.Mvc;
+using Server.Filters;
 using Server.ServeRepositories;
 
 
@@ -35,6 +36,7 @@ namespace Server.Controllers
         }
         //// Get /api/notes/{id}
         [HttpGet("{id}")]
+        [NoteAccessAuthorization("noteId")]
         public async Task<IActionResult> GetNote(Guid noteId)
         {
             Guid idUser = GetUserIdFromRequest();
@@ -66,14 +68,11 @@ namespace Server.Controllers
             ));
         }
         [HttpGet("GetAllCharacterByNote")]
+        [NoteAccessAuthorization("noteId")]
         public async Task<IActionResult> GetAllCharacterByNote(Guid noteId)
         {
             Guid userId = GetUserIdFromRequest();
-            if (_notesRepository.DoseUserHaveAccessToNote(noteId, userId) == false)
-            {
-                return BadRequest("You do not have access to this note.");
-            }
-            _notesRepository.SaveNoteUserConnection(noteId, userId);
+            await _notesRepository.SaveNoteUserConnection(noteId, userId);
             var serverChanges = await _notesRepository.getCRDTCharactersbyIdNote(noteId, userId);
 
             // Convert CRDTCharacterServer to DToSendChanges for client
@@ -101,6 +100,7 @@ namespace Server.Controllers
 
         //// PUT /api/notes/{id}
         [HttpPut("{id}")]
+        [NoteAccessAuthorization("noteId")]
         public async Task<IActionResult> UpdateNotes(Guid noteId, [FromBody] NoteClient note)
         {
             Guid idUser = GetUserIdFromRequest();
@@ -131,11 +131,12 @@ namespace Server.Controllers
             ));
 
         }
-        [HttpPost("GiveNoteAccessToUser")]
-        public async Task<IActionResult> GiveNoteAccessToUser(Guid userId, Guid noteId)
+        [HttpPost("GiveNoteAccessToUser/{noteId}")]
+        [NoteAccessAuthorization("noteId")]
+        public async Task<IActionResult> GiveNoteAccessToUser(Guid noteId, [FromQuery] string UserName)
         {
-            //Guid userId = GetUserIdFromRequest();
-            await _notesRepository.SaveNoteUserConnection(noteId, userId);
+            Guid userId = GetUserIdFromRequest();
+            await _notesRepository.SaveNoteUserConnection(noteId, UserName);
             return Ok(ApiResponse<object>.SuccessResponse(
                 data: null,
                 message: "Note access granted successfully."
@@ -143,14 +144,11 @@ namespace Server.Controllers
         }
 
         [HttpDelete("{id}")]
+        [NoteAccessAuthorization("id")]
         public async Task<IActionResult> DeleteNote(Guid id)
         {
-            Guid idUser = GetUserIdFromRequest();
-            if(!_notesRepository.DoseUserHaveAccessToNote(id, idUser))
-            {
-                return BadRequest("You do not have access to this note.");
-            }
-            await _notesRepository.DeleteNote(id, idUser);
+            Guid userId = GetUserIdFromRequest();
+            await _notesRepository.DeleteNote(id, userId);
             return Ok(ApiResponse<object>.SuccessResponse(
                 data: null,
                 message: "Note deleted successfully."
@@ -183,7 +181,5 @@ namespace Server.Controllers
                 .Select(note => EntityMapper.MapNoteServerToNoteClient(note))
                 .ToList();
         }
-
-        
     }
 }

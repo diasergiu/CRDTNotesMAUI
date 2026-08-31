@@ -8,6 +8,7 @@ using System.Text;
 namespace DatabaseLibrary.Entities.Server
 {
     [Table("User")]
+    [Index(nameof(Username),IsUnique = true)]
     public class UserServer : IUser
     {
         [Key]

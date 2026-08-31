@@ -15,7 +15,7 @@ namespace Server.ServeRepositories
             _dbContextServer = context;
         }
 
-        public bool DoseUserHaveAccessToNote(Guid userId, Guid noteId)
+        public bool DoseUserHaveAccessToNote(Guid noteId, Guid userId)
         {
             var noteUser = _dbContextServer.Note_Users.FirstOrDefault(nu => nu.IdNote == noteId && nu.IdUser == userId);
             return noteUser != null;
@@ -104,13 +104,19 @@ namespace Server.ServeRepositories
             }
         }
 
-        public async Task DeleteNote(Guid noteId, Guid idUser)
+        public async Task DeleteNote(Guid noteId, Guid IdUser)
+        {
+            await _DeleteNote(noteId, IdUser);
+            await _dbContextServer.SaveChangesAsync();
+        }
+
+        private async Task _DeleteNote(Guid noteId, Guid idUser)
         {
             // Verify the note belongs to the user
             var noteUser = await _dbContextServer.Note_Users
                 .FirstOrDefaultAsync(nu => nu.IdNote == noteId && nu.IdUser == idUser);
 
-            if (noteUser == null)
+            if (noteUser == null) // this shuold be done now by the NoteAccessAuthorization method
             {
                 throw new Exception("Note not found or access denied.");
             }
@@ -119,7 +125,7 @@ namespace Server.ServeRepositories
             _dbContextServer.Note_Users.Remove(noteUser);
 
             // Delete the note itself if there are no users connected to note
-            List<Note_UserServer> remainingConnections = _dbContextServer.Note_Users.Where(n => n.IdNote == noteId).ToList();
+            List<Note_UserServer> remainingConnections = await _dbContextServer.Note_Users.Where(n => n.IdNote == noteId).ToListAsync();
             if (remainingConnections.Count == 1)
             {
                 var note = await _dbContextServer.Notes.FirstOrDefaultAsync(n => n.IdNote == noteId);
@@ -127,15 +133,13 @@ namespace Server.ServeRepositories
                 {
                     _dbContextServer.Notes.Remove(note);
                 }
-                DeleteCharacters(note.IdNote);
-            }
-
-            await _dbContextServer.SaveChangesAsync();
+                await DeleteCharacters(note.IdNote);
+            }           
         }
 
-        public void DeleteCharacters(Guid noteId)
+        public async Task DeleteCharacters(Guid noteId)
         {
-            _dbContextServer.CRDTCharacters.Where(n => n.IdNote == noteId).ExecuteDelete();
+            await _dbContextServer.CRDTCharacters.Where(n => n.IdNote == noteId).ExecuteDeleteAsync();
 
         }
         public async Task SaveAllChangesFromClient(List<DToSendChanges> changes, Guid idUser)
@@ -162,6 +166,10 @@ namespace Server.ServeRepositories
                         IdNote = item.NoteServer.IdNote,
                         IdUser = idUser
                     });
+                }
+                else if(item.NoteServer.isDeleted)
+                {
+                    await _DeleteNote(item.NoteServer.IdNote, idUser);
                 }
                 else
                 {
@@ -252,8 +260,18 @@ namespace Server.ServeRepositories
 
         public async Task SaveNoteUserConnection(Guid noteId, Guid userId)
         {
-            _dbContextServer.Note_Users.Add(new Note_UserServer() { IdNote = noteId, IdUser = userId });
-            await _dbContextServer.SaveChangesAsync(); // i dont think this is the best way to handle this 
+                _dbContextServer.Note_Users.Add(new Note_UserServer() { IdNote = noteId, IdUser = userId });
+                await _dbContextServer.SaveChangesAsync();
+        
+        }
+
+        public async Task SaveNoteUserConnection(Guid noteId, string userName)
+        {
+            var user = await _dbContextServer.Users.FirstOrDefaultAsync(u => u.Username == userName);
+            if (user != null)
+            {
+                await SaveNoteUserConnection(noteId, user.IdUser);
+            }
         }
     }
 

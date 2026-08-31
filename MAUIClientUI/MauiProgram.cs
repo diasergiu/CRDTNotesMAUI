@@ -83,7 +83,7 @@ namespace MAUIClientUI
                 return args[1];
 
             // defautl
-            return "Default";
+            return "";
         }
 
         private static void InitializeDatabase(IServiceProvider services, string instanceId)

@@ -2,6 +2,7 @@ using DatabaseLibrary.WrapperClasses;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 
 namespace MAUIClientUI.Services.ServerRequests
@@ -24,7 +25,7 @@ namespace MAUIClientUI.Services.ServerRequests
             _userContext = userContext ?? new DefaultUserContextAdapter();
         }
 
-        protected HttpRequestMessage GetRequestWithIdHeader(HttpMethod method, string url)
+        protected HttpRequestMessage GetRequestWithIdHeader(HttpMethod method, string url, Guid? noteId = null)
         {
             var request = new HttpRequestMessage(method, url);
             request.Headers.Add("X-User-Id", _userContext.LocalUser.ToString());
@@ -32,12 +33,25 @@ namespace MAUIClientUI.Services.ServerRequests
             {
                 request.Headers.Add("X-Connection-Id", _userContext.HubConnectionId);
             }
+            if(noteId != null)
+            {
+                request.Headers.Add("noteId", noteId.ToString());
+            }
             return request;
         }
 
-        protected async Task<HttpResponseMessage> SendRequest<T>(HttpMethod method, String url, T? data)
+        protected async Task<HttpResponseMessage> SendRequest<T>(HttpMethod method, string url, T? data, Guid? noteId = null)
         {
-            var request = GetRequestWithIdHeader(method, url);
+            var request = noteId.HasValue
+                ? GetRequestWithIdHeader(method, url, noteId.Value)
+                : GetRequestWithIdHeader(method, url);
+
+            SerializeJson<T>(request, data);
+            var result = await _httpClient.SendAsync(request);
+            return result;
+        }
+        protected void SerializeJson<T>(HttpRequestMessage request, T? data)
+        {
             if (data != null)
             {
                 var settings = new JsonSerializerSettings
@@ -47,9 +61,7 @@ namespace MAUIClientUI.Services.ServerRequests
                 var json = JsonConvert.SerializeObject(data, settings);
                 request.Content = new StringContent(json, Encoding.UTF8, "application/json");
             }
-            var result = await _httpClient.SendAsync(request);
-            return result;
-        }
+        }        
     }
 
     /// <summary>
