@@ -2,6 +2,8 @@
 using DatabaseLibrary.Entities;
 using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.Entities.Server;
+using DatabaseLibrary.RequestBody.EntityMappers;
+using MAUIClientUI.Services.HelperClasses;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -69,7 +71,7 @@ namespace MAUIClientUI.Repositories
             _dbContextUser.Users.Add(newUser);
         }
 
-        public void UpdateNote(NoteClient note)
+        public virtual void UpdateNote(NoteClient note)
         {
             _dbContextUser.ChangeTracker.Clear();
             _dbContextUser.Notes.Update(note);
@@ -77,7 +79,7 @@ namespace MAUIClientUI.Repositories
 
 
         }
-        public void CreateNote(NoteClient note)
+        public virtual void CreateNote(NoteClient note)
         {
             _dbContextUser.ChangeTracker.Clear();
             _dbContextUser.Notes.Add(note);
@@ -88,6 +90,15 @@ namespace MAUIClientUI.Repositories
         {
             _dbContextUser.ChangeTracker.Clear();
             _dbContextUser.Notes.Remove(note);
+            _dbContextUser.SaveChanges();
+        }
+
+        public void SoftDeleteNote(NoteClient note)
+        {
+            _dbContextUser.ChangeTracker.Clear();
+            note.DirtyFlagChangesMade = true;
+            note.isDeleted = true;
+            _dbContextUser.Notes.Update(note);
             _dbContextUser.SaveChanges();
         }
 
@@ -106,7 +117,7 @@ namespace MAUIClientUI.Repositories
 
         public async Task<List<NoteClient>> GetAllNotes()
         {
-            return _dbContextUser.Notes.Include(b => b.CRDTCharacter).ToList();
+            return _dbContextUser.Notes.Where(n => n.isDeleted != true).Include(b => b.CRDTCharacter).ToList();
         }
 
         public async Task ClearDirtyFlag(List<NoteClient> offlineChanges)
@@ -185,9 +196,46 @@ namespace MAUIClientUI.Repositories
             _dbContextUser.ChangeTracker.Clear();
         }
 
-        public async Task DeleteCharacterByNoteId(Guid noteId)
+        public void DeleteCharacterByNoteId(Guid noteId)
         {
             _dbContextUser.CRDTCharacters.Where(n => n.IdNote == noteId).ExecuteDeleteAsync();
+        }
+
+        public async Task DeleteNotesWithIdDeleted()
+        {
+            await _dbContextUser.Notes.Where(n => n.isDeleted).ExecuteDeleteAsync();
+        }
+
+        public async Task UpdateBasedOnNoteServer(List<NoteServer> data)
+        {
+            var listOfCRDTByCharacter = _dbContextUser.CRDTCharacters.ToList();
+            foreach (NoteServer note in data)
+            {
+                var decodedChanges = new List<CRDTCharacterClient>();
+                if (note.CRDTCharacter != null)
+                {
+                    foreach (var change in note.CRDTCharacter)
+                    {
+                        var decodedCharacters = CharacterSerializer.Decode(change.Payload);
+
+                        foreach (var character in decodedCharacters)
+                        {
+
+                            decodedChanges.Add(new CRDTCharacterClient
+                            {
+                                IdCharacter = character.IdCharacter,
+                                Character = character.Character,
+                                Tombstone = character.Tombstone,
+                                IdNote = change.NoteServer.IdNote,
+                                IsDirtyFlag = true,
+                            });
+                        }
+                        _dbContextUser.Notes.Update(EntityMapper.MapNoteServerToNoteClient(note));
+                        await SaveCRDTChanges(decodedChanges);
+
+                    }
+                }
+            }
         }
     }
 }

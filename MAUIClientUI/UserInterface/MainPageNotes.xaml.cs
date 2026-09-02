@@ -4,12 +4,15 @@ using MAUIClientUI.MVVM;
 using MAUIClientUI.Repositories;
 using MAUIClientUI.Services;
 using MAUIClientUI.Services.HelperClasses;
+using Microsoft.Extensions.Logging;
 
 namespace MAUIClientUI.UserInterface;
 
 public partial class MainPageNotes : ContentPage
 {
     private MainPageViewModel _viewModel;
+
+    private ILogger _logger;
     public MainPageNotes()
     {
         var _noteServices = new DummyNoteServices();
@@ -22,7 +25,8 @@ public partial class MainPageNotes : ContentPage
 
         this.BindingContext = _viewModel;
 
-        
+        var loggerFactory = IPlatformApplication.Current.Services.GetService<ILoggerFactory>();
+        _logger = loggerFactory?.CreateLogger<MainPageNotes>();
         LoadData();
     }
 
@@ -33,14 +37,9 @@ public partial class MainPageNotes : ContentPage
     }
     #region Just navigation to other elements
 
-    private async void OnLoginClicked(object sender, EventArgs e)
-    {
-        var loginPopup = new LoginPopup();
-        await Navigation.PushModalAsync(loginPopup);
-    }
     #endregion
     protected override async void OnAppearing()
     {
         await _viewModel.LoadNotesAsync();
-    }  
+    }
 }

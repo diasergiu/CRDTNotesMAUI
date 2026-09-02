@@ -142,7 +142,7 @@ namespace Server.ServeRepositories
             await _dbContextServer.CRDTCharacters.Where(n => n.IdNote == noteId).ExecuteDeleteAsync();
 
         }
-        public async Task SaveAllChangesFromClient(List<DToSendChanges> changes, Guid idUser)
+        public async Task SaveAllChangesFromClient(List<DTOSendChanges> changes, Guid idUser)
         {
             if (changes == null || changes.Count == 0)
                 return;
@@ -207,7 +207,6 @@ namespace Server.ServeRepositories
             }
         }
 
-
         public async Task<NoteServer> GetNoteById(Guid IdNote, Guid idUser)
         {
             var noteAccess = _dbContextServer.Note_Users.FirstOrDefault(n => n.IdUser == idUser && n.IdNote == IdNote);
@@ -226,7 +225,7 @@ namespace Server.ServeRepositories
             _dbContextServer.CRDTCharacters.AddRange(crdtCharacters);
             await _dbContextServer.SaveChangesAsync();
         }
-        public async Task saveCRDTChanges(CRDTChangePayload changes)
+        public async Task SaveCRDTChanges(CRDTChangePayload changes)
         {
             _dbContextServer.CRDTCharacters.Add(new CRDTCharacterServer()
             {
@@ -246,7 +245,7 @@ namespace Server.ServeRepositories
             .ToListAsync();
         }
 
-        public async Task<List<CRDTCharacterServer>> getCRDTCharactersbyIdNote(Guid noteId, Guid userId)
+        public async Task<List<CRDTCharacterServer>> GetCRDTCharactersbyIdNote(Guid noteId, Guid userId)
         {
             if (DoseUserHaveAccessToNote(userId, noteId))
             {
@@ -272,6 +271,12 @@ namespace Server.ServeRepositories
             {
                 await SaveNoteUserConnection(noteId, user.IdUser);
             }
+        }
+
+        internal async Task<List<NoteServer>> GetAllChangesDTO(Guid userId)
+        {
+            return await _dbContextServer.Notes.Where(n => n.NoteUser.Any(un => un.IdUser == userId)).Include(c => c.CRDTCharacter).ToListAsync();
+
         }
     }
 

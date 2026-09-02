@@ -5,7 +5,7 @@ using System.Text;
 
 namespace DatabaseLibrary.WrapperClasses
 {
-    public class DToSendChanges
+    public class DTOSendChanges
     {
         public NoteServer NoteServer { get; set; }
         public string Payload { get; set; }

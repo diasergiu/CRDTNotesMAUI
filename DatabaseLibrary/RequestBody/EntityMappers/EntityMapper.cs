@@ -21,7 +21,8 @@ namespace DatabaseLibrary.RequestBody.EntityMappers
                 CreationDate = noteClient.CreationDate,
                 Version = noteClient.Version,
                 DirtyFlagChangesMade = noteClient.DirtyFlagChangesMade,
-              //  CRDTCharacter = MapCharacterClientToServer(noteClient.CRDTCharacter)
+                isDeleted = noteClient.isDeleted,
+                //  CRDTCharacter = MapCharacterClientToServer(noteClient.CRDTCharacter)
 
             };
         }

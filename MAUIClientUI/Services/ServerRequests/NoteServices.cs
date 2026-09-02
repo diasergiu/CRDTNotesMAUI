@@ -20,10 +20,10 @@ namespace MAUIClientUI.Services.ServerRequests
         {
             _notesRepository = noteRepository;    
         }
-        public async Task<ApiResult> SendChangesToServer(List<DToSendChanges> changes)
+        public async Task<ApiResultData<List<NoteServer>>> SendChangesToServer(List<DTOSendChanges> changes)
         {
-             return await ExceptionHandlingHelper.ExecuteAsync(
-                async () => await SendRequest<List<DToSendChanges>>(HttpMethod.Post, $"{_baseURL}/SendChangesToServer", changes),
+             return await ExceptionHandlingHelper.ExecuteAsync<List<NoteServer>>(
+                async () => await SendRequest<List<DTOSendChanges>>(HttpMethod.Post, $"{_baseURL}/SendChangesToServer", changes),
                 nameof(SendChangesToServer)
             );
         }
@@ -37,9 +37,9 @@ namespace MAUIClientUI.Services.ServerRequests
             return result;
         }
 
-        public async Task<ApiResultData<List<DToSendChanges>>> GetServerChanges()
+        public async Task<ApiResultData<List<NoteServer>>> GetServerChanges()
         {
-            var result = await ExceptionHandlingHelper.ExecuteAsyncWithDataExtraction<List<DToSendChanges>>(
+            var result = await ExceptionHandlingHelper.ExecuteAsyncWithDataExtraction<List<NoteServer>>(
                 async () => await SendRequest<Object>(HttpMethod.Get, $"{_baseURL}/GetServerChanges", null),
                 nameof(GetServerChanges)
             );
@@ -87,9 +87,9 @@ namespace MAUIClientUI.Services.ServerRequests
 
             return result;
         }
-        public async Task<ApiResultData<List<DToSendChanges>>> GetServerChangesByNote(Guid noteId)
+        public async Task<ApiResultData<List<DTOSendChanges>>> GetServerChangesByNote(Guid noteId)
         {
-            var result = await ExceptionHandlingHelper.ExecuteAsyncWithDataExtraction<List<DToSendChanges>>(
+            var result = await ExceptionHandlingHelper.ExecuteAsyncWithDataExtraction<List<DTOSendChanges>>(
                 async () => await SendRequest<Object>(HttpMethod.Get, $"{_baseURL}/GetAllCharacterByNote/{noteId}", null, noteId),
                 nameof(GetServerChangesByNote)
             );

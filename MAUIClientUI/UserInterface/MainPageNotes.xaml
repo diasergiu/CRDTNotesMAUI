@@ -32,14 +32,14 @@
             <Button 
                 x:Name="LoginButton"
                 Grid.Column="2"
-                Text="Login"
+                Text="{Binding TextLogin}"
                 BackgroundColor="#2196F3"
                 TextColor="White"
                 CornerRadius="8"
                 FontSize="14"
                 HeightRequest="40"
                 WidthRequest="80"
-                Clicked="OnLoginClicked" />
+                Command="{Binding AuthenticationButtonClickedCommand}" />
         </Grid>
 
         <Button 

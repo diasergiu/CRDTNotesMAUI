@@ -1,5 +1,6 @@
 ﻿using DatabaseLibrary.Entities;
 using DatabaseLibrary.Entities.Client;
+using DatabaseLibrary.Entities.Server;
 using DatabaseLibrary.RequestBody.EntityMappers;
 using DatabaseLibrary.WrapperClasses;
 using MAUIClientUI.Services.HelperClasses;
@@ -11,9 +12,9 @@ namespace MAUIClientUI.Services
 {
     public class DummyNoteServices : INoteServices
     {
-        public async Task<ApiResult> SendChangesToServer(List<DToSendChanges> noteClient)
+        public async Task<ApiResultData<List<NoteServer>>> SendChangesToServer(List<DTOSendChanges> noteClient)
         {
-            return ApiResult.Success();
+            return ApiResultData<List<NoteServer>>.Success(new List<NoteServer>());
         }
 
         public async Task<ApiResultData<List<NoteClient>>> GetAllNotesFromUser(Guid IdUser)
@@ -21,9 +22,9 @@ namespace MAUIClientUI.Services
             return ApiResultData<List<NoteClient>>.Success(new List<NoteClient>());
         }
 
-        public async Task<ApiResultData<List<DToSendChanges>>> GetServerChanges()
+        public async Task<ApiResultData<List<NoteServer>>> GetServerChanges()
         {
-            return ApiResultData<List<DToSendChanges>>.Success(new List<DToSendChanges>());
+            return ApiResultData<List<NoteServer>>.Success(new List<NoteServer>());
         }
 
         public async Task<ApiResult> CreateNewNote(NoteClient currentNote)
@@ -46,9 +47,9 @@ namespace MAUIClientUI.Services
             return ApiResult.Success();
         }
 
-        public async Task<ApiResultData<List<DToSendChanges>>> GetServerChangesByNote(Guid noteId)
+        public async Task<ApiResultData<List<DTOSendChanges>>> GetServerChangesByNote(Guid noteId)
         {
-            return ApiResultData<List<DToSendChanges>>.Success(new List<DToSendChanges>());
+            return ApiResultData<List<DTOSendChanges>>.Success(new List<DTOSendChanges>());
         }
 
         public async Task<ApiResultData<NoteClient>> GetNote(Guid noteId)

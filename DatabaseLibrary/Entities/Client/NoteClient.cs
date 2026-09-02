@@ -21,6 +21,7 @@ namespace DatabaseLibrary.Entities.Client
         public DateTime LastUpdate { get; set; }
         public int Version { get; set; }
         public bool DirtyFlagChangesMade { get; set; }
+        public bool isDeleted { get; set; }
         [JsonIgnore]
         public List<CRDTCharacterClient>? CRDTCharacter { get; set; }
 

@@ -15,17 +15,17 @@ namespace MAUIClientUI.Miscellaneous
     /// transport directly. Input handlers only decode keystrokes and call <see cref="InsertCharacter"/> /
     /// <see cref="DeleteCharacter"/>; remote updates are applied through <see cref="ApplyRemoteChangeAsync"/>.
     /// </summary>
-    public class NoteController
+    public class NoteOrchestrator
     {
         private readonly Document _Document;
         private readonly NoteClient _currentNote;
         private readonly CRDTCharacterRepository _crdtCharacterRepository;
         private readonly NoteRepository _noteRepository;
         private readonly INoteServices _noteServices;
-        private readonly ILogger<NoteController>? _logger;
+        private readonly ILogger<NoteOrchestrator>? _logger;
 
-        public NoteController(NoteClient currentNote, NoteRepository noteRepository,
-            INoteServices noteServices,  CRDTCharacterRepository characterRepository, ILogger<Document> cursorLogger = null, ILogger<NoteController> logger = null)
+        public NoteOrchestrator(NoteClient currentNote, NoteRepository noteRepository,
+            INoteServices noteServices,  CRDTCharacterRepository characterRepository, ILogger<Document> cursorLogger = null, ILogger<NoteOrchestrator> logger = null)
         {
             _currentNote = currentNote ?? throw new ArgumentNullException(nameof(currentNote));
             _noteRepository = noteRepository ?? throw new ArgumentNullException(nameof(noteRepository));
@@ -57,6 +57,9 @@ namespace MAUIClientUI.Miscellaneous
 
             // Persist locally
             _crdtCharacterRepository.SaveNewCrdtCharacter(clientCharacter);
+            
+            // Mark the note as dirty
+            MarkNoteAsDirty();
 
             // Send to server (payload used for encryption, conversion handled inside)
             SendChangeToServerSafely(newCharacter);
@@ -81,6 +84,9 @@ namespace MAUIClientUI.Miscellaneous
 
                 newPayloads.Add(payload);
             }
+            
+            // Mark the note as dirty
+            MarkNoteAsDirty();
 
             // Send batch of payloads to server
             SendChangesToServerSafely(newPayloads);
@@ -97,6 +103,9 @@ namespace MAUIClientUI.Miscellaneous
                 // Wrap in client object for persistence
                 var clientCharacter = WrapPayloadAsClient(payload);
                 _crdtCharacterRepository.UpdateCharacter(clientCharacter);
+
+                // Mark the note as dirty
+                MarkNoteAsDirty();
 
                 // Send to server
                 SendChangeToServerSafely(payload);
@@ -122,6 +131,9 @@ namespace MAUIClientUI.Miscellaneous
                     // Wrap in client object for persistence
                     var clientCharacter = WrapPayloadAsClient(payload);
                     _crdtCharacterRepository.UpdateCharacter(clientCharacter);
+                    
+                    // Mark the note as dirty
+                    MarkNoteAsDirty();
 
                     deletedPayloads.Add(payload);
                 }
@@ -283,6 +295,16 @@ namespace MAUIClientUI.Miscellaneous
                 IsDirtyFlag = false,  // Doesn't matter for encoding
                 ClockDateTime = DateTime.UtcNow
             };
+        }
+
+        /// <summary>
+        /// Marks the note as modified offline and persists the change to the repository.
+        /// Called whenever content changes to ensure sync tracking when offline.
+        /// </summary>
+        private void MarkNoteAsDirty()
+        {
+            _currentNote.DirtyFlagChangesMade = true;
+            _noteRepository.UpdateNote(_currentNote);
         }
     }
 }

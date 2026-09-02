@@ -53,17 +53,10 @@ namespace Server.Controllers
         public async Task<IActionResult> GetServerChanges()
         {
             Guid userId = GetUserIdFromRequest();
-            var serverChanges = await _notesRepository.GetAllCRDTByUser(userId);
 
-            // Convert CRDTCharacterServer to DToSendChanges for client
-            var dtoChanges = serverChanges.Select(sc => new DToSendChanges
-            {
-                NoteServer = sc.NoteServer,
-                Payload = sc.Payload
-            }).ToList();
-
+            var listChangesFromServer = await _notesRepository.GetAllNotesFromUser(userId);
             return Ok(ApiResponse<object>.SuccessResponse(
-                data: dtoChanges,
+                data: listChangesFromServer,
                 message: "Server changes retrieved successfully."
             ));
         }
@@ -73,10 +66,10 @@ namespace Server.Controllers
         {
             Guid userId = GetUserIdFromRequest();
             await _notesRepository.SaveNoteUserConnection(noteId, userId);
-            var serverChanges = await _notesRepository.getCRDTCharactersbyIdNote(noteId, userId);
+            var serverChanges = await _notesRepository.GetCRDTCharactersbyIdNote(noteId, userId);
 
             // Convert CRDTCharacterServer to DToSendChanges for client
-            var dtoChanges = serverChanges.Select(sc => new DToSendChanges
+            var dtoChanges = serverChanges.Select(sc => new DTOSendChanges
             {
                 NoteServer = sc.NoteServer,
                 Payload = sc.Payload
@@ -91,10 +84,9 @@ namespace Server.Controllers
         public async Task<IActionResult> SendCRDTChangestoServer([FromBody] CRDTChangePayload changes)
         {
             Guid idUser = GetUserIdFromRequest();
-            await _notesRepository.saveCRDTChanges(changes);
+            await _notesRepository.SaveCRDTChanges(changes);
             string? senderConnectionId = Request.Headers["X-Connection-Id"].FirstOrDefault();
             await _noteSyncHub.PushUpdatesToSubscribedUserAsync(changes, idUser, senderConnectionId);
-
             return Ok("Success");
         }
 
@@ -121,12 +113,13 @@ namespace Server.Controllers
         }
 
         [HttpPost("SendChangesToServer")]
-        public async Task<IActionResult> SendChangesToServer([FromBody] List<DToSendChanges> noteClient)
+        public async Task<IActionResult> SendChangesToServer([FromBody] List<DTOSendChanges> noteClient)
         {
             Guid idUser = GetUserIdFromRequest();
             await _notesRepository.SaveAllChangesFromClient(noteClient, idUser);
+            var listChangesFromServer = await _notesRepository.GetAllNotesFromUser(idUser);
             return Ok(ApiResponse<object>.SuccessResponse(
-                data: null,
+                data: listChangesFromServer,
                 message: "Changes synced successfully."
             ));
 

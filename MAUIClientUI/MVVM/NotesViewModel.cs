@@ -8,6 +8,7 @@ using MAUIClientUI.Miscellaneous;
 using MAUIClientUI.Repositories;
 using MAUIClientUI.Services;
 using MAUIClientUI.Services.HelperClasses;
+using MAUIClientUI.Services.ServerRequests;
 using MAUIClientUI.UserInterface;
 using Microsoft.Extensions.Logging;
 using System;
@@ -34,7 +35,7 @@ namespace MAUIClientUI.MVVM
         private readonly NotificationServices _notificationService;
         private readonly INoteServices _noteServices;
         private readonly ILogger<NoteView> _logger;
-        private readonly NoteController _noteController;
+        private readonly NoteOrchestrator _noteController;
         private readonly iDialogHelper _dialogHelper;
         private readonly INavigationHelper _navigationHelper;
         #endregion
@@ -52,7 +53,7 @@ namespace MAUIClientUI.MVVM
         /// The CRDT controller owning the note model. Exposed so the View's platform-specific
         /// input handler can forward keystrokes without touching the CRDT model itself.
         /// </summary>
-        public NoteController NoteController => _noteController;
+        public NoteOrchestrator NoteOrchestrator => _noteController;
 
         public NotesViewModel(NoteClient note, INoteServices noteService, bool isNewNote = false)
         {
@@ -70,7 +71,7 @@ namespace MAUIClientUI.MVVM
             var cursorLogger = loggerFactory?.CreateLogger<CRDTLibrary.Cursor.Document>();
             var characterRepository = IPlatformApplication.Current.Services.GetService<CRDTCharacterRepository>();
 
-            _noteController = new NoteController(_currentNote, _noteRepository, _noteServices, characterRepository, cursorLogger);
+            _noteController = new NoteOrchestrator(_currentNote, _noteRepository, _noteServices, characterRepository, cursorLogger);
 
             //LoadNoteData();
         }
@@ -98,6 +99,12 @@ namespace MAUIClientUI.MVVM
 
             _currentNote.Version = 1;
             _logger?.LogInformation($"NoteView appearing for note: {_currentNote.IdNote}");
+
+            if (UserDevice.LocalUser == Guid.Empty)
+            {
+                _logger?.LogWarning("Not connecting to real-time notifications: user not logged in.");
+                return;
+            }
 
             if (_currentNote != null && !_isNewNote)
             {
@@ -182,22 +189,43 @@ namespace MAUIClientUI.MVVM
             }
             try
             {
-                var deleteResult = await _noteServices.DeleteNote(_currentNote.IdNote);
-                if (!deleteResult.IsSuccess)
+                //bool isOffline = !Connectivity.Current.NetworkAccess.HasFlag(NetworkAccess.Internet);
+                if (typeof(DummyNoteServices).IsInstanceOfType(_noteServices))
                 {
-                    await _dialogHelper.ShowAlertAsync("Error", deleteResult.ErrorMessage, "OK");
-                    return;
+                    SoftDelete();
+                }
+                else
+                {
+                    await HardDeleteNoteAsync();
                 }
 
-                _noteRepository.DeleteNote(_currentNote);
-                _noteRepository.DeleteCharacterByNoteId(_currentNote.IdNote);
-                await _dialogHelper.ShowAlertAsync("Success", "Note deleted successfully!", "OK");
+               
+                
                 await _navigationHelper.PopAsync();
             }
             catch (Exception ex)
             {
                 await _dialogHelper.ShowAlertAsync("Error", $"An error occurred while deleting the note: {ex.Message}", "OK");
             }
+        }
+
+        private async Task SoftDelete()
+        {
+            _noteRepository.SoftDeleteNote(_currentNote);
+            await _dialogHelper.ShowAlertAsync("Success", "Note marked for deletion. It will be synced when online.", "OK");
+        }
+
+        private async Task HardDeleteNoteAsync()
+        {
+            var deleteResult = await _noteServices.DeleteNote(_currentNote.IdNote);
+            if (!deleteResult.IsSuccess)
+            {
+                await _dialogHelper.ShowAlertAsync("Error", deleteResult.ErrorMessage, "OK");
+                return;
+            }
+
+            _noteRepository.DeleteNote(_currentNote);
+            await _dialogHelper.ShowAlertAsync("Success", "Note deleted successfully!", "OK");
         }
         #endregion
 
