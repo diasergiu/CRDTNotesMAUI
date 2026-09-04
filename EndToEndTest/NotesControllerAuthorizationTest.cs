@@ -13,7 +13,7 @@ using Xunit;
 
 namespace EndToEndTest
 {
-    public class NotesControllerAuthorizationTests
+    public class NotesControllerAuthorizationTests : IDisposable
     {
         private readonly DbContextServer _dbContext;
         private readonly NotesRepository _repository;
@@ -35,6 +35,19 @@ namespace EndToEndTest
             // Create NoteSyncHub with mocked dependency
             var noteSyncHub = new NoteSyncHub(hubContextMock.Object);
             _controller = new NotesController(_repository, noteSyncHub);
+        }
+
+        public void Dispose()
+        {
+            try
+            {
+                _dbContext.Database.EnsureDeleted();
+            }
+            catch
+            {
+                // Best-effort cleanup.
+            }
+            _dbContext.Dispose();
         }
 
         private void SetupControllerContext(Guid userId)

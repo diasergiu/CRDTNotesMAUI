@@ -9,7 +9,7 @@ using Xunit;
 
 namespace EndToEndTest
 {
-    public class ServerIntegrationTests
+    public class ServerIntegrationTests : IDisposable
     {
         private readonly DbContextServer _dbContext;
         private readonly NotesRepository _repository;
@@ -26,6 +26,19 @@ namespace EndToEndTest
             _repository = new NotesRepository(_dbContext);
             _userRepository = new UserRepository(_dbContext);
             _userController = new UserController(_userRepository);
+        }
+
+        public void Dispose()
+        {
+            try
+            {
+                _dbContext.Database.EnsureDeleted();
+            }
+            catch
+            {
+                // Best-effort cleanup.
+            }
+            _dbContext.Dispose();
         }
 
         #region User Registration and Login Flow

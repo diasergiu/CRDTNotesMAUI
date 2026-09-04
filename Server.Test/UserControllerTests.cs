@@ -15,7 +15,7 @@ using Xunit;
 
 namespace Server.Test
 {
-    public class UserControllerTests
+    public class UserControllerTests : IDisposable
     {
         private readonly DbContextServer _dbContext;
         private readonly UserRepository _repository;
@@ -32,6 +32,19 @@ namespace Server.Test
 
             _repository = new UserRepository(_dbContext);
             _controller = new UserController(_repository);
+        }
+
+        public void Dispose()
+        {
+            try
+            {
+                _dbContext.Database.EnsureDeleted();
+            }
+            catch
+            {
+                // Best-effort cleanup.
+            }
+            _dbContext.Dispose();
         }
 
         #region Login Tests

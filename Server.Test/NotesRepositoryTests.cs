@@ -9,7 +9,7 @@ using Server.ServerHub;
 
 namespace Server.Test
 {
-    public class NotesRepositoryTests
+    public class NotesRepositoryTests : IDisposable
     {
         private readonly DbContextServer _dbContext;
         private readonly NotesRepository _repository;
@@ -22,6 +22,19 @@ namespace Server.Test
 
             _dbContext = new DbContextServer(options);
             _repository = new NotesRepository(_dbContext);
+        }
+
+        public void Dispose()
+        {
+            try
+            {
+                _dbContext.Database.EnsureDeleted();
+            }
+            catch
+            {
+                // Best-effort cleanup.
+            }
+            _dbContext.Dispose();
         }
 
         #region GetAllNotesFromUser Tests

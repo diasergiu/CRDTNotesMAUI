@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Server.Test
 {
-    public class UserRepositoryTests
+    public class UserRepositoryTests : IDisposable
     {
         private readonly DbContextServer _dbContext;
         private readonly UserRepository _repository;
@@ -19,6 +19,19 @@ namespace Server.Test
 
             _dbContext = new DbContextServer(options);
             _repository = new UserRepository(_dbContext);
+        }
+
+        public void Dispose()
+        {
+            try
+            {
+                _dbContext.Database.EnsureDeleted();
+            }
+            catch
+            {
+                // Best-effort cleanup.
+            }
+            _dbContext.Dispose();
         }
 
         [Fact]
