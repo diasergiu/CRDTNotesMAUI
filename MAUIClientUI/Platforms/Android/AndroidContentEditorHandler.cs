@@ -7,22 +7,12 @@ using static Bumptech.Glide.DiskLruCache.DiskLruCache;
 
 namespace MAUIClientUI.Platforms.Android
 {
-    public class AndroidContentEditorHandler : IContentEditorInputHandler
+    public class AndroidContentEditorHandler : ContentEditorInputHandler
     {
-        private readonly Microsoft.Maui.Controls.Editor _editor;
-        private string _previousText = string.Empty;
-
-        public event Action<int, char> CharacterInserted;
-        public event Action<int> CharacterDeleted;
-        public event Action<int, string> StringInserted;
-        public event Action<int, int> RangeDeleted;
-
-        public AndroidContentEditorHandler(Microsoft.Maui.Controls.Editor editor)
+        public AndroidContentEditorHandler(Microsoft.Maui.Controls.Editor editor) : base(editor)
         {
-            _editor = editor ?? throw new ArgumentNullException(nameof(editor));
-            _previousText = _editor.Text ?? string.Empty;
         }
-        public void HandleKeyPress(object sender, dynamic e)
+        public override void HandleKeyPress(object sender, dynamic e)
         {
              if (_editor is null || e?.Event is null)
             {
@@ -35,7 +25,7 @@ namespace MAUIClientUI.Platforms.Android
             // Handle Backspace/Delete key
             if (e.KeyCode == Keycode.Back)
             {
-                CharacterDeleted?.Invoke(cursorPosition);
+                _ = InvokeCharacterDeleted(cursorPosition);
                 e.Handled = true;
                 Debug.WriteLine("Backspace pressed");
                 return;
@@ -49,12 +39,12 @@ namespace MAUIClientUI.Platforms.Android
                 return;
             }
 
-            CharacterInserted?.Invoke(cursorPosition, typedChar);
+            _ = InvokeCharacterInserted(cursorPosition, typedChar);
             Debug.WriteLine($"Key pressed: {typedChar}");
             e.Handled = false;
         }
 
-        public void HandleTextChanged(object sender, dynamic e)
+        public override void HandleTextChanged(object sender, dynamic e)
         {
             if (_editor == null) return;
 
@@ -77,11 +67,11 @@ namespace MAUIClientUI.Platforms.Android
 
                 if (deletedCount == 1)
                 {
-                    CharacterDeleted?.Invoke(cursorPosition);
+                    _ = InvokeCharacterDeleted(cursorPosition);
                 }
                 else
                 {
-                    RangeDeleted?.Invoke(startPos, endPos);
+                    _ = InvokeRangeDeleted(startPos, endPos);
                 }
             }
             // Text was inserted
@@ -92,11 +82,11 @@ namespace MAUIClientUI.Platforms.Android
 
                 if (insertedCount == 1)
                 {
-                    CharacterInserted?.Invoke(cursorPosition - 1, insertedText[0]);
+                    _ = InvokeCharacterInserted(cursorPosition - 1, insertedText[0]);
                 }
                 else
                 {
-                    StringInserted?.Invoke(cursorPosition - insertedCount, insertedText);
+                    _ = InvokeStringInserted(cursorPosition - insertedCount, insertedText);
                     Debug.WriteLine($"String inserted: '{insertedText}' at position {cursorPosition - insertedCount}");
                 }
             }
@@ -130,7 +120,7 @@ namespace MAUIClientUI.Platforms.Android
             return 0;
         }
 
-        public void HandleKeyUp(object sender, dynamic e)
+        public override void HandleKeyUp(object sender, dynamic e)
         {
             // Platform-specific key up handling can be added here if needed
             Debug.WriteLine($"Key Up: {e?.KeyCode}");

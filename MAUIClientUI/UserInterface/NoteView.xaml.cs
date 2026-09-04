@@ -25,6 +25,7 @@ public partial class NoteView : ContentPage
         Title = "",
         CreationDate = DateTime.Now,
         LastUpdate = DateTime.Now,
+        DirtyFlagChangesMade = true,
         Version = 1
     }, noteService, true)
     {
@@ -83,8 +84,8 @@ public partial class NoteView : ContentPage
         {
 #if WINDOWS
         _inputHandler = new WindowsContentEditorHandler(ContentEditor);
-        _inputHandler.CharacterInserted += _notesViewModel.NoteController.InsertCharacter;
-        _inputHandler.CharacterDeleted += _notesViewModel.NoteController.DeleteCharacter;
+        _inputHandler.CharacterInserted += _notesViewModel.NoteOrchestrator.InsertCharacter;
+        _inputHandler.CharacterDeleted += _notesViewModel.NoteOrchestrator.DeleteCharacter;
         //_inputHandler.StringInserted += _notesViewModel.NoteController.InsertString;     
         //_inputHandler.RangeDeleted += _notesViewModel.NoteController.DeleteCharacterRange;
         var platformView = (Microsoft.UI.Xaml.Controls.TextBox)editor.Handler.PlatformView;
@@ -96,8 +97,8 @@ public partial class NoteView : ContentPage
         }
 #elif ANDROID
             _inputHandler = new AndroidContentEditorHandler(ContentEditor);
-            _inputHandler.CharacterInserted += _notesViewModel.NoteController.InsertCharacter;
-            _inputHandler.CharacterDeleted += _notesViewModel.NoteController.DeleteCharacter;
+            _inputHandler.CharacterInserted += _notesViewModel.NoteOrchestrator.InsertCharacter;
+            _inputHandler.CharacterDeleted += _notesViewModel.NoteOrchestrator.DeleteCharacter;
             //_inputHandler.StringInserted += _notesViewModel.NoteController.InsertString;
             //_inputHandler.RangeDeleted += _notesViewModel.NoteController.DeleteCharacterRange;
             var platformView = (Android.Widget.EditText)editor.Handler.PlatformView;

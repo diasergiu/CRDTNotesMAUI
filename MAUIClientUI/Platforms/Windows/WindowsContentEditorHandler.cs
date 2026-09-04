@@ -8,24 +8,14 @@ using Microsoft.UI.Xaml.Input;
 
 namespace MAUIClientUI.Platforms.Windows
 {
-    public class WindowsContentEditorHandler : IContentEditorInputHandler
+    public class WindowsContentEditorHandler : ContentEditorInputHandler
     {
-        private readonly Editor _editor;
-        private string _previousText = string.Empty;
-
-        public event Action<int, char> CharacterInserted;
-        public event Action<int> CharacterDeleted;
-        public event Action<int, string> StringInserted;
-        public event Action<int, int> RangeDeleted;
-
-        public WindowsContentEditorHandler(Editor editor)
+        public WindowsContentEditorHandler(Editor editor) : base(editor)
         {
-            _editor = editor ?? throw new ArgumentNullException(nameof(editor));
-            _previousText = _editor.Text ?? string.Empty;
         }
 
 
-        public void HandleKeyPress(object sender, dynamic e)
+        public override void HandleKeyPress(object sender, dynamic e)
         {
             var key = GetkeyPressed(e);
 
@@ -35,7 +25,7 @@ namespace MAUIClientUI.Platforms.Windows
             // Handle Backspace key
             if (key == VirtualKey.Back.ToString())
             {
-                CharacterDeleted?.Invoke(cursorPosition);
+                _ = InvokeCharacterDeleted(cursorPosition);
                 e.Handled = true;
                 Debug.WriteLine("Backspace pressed");
                 return;
@@ -47,11 +37,11 @@ namespace MAUIClientUI.Platforms.Windows
                 string charToInsert = key == "Space" ? " " : key;
                 char typedChar = ResolveTypedCharacter((VirtualKey)Enum.Parse(typeof(VirtualKey), key), charToInsert[0]);
 
-                CharacterInserted?.Invoke(cursorPosition, typedChar);
+                _ = InvokeCharacterInserted(cursorPosition, typedChar);
                 Debug.WriteLine("Key pressed");
             }
         }
-        public void HandleTextChanged(object sender, dynamic e)
+        public override void HandleTextChanged(object sender, dynamic e)
         {
             string newText = _editor.Text ?? string.Empty;
             int cursorPosition = GetEditorCurrentPosition();
@@ -69,11 +59,11 @@ namespace MAUIClientUI.Platforms.Windows
 
                 if (deletedCount == 1)
                 {
-                    CharacterDeleted?.Invoke(cursorPosition);
+                    _ = InvokeCharacterDeleted(cursorPosition);
                 }
                 else
                 {
-                    RangeDeleted?.Invoke(startPos, endPos);
+                    _ = InvokeRangeDeleted(startPos, endPos);
                 }
             }
             // Text was inserted (typing, paste, or multi-char selection replace)
@@ -84,11 +74,11 @@ namespace MAUIClientUI.Platforms.Windows
 
                 if (insertedCount == 1)
                 {
-                    CharacterInserted?.Invoke(cursorPosition - 1, insertedText[0]);
+                    _ = InvokeCharacterInserted(cursorPosition - 1, insertedText[0]);
                 }
                 else
                 {
-                    StringInserted?.Invoke(cursorPosition - insertedCount, insertedText);
+                    _ = InvokeStringInserted(cursorPosition - insertedCount, insertedText);
                     Debug.WriteLine($"String inserted: '{insertedText}' at position {cursorPosition - insertedCount}");
                 }
             }
@@ -114,7 +104,7 @@ namespace MAUIClientUI.Platforms.Windows
             return keyEvent.Key.ToString();
         }
 
-        public void HandleKeyUp(object sender, dynamic e)
+        public override void HandleKeyUp(object sender, dynamic e)
         {
             var keyEvent = e as KeyRoutedEventArgs;
             if (keyEvent is not null)
@@ -159,6 +149,8 @@ namespace MAUIClientUI.Platforms.Windows
 
         private static bool IsKeyLocked(VirtualKey key)
             => (InputKeyboardSource.GetKeyStateForCurrentThread(key) & CoreVirtualKeyStates.Locked) == CoreVirtualKeyStates.Locked;
+
+        
     }
 }
 #endif

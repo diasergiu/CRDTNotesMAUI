@@ -1,14 +1,9 @@
-using CRDTLibrary.Cursor;
 using DatabaseLibrary.Entities.Client;
+using EndToEndTest.Mocks;
 using MAUIClientUI.Miscellaneous;
-using MAUIClientUI.Repositories;
-using MAUIClientUI.Services;
 using MAUIClientUI.Services.HelperClasses;
-using MAUIClientUI.Test.Mocks;
-using Microsoft.Maui.Hosting;
-using Xunit;
 
-namespace MAUIClientUI.Test.EndToEndServiceTest
+namespace EndToEndTest.EndToEndServiceTest
 {
     /// <summary>
     /// End-to-End tests for character update flow between two clients using CRDT.
@@ -29,8 +24,8 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
 
         private NoteClient _noteClientA;
         private NoteClient _noteClientB;
-        private NoteController _controllerA;
-        private NoteController _controllerB;
+        private NoteOrchestrator _controllerA;
+        private NoteOrchestrator _controllerB;
         private MockNoteServices _mockNoteServices;
         private MockNotificationServices _mockNotificationServices;
         private DbContextClient _dbContextA;
@@ -81,8 +76,8 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
             _dbContextB = new DbContextClient();
 
             // Create NoteControllers for both clients using mock repositories
-            _controllerA = new NoteController(_noteClientA, mockNoteRepoA, _mockNoteServices, mockCRDTRepoA);
-            _controllerB = new NoteController(_noteClientB, mockNoteRepoB, _mockNoteServices, mockCRDTRepoB);
+            _controllerA = new NoteOrchestrator(_noteClientA, mockNoteRepoA, _mockNoteServices, mockCRDTRepoA);
+            _controllerB = new NoteOrchestrator(_noteClientB, mockNoteRepoB, _mockNoteServices, mockCRDTRepoB);
 
             // Wire up bi-directional communication:
             // When either client sends a change, the mock service broadcasts to both clients

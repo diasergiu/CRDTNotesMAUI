@@ -22,7 +22,7 @@ namespace MAUIClientUI.Services.ServerRequests
         }
         public async Task<ApiResultData<List<NoteServer>>> SendChangesToServer(List<DTOSendChanges> changes)
         {
-             return await ExceptionHandlingHelper.ExecuteAsync<List<NoteServer>>(
+             return await ExceptionHandlingHelper.ExecuteAsyncWithDataExtraction<List<NoteServer>>(
                 async () => await SendRequest<List<DTOSendChanges>>(HttpMethod.Post, $"{_baseURL}/SendChangesToServer", changes),
                 nameof(SendChangesToServer)
             );

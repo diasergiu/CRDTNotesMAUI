@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.Json;
 using Xunit;
 
-namespace MAUIClientUI.Test.EndToEndServiceTest
+namespace EndToEndTest.EndToEndServiceTest
 {
     /// <summary>
     /// Integration/End-to-End tests that call the actual server.
@@ -362,42 +362,6 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
             else
             {
                 Assert.True(upperCaseLogin.IsSuccess, "Server is case-insensitive for usernames");
-            }
-        }
-
-        // ==================== HELPER METHODS ====================
-
-        /// <summary>
-        /// Helper to inject real HttpClient into the service for actual server calls
-        /// </summary>
-        private void InjectHttpClient(UserServices service, HttpClient httpClient)
-        {
-            var httpClientField = typeof(UserServices)
-                .BaseType
-                ?.GetField("_httpClient", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-            if (httpClientField != null)
-            {
-                httpClientField.SetValue(service, httpClient);
-            }
-        }
-
-        /// <summary>
-        /// Verifies the server is running and accessible
-        /// </summary>
-        private async Task<bool> IsServerRunning()
-        {
-            try
-            {
-                using (var client = new HttpClient { Timeout = TimeSpan.FromSeconds(5) })
-                {
-                    var response = await client.GetAsync(_testServerUrl);
-                    return true;
-                }
-            }
-            catch
-            {
-                return false;
             }
         }
     }

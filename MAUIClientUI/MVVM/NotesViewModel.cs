@@ -220,10 +220,10 @@ namespace MAUIClientUI.MVVM
             var deleteResult = await _noteServices.DeleteNote(_currentNote.IdNote);
             if (!deleteResult.IsSuccess)
             {
+                SoftDelete();
                 await _dialogHelper.ShowAlertAsync("Error", deleteResult.ErrorMessage, "OK");
                 return;
             }
-
             _noteRepository.DeleteNote(_currentNote);
             await _dialogHelper.ShowAlertAsync("Success", "Note deleted successfully!", "OK");
         }

@@ -1,7 +1,7 @@
 using DatabaseLibrary.Entities.Client;
 using MAUIClientUI.Repositories;
 
-namespace MAUIClientUI.Test.Mocks
+namespace EndToEndTest.Mocks
 {
     /// <summary>
     /// Mock implementation of CRDTCharacterRepository for testing.

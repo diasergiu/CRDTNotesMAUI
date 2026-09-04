@@ -169,6 +169,10 @@ namespace Server.ServeRepositories
                 }
                 else if(item.NoteServer.isDeleted)
                 {
+                    if (existingNoteIds.Contains(item.NoteServer.IdNote))
+                    {
+                        continue;
+                    }
                     await _DeleteNote(item.NoteServer.IdNote, idUser);
                 }
                 else

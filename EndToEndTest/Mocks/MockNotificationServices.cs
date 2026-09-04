@@ -1,6 +1,6 @@
 using DatabaseLibrary.WrapperClasses;
 
-namespace MAUIClientUI.Test.Mocks
+namespace EndToEndTest.Mocks { 
 
     public class MockNotificationServices
     {

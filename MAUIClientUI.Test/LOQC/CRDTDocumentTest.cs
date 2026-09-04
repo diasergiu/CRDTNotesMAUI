@@ -10,7 +10,7 @@ using Xunit;
 
 namespace MAUIClientUI.Test.LOQC
 {
-    public class CRDTLSEQTest
+    public class CRDTDocumentTest
     {
 
         private void AssertCharacterEquality(CRDTCharacterPayload expected, CRDTCharacterPayload actual)

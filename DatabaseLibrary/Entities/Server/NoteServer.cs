@@ -22,8 +22,8 @@ namespace DatabaseLibrary.Entities.Server
         public bool isDeleted { get; set; }
         public int Version { get; set; }
         public List<Note_UserServer>? NoteUser { get; set; }
-        [Newtonsoft.Json.JsonIgnore]
-        [System.Text.Json.Serialization.JsonIgnore]
+        //[Newtonsoft.Json.JsonIgnore]
+        //[System.Text.Json.Serialization.JsonIgnore]
         public List<CRDTCharacterServer>? CRDTCharacter { get; set; }
     }
 }

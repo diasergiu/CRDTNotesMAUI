@@ -7,7 +7,7 @@ using Server.ServeRepositories;
 using System.Reflection;
 using Xunit;
 
-namespace Server.Test
+namespace EndToEndTest
 {
     public class ServerIntegrationTests
     {
@@ -55,7 +55,7 @@ namespace Server.Test
 
             // Extract user ID from response data using reflection
             var dataType = registerResponse.Data.GetType();
-            var idUserProperty = dataType.GetProperty("IdUser") ?? dataType.GetProperty("idUser");
+            var idUserProperty = dataType.GetProperty("idUser") ?? dataType.GetProperty("idUser");
             Assert.NotNull(idUserProperty);
             var registeredUserId = (Guid)idUserProperty.GetValue(registerResponse.Data);
             Assert.NotEqual(Guid.Empty, registeredUserId);
@@ -73,7 +73,7 @@ namespace Server.Test
             Assert.True(loginResponse.Success);
 
             var loginDataType = loginResponse.Data.GetType();
-            var loginIdUserProperty = loginDataType.GetProperty("IdUser") ?? loginDataType.GetProperty("idUser");
+            var loginIdUserProperty = loginDataType.GetProperty("idUser") ?? loginDataType.GetProperty("idUser");
             Assert.NotNull(loginIdUserProperty);
             var loginUserId = (Guid)loginIdUserProperty.GetValue(loginResponse.Data);
             Assert.Equal(registeredUserId, loginUserId);

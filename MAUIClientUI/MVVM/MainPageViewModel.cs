@@ -79,7 +79,7 @@ namespace MAUIClientUI.MVVM
             IsLoggedIn = true; // this shuold change syncButton to enabled
             TextLogin = "Logout";
             SendOfflineChanges(userId);
-            GetChangesFromServer();
+            //GetChangesFromServer();
         }
         [RelayCommand]
         public async Task AuthenticationButtonClicked()

@@ -34,8 +34,8 @@ namespace Server.Controllers
             return Ok(ApiResponse<List<NoteClient>>.SuccessResponse(notes));
 
         }
-        //// Get /api/notes/{id}
-        [HttpGet("{id}")]
+        //// Get /api/notes/{noteId}
+        [HttpGet("{noteId}")]
         [NoteAccessAuthorization("noteId")]
         public async Task<IActionResult> GetNote(Guid noteId)
         {
@@ -91,7 +91,7 @@ namespace Server.Controllers
         }
 
         //// PUT /api/notes/{id}
-        [HttpPut("{id}")]
+        [HttpPut("{noteId}")]
         [NoteAccessAuthorization("noteId")]
         public async Task<IActionResult> UpdateNotes(Guid noteId, [FromBody] NoteClient note)
         {
@@ -136,12 +136,12 @@ namespace Server.Controllers
             ));
         }
 
-        [HttpDelete("{id}")]
-        [NoteAccessAuthorization("id")]
-        public async Task<IActionResult> DeleteNote(Guid id)
+        [HttpDelete("{noteId}")]
+        [NoteAccessAuthorization("noteId")]
+        public async Task<IActionResult> DeleteNote(Guid noteId) 
         {
             Guid userId = GetUserIdFromRequest();
-            await _notesRepository.DeleteNote(id, userId);
+            await _notesRepository.DeleteNote(noteId, userId);
             return Ok(ApiResponse<object>.SuccessResponse(
                 data: null,
                 message: "Note deleted successfully."

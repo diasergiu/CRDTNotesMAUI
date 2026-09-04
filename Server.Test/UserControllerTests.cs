@@ -68,10 +68,11 @@ namespace Server.Test
 
             // The Data should be an anonymous object with idUser property
             Assert.NotNull(apiResponse.Data);
+            // Convert to JsonElement and access the property
+            var jsonElement = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(apiResponse.Data));
+            jsonElement.TryGetProperty("idUser", out var idUserElement);
+            Guid returnedUserId = Guid.Parse(idUserElement.GetString());
 
-            // Access the anonymous object using dynamic or reflection
-            dynamic data = apiResponse.Data;
-            Guid returnedUserId = data.idUser;
             Assert.Equal(userId, returnedUserId);
         }
 
@@ -152,7 +153,7 @@ namespace Server.Test
             Assert.True(apiResponse.Success);
 
             // Extract IdUser from the anonymous Data object using reflection
-            var dataProperty = apiResponse.Data?.GetType().GetProperty("IdUser", System.Reflection.BindingFlags.IgnoreCase | System.Reflection.BindingFlags.Public);
+            var dataProperty = apiResponse.Data?.GetType().GetProperty("idUser", System.Reflection.BindingFlags.IgnoreCase | System.Reflection.BindingFlags.Public);
             var idUserValue = dataProperty?.GetValue(apiResponse.Data) as Guid?;
             Assert.NotEqual(Guid.Empty, idUserValue);
 

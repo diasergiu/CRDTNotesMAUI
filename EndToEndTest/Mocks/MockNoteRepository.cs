@@ -1,13 +1,14 @@
 using DatabaseLibrary.Entities.Client;
 using MAUIClientUI.Repositories;
 
-namespace MAUIClientUI.Test.Mocks
+namespace EndToEndTest.Mocks
 {
 
     public class MockNoteRepository : NoteRepository
     {
         private readonly List<CRDTCharacterClient> _characters = new();
         private List<NoteClient> _mockNotes = new();
+        private Dictionary<Guid, NoteClient> _mockNotesDict = new();
 
         public MockNoteRepository() : base(new DbContextClient())
         {
@@ -20,6 +21,7 @@ namespace MAUIClientUI.Test.Mocks
         public void SetMockNotes(List<NoteClient> notes)
         {
             _mockNotes = notes ?? new List<NoteClient>();
+            _mockNotesDict = _mockNotes.ToDictionary(n => n.IdNote);
         }
 
 
@@ -28,6 +30,32 @@ namespace MAUIClientUI.Test.Mocks
             return _mockNotes;
         }
 
+        /// <summary>
+        /// Override UpdateNote to avoid DbContext issues in tests.
+        /// Instead of using DbContext, just update the in-memory mock.
+        /// </summary>
+        public override void UpdateNote(NoteClient note)
+        {
+            if (note == null) return;
+
+            // Update the in-memory mock dictionary
+            if (_mockNotesDict.ContainsKey(note.IdNote))
+            {
+                _mockNotesDict[note.IdNote] = note;
+            }
+            else
+            {
+                _mockNotesDict.Add(note.IdNote, note);
+            }
+
+            // Also update the list
+            var existing = _mockNotes.FirstOrDefault(n => n.IdNote == note.IdNote);
+            if (existing != null)
+            {
+                _mockNotes.Remove(existing);
+            }
+            _mockNotes.Add(note);
+        }
 
         public override async Task SaveCRDTChanges(List<CRDTCharacterClient> changes)
         {
@@ -49,6 +77,8 @@ namespace MAUIClientUI.Test.Mocks
         {
             _characters.Clear();
             _mockNotes.Clear();
+            _mockNotesDict.Clear();
         }
     }
 }
+

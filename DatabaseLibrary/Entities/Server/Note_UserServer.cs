@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace DatabaseLibrary.Entities.Server
 {
@@ -20,6 +21,7 @@ namespace DatabaseLibrary.Entities.Server
         //[ForeignKey("Note")]
         public Guid IdNote { get; set; }
         public UserServer? User { get; set; }
+        [JsonIgnore]
         public NoteServer? Note { get; set; }
     }
 }

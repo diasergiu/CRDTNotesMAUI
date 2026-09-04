@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Net.WebSockets;
 using System.Text;
 
 namespace MAUIClientUI.Repositories
@@ -143,7 +144,6 @@ namespace MAUIClientUI.Repositories
             if (changes == null || changes.Count == 0)
                 return;
 
-            // Clear change tracker to prevent conflicts
             _dbContextUser.ChangeTracker.Clear();
 
             // De-duplicate the input list by keeping only the last occurrence of each character
@@ -208,10 +208,25 @@ namespace MAUIClientUI.Repositories
 
         public async Task UpdateBasedOnNoteServer(List<NoteServer> data)
         {
-            var listOfCRDTByCharacter = _dbContextUser.CRDTCharacters.ToList();
+            if (data == null || data.Count == 0)
+                return;
+
+            _dbContextUser.ChangeTracker.Clear();
+
+            var listNotes = await _dbContextUser.Notes.AsNoTracking().ToDictionaryAsync(n => n.IdNote);
+            var decodedChanges = new List<CRDTCharacterClient>();
             foreach (NoteServer note in data)
             {
-                var decodedChanges = new List<CRDTCharacterClient>();
+                var noteProcess = EntityMapper.MapNoteServerToNoteClient(note);
+                noteProcess.DirtyFlagChangesMade = false;
+                if (!listNotes.ContainsKey(noteProcess.IdNote))
+                {
+                    _dbContextUser.Add(noteProcess);
+                }
+                else
+                {
+                    _dbContextUser.Update(noteProcess);
+                }
                 if (note.CRDTCharacter != null)
                 {
                     foreach (var change in note.CRDTCharacter)
@@ -221,21 +236,27 @@ namespace MAUIClientUI.Repositories
                         foreach (var character in decodedCharacters)
                         {
 
-                            decodedChanges.Add(new CRDTCharacterClient
+                            decodedChanges.Add(new CRDTCharacterClient()
                             {
                                 IdCharacter = character.IdCharacter,
                                 Character = character.Character,
                                 Tombstone = character.Tombstone,
-                                IdNote = change.NoteServer.IdNote,
-                                IsDirtyFlag = true,
-                            });
+                                IdNote = note.IdNote,
+                                IsDirtyFlag = false,
+                            });                       
                         }
-                        _dbContextUser.Notes.Update(EntityMapper.MapNoteServerToNoteClient(note));
-                        await SaveCRDTChanges(decodedChanges);
-
                     }
+                    
                 }
+                
             }
+            await _dbContextUser.SaveChangesAsync();
+            if (decodedChanges.Any())
+            {
+                await SaveCRDTChanges(decodedChanges);
+            }
+
+            _dbContextUser.ChangeTracker.Clear();
         }
     }
 }

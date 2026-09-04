@@ -9,7 +9,7 @@ using MAUIClientUI.Services.ServerRequests;
 using MAUIClientUI.WinUI;
 using Xunit;
 
-namespace MAUIClientUI.Test.EndToEndServiceTest
+namespace EndToEndTest.EndToEndServiceTest
 {
     /// <summary>
     /// End-to-End Integration tests for character update flow using a REAL server.
@@ -49,8 +49,8 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
 
         private NoteClient _noteClientA;
         private NoteClient _noteClientB;
-        private NoteController _controllerA;
-        private NoteController _controllerB;
+        private NoteOrchestrator _controllerA;
+        private NoteOrchestrator _controllerB;
         private NoteServices _noteServicesA;
         private NoteServices _noteServicesB;
         private NotificationServices _notificationServicesA;
@@ -186,8 +186,8 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
             _dbContextB.SaveChanges();
 
             // Create NoteControllers
-            _controllerA = new NoteController(_noteClientA, _noteRepoA, _noteServicesA, _crdtRepoA);
-            _controllerB = new NoteController(_noteClientB, _noteRepoB, _noteServicesB, _crdtRepoB);
+            _controllerA = new NoteOrchestrator(_noteClientA, _noteRepoA, _noteServicesA, _crdtRepoA);
+            _controllerB = new NoteOrchestrator(_noteClientB, _noteRepoB, _noteServicesB, _crdtRepoB);
 
             // Subscribe both clients to remote updates
             _notificationServicesA.NoteUpdated += async (sender, payload) =>
@@ -290,7 +290,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
 
             // Act
             char insertChar = 'H';
-            _controllerA.InsertCharacter(0, insertChar);
+            await _controllerA.InsertCharacter(0, insertChar);
 
             // Wait for Client B to receive update from server
             await WaitForUpdate(_clientBUpdateReceived, 10000);
@@ -321,7 +321,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
             for (int i = 0; i < textToInsert.Length; i++)
             {
                 _clientBUpdateReceived = new TaskCompletionSource<bool>();
-                _controllerA.InsertCharacter(i, textToInsert[i]);
+                await _controllerA.InsertCharacter(i, textToInsert[i]);
 
                 try
                 {
@@ -357,8 +357,8 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
             _clientAUpdateReceived = new TaskCompletionSource<bool>();
 
             // Act - Both clients insert concurrently
-            var insertA = Task.Run(() => _controllerA.InsertCharacter(0, 'A'));
-            var insertB = Task.Run(() => _controllerB.InsertCharacter(0, 'B'));
+            var insertA = _controllerA.InsertCharacter(0, 'A');
+            var insertB = _controllerB.InsertCharacter(0, 'B');
 
             await Task.WhenAll(insertA, insertB);
 
@@ -392,7 +392,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
             string pasteText = "Hello World";
 
             // Act
-            _controllerA.InsertString(0, pasteText);
+            await _controllerA.InsertString(0, pasteText);
 
             // Wait for update
             await WaitForUpdate(_clientBUpdateReceived, 10000);
@@ -415,11 +415,13 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
             // Arrange
             string initialText = "ABC";
 
-            // Setup: Insert initial text
+            // Setup: Insert initial text - WAIT FOR EACH INSERTION TO COMPLETE
             for (int i = 0; i < initialText.Length; i++)
             {
                 _clientBUpdateReceived = new TaskCompletionSource<bool>();
-                _controllerA.InsertCharacter(i, initialText[i]);
+
+                // Use async version and await it
+                await _controllerA.InsertCharacter(i, initialText[i]);
 
                 try
                 {
@@ -429,6 +431,9 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
                 {
                     // Continue
                 }
+
+                // Add delay between operations to avoid DbContext congestion
+                await Task.Delay(100);
             }
 
             await Task.Delay(500);
@@ -439,7 +444,7 @@ namespace MAUIClientUI.Test.EndToEndServiceTest
 
             // Act - Reset listener and delete
             _clientBUpdateReceived = new TaskCompletionSource<bool>();
-            _controllerA.DeleteCharacter(1);
+            await _controllerA.DeleteCharacter(1);
 
             // Wait for deletion to propagate
             await WaitForUpdate(_clientBUpdateReceived, 10000);

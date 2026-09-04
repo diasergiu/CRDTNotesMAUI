@@ -1,5 +1,6 @@
 using DatabaseLibrary.Entities;
 using DatabaseLibrary.Entities.Client;
+using DatabaseLibrary.Entities.Server;
 using DatabaseLibrary.WrapperClasses;
 using MAUIClientUI.Services;
 using MAUIClientUI.Services.HelperClasses;
@@ -7,14 +8,14 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MAUIClientUI.Test.Mocks
+namespace EndToEndTest.Mocks
 {
 
     public class MockNoteServices : INoteServices
     {
         private readonly List<CRDTChangePayload> _sentChanges = new List<CRDTChangePayload>();
         private List<NoteClient> _mockNotes = new List<NoteClient>();
-        private List<DToSendChanges> _mockServerChanges = new List<DToSendChanges>();
+        private List<NoteServer> _mockServerChanges = new List<NoteServer>();
 
         public IReadOnlyList<CRDTChangePayload> SentChanges => _sentChanges.AsReadOnly();
 
@@ -26,9 +27,9 @@ namespace MAUIClientUI.Test.Mocks
             _mockNotes = notes ?? new List<NoteClient>();
         }
 
-        public void SetMockServerChanges(List<DToSendChanges> changes)
+        public void SetMockServerChanges(List<NoteServer> changes)
         {
-            _mockServerChanges = changes ?? new List<DToSendChanges>();
+            _mockServerChanges = changes ?? new List<NoteServer>();
         }
 
         public Task<ApiResultData<List<NoteClient>>> GetAllNotesFromUser(Guid IdUser)
@@ -41,9 +42,9 @@ namespace MAUIClientUI.Test.Mocks
             return Task.FromResult(result);
         }
 
-        public Task<ApiResultData<List<DToSendChanges>>> GetServerChanges()
+        public Task<ApiResultData<List<NoteServer>>> GetServerChanges()
         {
-            var result = new ApiResultData<List<DToSendChanges>>
+            var result = new ApiResultData<List<NoteServer>>
             {
                 IsSuccess = true,
                 Data = _mockServerChanges
@@ -66,7 +67,7 @@ namespace MAUIClientUI.Test.Mocks
             throw new NotImplementedException();
         }
 
-        public Task<ApiResult> SendChangesToServer(List<DToSendChanges> noteClient)
+        public Task<ApiResultData<List<NoteServer>>> SendChangesToServer(List<DTOSendChanges> noteClient)
         {
             throw new NotImplementedException();
         }
@@ -85,7 +86,7 @@ namespace MAUIClientUI.Test.Mocks
             return new ApiResult { IsSuccess = true };
         }
 
-        public Task<ApiResultData<List<DToSendChanges>>> GetServerChangesByNote(Guid noteId)
+        public Task<ApiResultData<List<DTOSendChanges>>> GetServerChangesByNote(Guid noteId)
         {
             throw new NotImplementedException();
         }
@@ -95,7 +96,7 @@ namespace MAUIClientUI.Test.Mocks
             throw new NotImplementedException();
         }
 
-        public Task<ApiResult> GiveNoteAccessToUser(Guid noteId, Guid userId)
+        public Task<ApiResult> GiveNoteAccessToUser(Guid noteId, string userId)
         {
             throw new NotImplementedException();
         }

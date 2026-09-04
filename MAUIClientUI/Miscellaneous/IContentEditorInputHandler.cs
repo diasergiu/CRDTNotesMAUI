@@ -9,14 +9,14 @@ namespace MAUIClientUI.Miscellaneous
         /// <summary>
         /// Raised when a character is typed. Provides the cursor position and the character.
         /// </summary>
-        event Action<int, char> CharacterInserted;
+        event Func<int, char, Task> CharacterInserted;
 
         /// <summary>
         /// Raised when a character deletion (backspace) is requested. Provides the cursor position.
         /// </summary>
-        event Action<int> CharacterDeleted;
-        event Action<int, string> StringInserted;
-        event Action<int, int> RangeDeleted;
+        event Func<int, Task> CharacterDeleted;
+        event Func<int, string, Task> StringInserted;
+        event Func<int, int, Task> RangeDeleted;
 
         /// <summary>
         /// Handles key press events for inserting or deleting characters.
