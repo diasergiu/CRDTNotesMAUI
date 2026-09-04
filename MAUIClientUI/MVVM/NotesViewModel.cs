@@ -192,15 +192,13 @@ namespace MAUIClientUI.MVVM
                 //bool isOffline = !Connectivity.Current.NetworkAccess.HasFlag(NetworkAccess.Internet);
                 if (typeof(DummyNoteServices).IsInstanceOfType(_noteServices))
                 {
-                    SoftDelete();
+                    await SoftDelete();
                 }
                 else
                 {
                     await HardDeleteNoteAsync();
                 }
 
-               
-                
                 await _navigationHelper.PopAsync();
             }
             catch (Exception ex)

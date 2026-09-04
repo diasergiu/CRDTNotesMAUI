@@ -1,15 +1,9 @@
 //using Android.Content;
-using DatabaseLibrary.Entities;
 using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.Entities.Server;
 using DatabaseLibrary.RequestBody.EntityMappers;
 using MAUIClientUI.Services.HelperClasses;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Net.WebSockets;
-using System.Text;
 
 namespace MAUIClientUI.Repositories
 {
@@ -94,13 +88,13 @@ namespace MAUIClientUI.Repositories
             _dbContextUser.SaveChanges();
         }
 
-        public void SoftDeleteNote(NoteClient note)
+        public async void SoftDeleteNote(NoteClient note)
         {
             _dbContextUser.ChangeTracker.Clear();
             note.DirtyFlagChangesMade = true;
             note.isDeleted = true;
             _dbContextUser.Notes.Update(note);
-            _dbContextUser.SaveChanges();
+            await _dbContextUser.SaveChangesAsync();
         }
 
         public void TextToCRDTCharacter(List<CRDTCharacterClient> characters)
@@ -118,7 +112,7 @@ namespace MAUIClientUI.Repositories
 
         public async Task<List<NoteClient>> GetAllNotes()
         {
-            return _dbContextUser.Notes.Where(n => n.isDeleted != true).Include(b => b.CRDTCharacter).ToList();
+            return _dbContextUser.Notes.Where(n => n.isDeleted == false).Include(b => b.CRDTCharacter).ToList();
         }
 
         public async Task ClearDirtyFlag(List<NoteClient> offlineChanges)
@@ -221,6 +215,10 @@ namespace MAUIClientUI.Repositories
                 noteProcess.DirtyFlagChangesMade = false;
                 if (!listNotes.ContainsKey(noteProcess.IdNote))
                 {
+                    if (note.isDeleted)
+                    {
+                        continue;
+                    }
                     _dbContextUser.Add(noteProcess);
                 }
                 else
