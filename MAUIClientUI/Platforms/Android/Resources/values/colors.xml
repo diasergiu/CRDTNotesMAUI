@@ -3,7 +3,7 @@
     <color name="colorPrimary">#512BD4</color>
     <color name="colorPrimaryDark">#2B0B98</color>
     <color name="colorAccent">#2B0B98</color>
-  <style name="AppTheme" parent="Theme.MaterialComponents.Light">
+  <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
     <!-- Your custom attributes here -->
   </style>
 </resources>

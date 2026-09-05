@@ -15,13 +15,15 @@ namespace MAUIClientUI.Platforms.Windows
         }
         public override void HandleKeyPress(object sender, dynamic e)
         {
-            var key = GetkeyPressed(e);
+            var keyEvent = e as KeyRoutedEventArgs;
+            if (keyEvent is null)
+                return;
 
+            VirtualKey virtualKey = keyEvent.Key;
             int cursorPosition = GetEditorCurrentPosition();
 
-
             // Handle Backspace key
-            if (key == VirtualKey.Back.ToString())
+            if (virtualKey == VirtualKey.Back)
             {
                 _ = HandleBackspaceAsync(cursorPosition);
                 e.Handled = true;
@@ -29,14 +31,11 @@ namespace MAUIClientUI.Platforms.Windows
                 return;
             }
 
-            // Handle regular character input
-            if (key.Length == 1 || key == "Space")
+            // Handle regular character input (letters, digits, punctuation, space, numpad).
+            if (TryResolveTypedCharacter(virtualKey, out char typedChar))
             {
-                string charToInsert = key == "Space" ? " " : key;
-                char typedChar = ResolveTypedCharacter((VirtualKey)Enum.Parse(typeof(VirtualKey), key), charToInsert[0]);
-
                 _ = HandleInsertionAsync(cursorPosition, typedChar);
-                Debug.WriteLine("Key pressed");
+                Debug.WriteLine($"Key pressed: '{typedChar}'");
             }
         }
 
@@ -64,14 +63,7 @@ namespace MAUIClientUI.Platforms.Windows
                 int startPos = cursorPosition;
                 int endPos = cursorPosition + deletedCount;
 
-                if (deletedCount == 1)
-                {
-                    _ = InvokeCharacterDeleted(cursorPosition);
-                }
-                else
-                {
-                    _ = InvokeRangeDeleted(startPos, endPos);
-                }
+                _ = InvokeRangeDeleted(startPos, endPos);
             }
             // Text was inserted (typing, paste, or multi-char selection replace)
             else if (newLength > oldLength)
@@ -79,15 +71,8 @@ namespace MAUIClientUI.Platforms.Windows
                 int insertedCount = newLength - oldLength;
                 string insertedText = ExtractInsertedText(newText, _previousText, cursorPosition, insertedCount);
 
-                if (insertedCount == 1)
-                {
-                    _ = InvokeCharacterInserted(cursorPosition - 1, insertedText[0]);
-                }
-                else
-                {
-                    _ = InvokeStringInserted(cursorPosition - insertedCount, insertedText);
-                    Debug.WriteLine($"String inserted: '{insertedText}' at position {cursorPosition - insertedCount}");
-                }
+                _ = InvokeStringInserted(cursorPosition - insertedCount, insertedText);
+                Debug.WriteLine($"String inserted: '{insertedText}' at position {cursorPosition - insertedCount}");
             }
 
             _previousText = newText;
@@ -137,18 +122,125 @@ namespace MAUIClientUI.Platforms.Windows
         }
 
         /// <summary>
-        /// VirtualKey names for letters are always uppercase, so the actual casing has to be
-        /// derived from the current Shift / CapsLock state.
+        /// Maps a <see cref="VirtualKey"/> to the character it produces on a US keyboard layout,
+        /// honoring the current Shift / CapsLock state. Returns false for keys that do not
+        /// produce a printable character (e.g. arrows, function keys, modifiers).
         /// </summary>
-        private static char ResolveTypedCharacter(VirtualKey key, char fallback)
+        private static bool TryResolveTypedCharacter(VirtualKey key, out char typedChar)
         {
-            if (key < VirtualKey.A || key > VirtualKey.Z)
-                return fallback;
-
             bool shiftDown = IsKeyDown(VirtualKey.Shift);
             bool capsLockOn = IsKeyLocked(VirtualKey.CapitalLock);
 
-            return (shiftDown ^ capsLockOn) ? char.ToUpperInvariant(fallback) : char.ToLowerInvariant(fallback);
+            // Letters A-Z
+            if (key >= VirtualKey.A && key <= VirtualKey.Z)
+            {
+                char letter = (char)('a' + (key - VirtualKey.A));
+                typedChar = (shiftDown ^ capsLockOn) ? char.ToUpperInvariant(letter) : letter;
+                return true;
+            }
+
+            // Top-row digits 0-9 (VirtualKey.Number0 == 0x30 == '0')
+            if (key >= VirtualKey.Number0 && key <= VirtualKey.Number9)
+            {
+                char digit = (char)('0' + (key - VirtualKey.Number0));
+                if (shiftDown)
+                {
+                    // US layout shifted digits
+                    typedChar = digit switch
+                    {
+                        '1' => '!',
+                        '2' => '@',
+                        '3' => '#',
+                        '4' => '$',
+                        '5' => '%',
+                        '6' => '^',
+                        '7' => '&',
+                        '8' => '*',
+                        '9' => '(',
+                        '0' => ')',
+                        _ => digit,
+                    };
+                }
+                else
+                {
+                    typedChar = digit;
+                }
+                return true;
+            }
+
+            // Numpad digits 0-9
+            if (key >= VirtualKey.NumberPad0 && key <= VirtualKey.NumberPad9)
+            {
+                typedChar = (char)('0' + (key - VirtualKey.NumberPad0));
+                return true;
+            }
+
+            switch (key)
+            {
+                case VirtualKey.Space:
+                    typedChar = ' ';
+                    return true;
+                case VirtualKey.Tab:
+                    typedChar = '\t';
+                    return true;
+                case VirtualKey.Multiply:
+                    typedChar = '*';
+                    return true;
+                case VirtualKey.Add:
+                    typedChar = '+';
+                    return true;
+                case VirtualKey.Subtract:
+                    typedChar = '-';
+                    return true;
+                case VirtualKey.Decimal:
+                    typedChar = '.';
+                    return true;
+                case VirtualKey.Divide:
+                    typedChar = '/';
+                    return true;
+            }
+
+            // Oem punctuation keys (US layout).
+            // Numeric values are used because some VirtualKey names are not exposed on all SDKs.
+            switch ((int)key)
+            {
+                case 0xBA: // OEM_1  ; :
+                    typedChar = shiftDown ? ':' : ';';
+                    return true;
+                case 0xBB: // OEM_PLUS  = +
+                    typedChar = shiftDown ? '+' : '=';
+                    return true;
+                case 0xBC: // OEM_COMMA  , <
+                    typedChar = shiftDown ? '<' : ',';
+                    return true;
+                case 0xBD: // OEM_MINUS  - _
+                    typedChar = shiftDown ? '_' : '-';
+                    return true;
+                case 0xBE: // OEM_PERIOD  . >
+                    typedChar = shiftDown ? '>' : '.';
+                    return true;
+                case 0xBF: // OEM_2  / ?
+                    typedChar = shiftDown ? '?' : '/';
+                    return true;
+                case 0xC0: // OEM_3  ` ~
+                    typedChar = shiftDown ? '~' : '`';
+                    return true;
+                case 0xDB: // OEM_4  [ {
+                    typedChar = shiftDown ? '{' : '[';
+                    return true;
+                case 0xDC: // OEM_5  \ |
+                    typedChar = shiftDown ? '|' : '\\';
+                    return true;
+                case 0xDD: // OEM_6  ] }
+                    typedChar = shiftDown ? '}' : ']';
+                    return true;
+                case 0xDE: // OEM_7  ' "
+                    typedChar = shiftDown ? '"' : '\'';
+                    return true;
+            }
+
+            typedChar = '\0';
+            return false;
         }
 
         private static bool IsKeyDown(VirtualKey key)

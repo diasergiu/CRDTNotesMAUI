@@ -88,28 +88,28 @@ public partial class NoteView : ContentPage
         {
 #if WINDOWS
         _inputHandler = new WindowsContentEditorHandler(ContentEditor);
-        _inputHandler.CharacterInserted += _notesViewModel.NoteOrchestrator.InsertCharacter;
-        _inputHandler.CharacterDeleted += _notesViewModel.NoteOrchestrator.DeleteCharacter;
-        //_inputHandler.StringInserted += _notesViewModel.NoteController.InsertString;     
-        //_inputHandler.RangeDeleted += _notesViewModel.NoteController.DeleteCharacterRange;
+        //_inputHandler.CharacterInserted += _notesViewModel.NoteOrchestrator.InsertCharacter;
+        //_inputHandler.CharacterDeleted += _notesViewModel.NoteOrchestrator.DeleteCharacter;
+        _inputHandler.StringInserted += _notesViewModel.NoteOrchestrator.InsertString;     
+        _inputHandler.RangeDeleted += _notesViewModel.NoteOrchestrator.DeleteCharacterRange;
         var platformView = (Microsoft.UI.Xaml.Controls.TextBox)editor.Handler.PlatformView;
         if (platformView != null)
         {
             platformView.KeyDown += _inputHandler.HandleKeyPress;
             platformView.KeyUp += _inputHandler.HandleKeyUp;
-            //platformView.TextChanged += _inputHandler.HandleTextChanged;
+            platformView.TextChanged += _inputHandler.HandleTextChanged;
         }
 #elif ANDROID
             _inputHandler = new AndroidContentEditorHandler(ContentEditor);
-            _inputHandler.CharacterInserted += _notesViewModel.NoteOrchestrator.InsertCharacter;
-            _inputHandler.CharacterDeleted += _notesViewModel.NoteOrchestrator.DeleteCharacter;
-            //_inputHandler.StringInserted += _notesViewModel.NoteController.InsertString;
-            //_inputHandler.RangeDeleted += _notesViewModel.NoteController.DeleteCharacterRange;
+            //_inputHandler.CharacterInserted += _notesViewModel.NoteOrchestrator.InsertCharacter;
+            //_inputHandler.CharacterDeleted += _notesViewModel.NoteOrchestrator.DeleteCharacter;
+            _inputHandler.StringInserted += _notesViewModel.NoteOrchestrator.InsertString;
+            _inputHandler.RangeDeleted += _notesViewModel.NoteOrchestrator.DeleteCharacterRange;
             var platformView = (Android.Widget.EditText)editor.Handler.PlatformView;
         if (platformView != null)
         {
             platformView.KeyPress += _inputHandler.HandleKeyPress;
-        //    platformView.TextChanged += _inputHandler.HandleTextChanged;    
+                platformView.TextChanged += _inputHandler.HandleTextChanged;
         }
 #endif
 

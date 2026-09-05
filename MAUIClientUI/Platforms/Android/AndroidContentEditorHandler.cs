@@ -74,14 +74,7 @@ namespace MAUIClientUI.Platforms.Android
                 int startPos = cursorPosition;
                 int endPos = cursorPosition + deletedCount;
 
-                if (deletedCount == 1)
-                {
-                    _ = HandleBackspaceAsync(cursorPosition);
-                }
-                else
-                {
-                    _ = InvokeRangeDeleted(startPos, endPos);
-                }
+                _ = InvokeRangeDeleted(startPos, endPos);
             }
             // Text was inserted
             else if (newLength > oldLength)
@@ -89,15 +82,8 @@ namespace MAUIClientUI.Platforms.Android
                 int insertedCount = newLength - oldLength;
                 string insertedText = ExtractInsertedText(newText, _previousText, cursorPosition, insertedCount);
 
-                if (insertedCount == 1)
-                {
-                    _ = HandleInsertionAsync(cursorPosition - 1, insertedText[0]);
-                }
-                else
-                {
-                    _ = InvokeStringInserted(cursorPosition - insertedCount, insertedText);
-                    Debug.WriteLine($"String inserted: '{insertedText}' at position {cursorPosition - insertedCount}");
-                }
+                _ = InvokeStringInserted(cursorPosition - insertedCount, insertedText);
+                Debug.WriteLine($"String inserted: '{insertedText}' at position {cursorPosition - insertedCount}");
             }
 
             _previousText = newText;
