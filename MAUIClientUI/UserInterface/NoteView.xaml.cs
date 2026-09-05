@@ -29,11 +29,15 @@ public partial class NoteView : ContentPage
         Version = 1
     }, noteService, true)
     {
-        var noteRepository = IPlatformApplication.Current.Services.GetService<NoteRepository>();
-        noteRepository.CreateNote(_currentNote);
     }
     public NoteView(NoteClient note, INoteServices noteService, bool isNewNote = false)
     {
+        if(isNewNote == true)
+        {
+            var noteRepository = IPlatformApplication.Current.Services.GetService<NoteRepository>();
+            noteRepository.CreateNote(note);
+        }
+
         InitializeComponent();
         _currentNote = note;
 

@@ -1,4 +1,4 @@
-.PHONY: migrate_client migrate_server
+.PHONY: run_server run_client
 
 # Client migration - usage: make migrate_client AddUserTable
 migrate_client:
@@ -12,8 +12,16 @@ migrate_server:
 	dotnet ef migrations add $(filter-out $@,$(MAKECMDGOALS)) --project DatabaseLibrary --context DbContextServer -v
 	dotnet ef database update --project DatabaseLibrary --context DbContextServer -v
 
+run_server:
+	dotnet run --project Server\Server.csproj --launch-profile "http"
 run_client:
-	start MAUIClientUI/bin/Debug/net10.0-windows10.0.19041.0/win-x64/MAUIClientUI.exe $(arg1) $(arg2)
+	dotnet run --project MAUIClientUI\MAUIClientUI.csproj 
+
+test:
+	dotnet test --no-build --verbosity normal
+	
+	# dotnet	test --filter "CharacterUpdateE2EIntegrationTest"
+	
 # Catch-all rule to prevent Make from complaining about extra arguments
 %:
 	@:

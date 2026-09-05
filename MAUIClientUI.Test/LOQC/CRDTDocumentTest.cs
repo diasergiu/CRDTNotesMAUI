@@ -79,7 +79,7 @@ namespace MAUIClientUI.Test.LOQC
             Document cursor = new Document("Hello", Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
 
             // Delete character to the left of position 2 (which is 'l')
-            var deleted = cursor.deleteCharacter(2);
+            var deleted = cursor.DeleteCharacter(2);
 
             Assert.Equal('e', deleted.Character);
             Assert.True(deleted.Tombstone);
@@ -272,27 +272,5 @@ namespace MAUIClientUI.Test.LOQC
             Assert.NotEmpty(result);
         }
 
-        //[Fact]
-        //public void TestDocumentConstructorFromList()
-        //{
-        //    var characters = new List<var>()
-        //    {
-        //        new var() { Character = 'H', IdCharacter = 1, ClientId = Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE") },
-        //        new var() { Character = 'i', IdCharacter = 2, ClientId = Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE") }
-        //    };
-
-        //    Document cursor = new Document(characters, Guid.Parse("E33A3ADE-11DC-4B23-8A8B-8DD8D6F886FE"));
-
-        //    Assert.NotNull(cursor);
-        //    Assert.Equal(2, cursor.GetCharacterListCount());
-        //}
-
-        //private void printCharacterList(Document cursor)
-        //{
-        //    foreach (var character in cursor.GetCharacterListValues())
-        //    {
-        //        Console.WriteLine($"Character: {character.Character}, Id: {character.IdCharacter}, LeftId: {character.IdLeftCharacter}, RightId: {character.IdRightCharacter}");
-        //    }
-        //}
     }
 }

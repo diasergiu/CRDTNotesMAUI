@@ -24,6 +24,8 @@ namespace MAUIClientUI.Repositories
 
         public virtual void SaveNewCrdtCharacter(CRDTCharacterClient newCharacter)
         {
+            _dbContext.ChangeTracker.Clear();
+
             // Check if character exists using AsNoTracking to avoid tracking conflicts
             var existing = _dbContext.CRDTCharacters
                 .AsNoTracking()
@@ -42,6 +44,7 @@ namespace MAUIClientUI.Repositories
 
         public virtual void UpdateCharacter(CRDTCharacterClient updateCharacter)
         {
+            _dbContext.ChangeTracker.Clear();
             _dbContext.CRDTCharacters.Update(updateCharacter);
             _dbContext.SaveChanges();
             _dbContext.ChangeTracker.Clear();

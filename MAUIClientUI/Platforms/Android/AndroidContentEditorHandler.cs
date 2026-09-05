@@ -25,7 +25,7 @@ namespace MAUIClientUI.Platforms.Android
             // Handle Backspace/Delete key
             if (e.KeyCode == Keycode.Back)
             {
-                _ = InvokeCharacterDeleted(cursorPosition);
+                _ = HandleBackspaceAsync(cursorPosition);
                 e.Handled = true;
                 Debug.WriteLine("Backspace pressed");
                 return;
@@ -39,9 +39,18 @@ namespace MAUIClientUI.Platforms.Android
                 return;
             }
 
-            _ = InvokeCharacterInserted(cursorPosition, typedChar);
+            _ = HandleInsertionAsync(cursorPosition, typedChar);
             Debug.WriteLine($"Key pressed: {typedChar}");
             e.Handled = false;
+        }
+
+        private async Task HandleInsertionAsync(int cursorPosition, char typedChar)
+        {
+            await InvokeCharacterInserted(cursorPosition, typedChar);
+        }
+        private async Task HandleBackspaceAsync(int cursorPosition)
+        {
+            await InvokeCharacterDeleted(cursorPosition);
         }
 
         public override void HandleTextChanged(object sender, dynamic e)
@@ -67,7 +76,7 @@ namespace MAUIClientUI.Platforms.Android
 
                 if (deletedCount == 1)
                 {
-                    _ = InvokeCharacterDeleted(cursorPosition);
+                    _ = HandleBackspaceAsync(cursorPosition);
                 }
                 else
                 {
@@ -82,7 +91,7 @@ namespace MAUIClientUI.Platforms.Android
 
                 if (insertedCount == 1)
                 {
-                    _ = InvokeCharacterInserted(cursorPosition - 1, insertedText[0]);
+                    _ = HandleInsertionAsync(cursorPosition - 1, insertedText[0]);
                 }
                 else
                 {

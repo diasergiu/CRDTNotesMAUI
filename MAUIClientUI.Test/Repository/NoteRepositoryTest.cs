@@ -159,7 +159,7 @@ namespace MAUIClientUI.Test.Repository
             var characters = verify.CRDTCharacters.OrderBy(c => c.IdCharacter).ToList();
             Assert.Equal(2, characters.Count);
             Assert.All(characters, c => Assert.Equal(_noteId, c.IdNote));
-            Assert.All(characters, c => Assert.True(c.IsDirtyFlag));
+            Assert.All(characters, c => Assert.False(c.IsDirtyFlag));
             Assert.Contains(characters, c => c.Character == 'H');
             Assert.Contains(characters, c => c.Character == 'i');
         }

@@ -91,8 +91,8 @@ namespace MAUIClientUI.Test.LOQC
             }
 
             // Tombstone a few characters; the same objects are carried in the operation set.
-            cursor.deleteCharacter(3);
-            cursor.deleteCharacter(7);
+            cursor.DeleteCharacter(3);
+            cursor.DeleteCharacter(7);
 
             string baseline = ApplyToFreshReplica(operations, ClientB);
 
@@ -212,7 +212,7 @@ namespace MAUIClientUI.Test.LOQC
         {
             var cursor = new Document("AB", ClientA);
 
-            var deleted = cursor.deleteCharacter(2);
+            var deleted = cursor.DeleteCharacter(2);
 
             Assert.True(deleted.Tombstone);
             Assert.Equal("A", cursor.GetString());
@@ -230,7 +230,7 @@ namespace MAUIClientUI.Test.LOQC
             }
 
             // Delete the second character locally.
-            cursor.deleteCharacter(2);
+            cursor.DeleteCharacter(2);
             Assert.Equal("A", cursor.GetString());
 
             // A stale replica re-sends the original (non-tombstoned) insert for that character.
@@ -250,8 +250,8 @@ namespace MAUIClientUI.Test.LOQC
         {
             var cursor = new Document("HELLO", ClientA);
 
-            cursor.deleteCharacter(1); // remove 'H'
-            cursor.deleteCharacter(5); // remove 'O'
+            cursor.DeleteCharacter(1); // remove 'H'
+            cursor.DeleteCharacter(5); // remove 'O'
 
             Assert.Equal("ELL", cursor.GetString());
         }

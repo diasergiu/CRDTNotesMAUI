@@ -699,6 +699,107 @@ namespace MAUIClientUI.Test.LOQC
 
             Assert.Equal(expectedStr, service.GenerateIdBetweenComposite(leftStr, rightStr, userId));
         }
+
+
+        #region Precision Threshold / Nesting Level Tests
+
+        [Fact]
+        public void GenerateIdBetweenComposite_GapBelowMinThreshold_AddsNestingLevel()
+        {
+            // Arrange: gap between left/right at this level is narrower than the safe decimal threshold
+            var service = new CRDTIdService(_clientId3);
+            decimal basePos = 1.5m;
+            decimal tinyGap = CRDTIdService.MinGapThreshold / 2; // below threshold
+
+            var leftId = $"({basePos},{_clientId1})";
+            var rightId = $"({basePos + tinyGap},{_clientId2})";
+
+            // Act
+            var result = service.GenerateIdBetweenComposite(leftId, rightId, _clientId3);
+            var parsed = service.ParseCompositeId(result);
+
+            // Assert: a new nesting level should be added (2 components instead of 1)
+            Assert.Equal(2, parsed.Count);
+            Assert.Equal(basePos, parsed[0].Position);
+            Assert.Equal(_clientId1, parsed[0].SiteId); // carried over from left boundary
+            Assert.Equal(_clientId3, parsed[1].SiteId); // new level belongs to inserting client
+        }
+
+        [Fact]
+        public void GenerateIdBetweenComposite_GapAboveMinThreshold_DoesNotAddNestingLevel()
+        {
+            // Arrange: gap comfortably above the safe decimal threshold
+            var service = new CRDTIdService(_clientId3);
+            decimal basePos = 1.5m;
+            decimal comfortableGap = CRDTIdService.MinGapThreshold * 1000; // well above threshold
+
+            var leftId = $"({basePos},{_clientId1})";
+            var rightId = $"({basePos + comfortableGap},{_clientId2})";
+
+            // Act
+            var result = service.GenerateIdBetweenComposite(leftId, rightId, _clientId3);
+            var parsed = service.ParseCompositeId(result);
+
+            // Assert: should resolve directly at this level, no extra nesting
+            Assert.Single(parsed);
+            Assert.True(parsed[0].Position > basePos && parsed[0].Position < basePos + comfortableGap);
+        }
+
+        [Fact]
+        public void GenerateIdBetweenComposite_RepeatedNarrowingInserts_EventuallyAddsNestingLevel()
+        {
+            // Arrange: repeatedly insert into the left half of a shrinking interval,
+            // simulating many users inserting "before" the previous insertion.
+            var service = new CRDTIdService(_clientId1);
+
+            string left = $"(0,{_clientId1})";
+            string right = $"(1,{_clientId1})";
+            int initialLevels = service.ParseCompositeId(left).Count; // 1
+
+            const int maxIterations = 200; // generous upper bound, real limit is ~83-84
+            string current = null;
+            int iterationsUsed = -1;
+
+            for (int i = 0; i < maxIterations; i++)
+            {
+                current = service.GenerateIdBetweenComposite(left, right, _clientId2);
+                var parsed = service.ParseCompositeId(current);
+
+                if (parsed.Count > initialLevels)
+                {
+                    iterationsUsed = i;
+                    break;
+                }
+
+                // Narrow the interval: new id becomes the right boundary for the next insert
+                right = current;
+            }
+
+            // Assert: nesting level must kick in well before the loop's generous upper bound,
+            // and definitely not collapse into a duplicate of an existing boundary.
+            Assert.True(iterationsUsed >= 0, "Expected a new nesting level to be added before exhausting max iterations");
+            Assert.NotEqual(left, current);
+            Assert.NotEqual(right, current);
+
+            var finalParsed = service.ParseCompositeId(current);
+            Assert.True(finalParsed.Count > initialLevels);
+        }
+
+        [Fact]
+        public void GenerateIdBetween_DirectApi_GapBelowThreshold_ThrowsInsteadOfDuplicating()
+        {
+            // Arrange: exercise the non-composite API directly with a gap already below
+            // the safe decimal threshold - it must fail loudly, not silently return a duplicate.
+            var service = new CRDTIdService(_clientId1);
+            decimal left = 1.0m;
+            decimal right = left + (CRDTIdService.MinGapThreshold / 2);
+
+            // Act & Assert
+            Assert.Throws<InvalidOperationException>(() =>
+                service.GenerateIdBetween(left, right, _clientId1));
+        }
+
+        #endregion
         public static IEnumerable<object[]> DecimalData()
         {
             yield return new object[]

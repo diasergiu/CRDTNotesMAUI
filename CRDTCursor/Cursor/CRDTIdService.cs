@@ -2,7 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+
+[assembly: InternalsVisibleTo("MAUIClientUI.Test")]
 
 namespace CRDTLibrary.Cursor
 {
@@ -14,7 +17,9 @@ namespace CRDTLibrary.Cursor
     public class CRDTIdService
     {
         private readonly Guid _localClientId;
-        private const int MAX_PRECISION = 1000000; // Decimal places to avoid infinite subdiv
+        private const int SAFE_DECIMAL_DIGITS = 25;
+
+        internal static readonly decimal MinGapThreshold = (decimal)Math.Pow(10, -SAFE_DECIMAL_DIGITS);
         private const string COMPOSITE_ID_PATTERN = @"\((.*?),(.*?)\)"; // Pattern: (position,clientId)
 
         public CRDTIdService(Guid clientId)
@@ -22,14 +27,6 @@ namespace CRDTLibrary.Cursor
             _localClientId = clientId;
         }
 
-        /// <summary>
-        /// Generate unique decimal ID between two boundaries
-        /// Handles conflict when two users pick same ID
-        /// </summary>
-        public decimal GenerateIdBetween(decimal? leftId, decimal? rightId, Guid clientId) // shuold we just skipp this part
-        {
-            return GenerateIdBetweenInternal(leftId, rightId, clientId, depth: 1); // how is this gonna change the string 
-        }
 
         /// <summary>
         /// Generate composite ID string between two boundaries
@@ -41,7 +38,6 @@ namespace CRDTLibrary.Cursor
             // Parse the left and right IDs into component arrays
             var leftComponents = ParseCompositeId(leftId);
             var rightComponents = ParseCompositeId(rightId);
-            decimal minGapAtDepth = (decimal)Math.Pow(10, -1);
 
             // Find the first level where positions differ, or determine nesting level
             int minLength = Math.Min(leftComponents.Count, rightComponents.Count);
@@ -50,7 +46,7 @@ namespace CRDTLibrary.Cursor
             // Find where components differ
             for (int i = 0; i < minLength; i++)
             {
-                if (leftComponents[i].Position != rightComponents[i].Position && !(rightComponents[i].Position - leftComponents[i].Position <= minGapAtDepth))
+                if (leftComponents[i].Position != rightComponents[i].Position && !(rightComponents[i].Position - leftComponents[i].Position <= MinGapThreshold))
                 {
                     // Positions differ at this level - generate new position between them
                     nestingLevel = i;
@@ -64,18 +60,12 @@ namespace CRDTLibrary.Cursor
             
             decimal? leftBoundary = nestingLevel < leftComponents.Count ? leftComponents[nestingLevel].Position : null;
             decimal? rightBoundary = nestingLevel < rightComponents.Count ? rightComponents[nestingLevel].Position : null;
-            
-            //if (nestingLevel < leftComponents.Count - 1) // should it be <=
-            //{
-            //    resultComponents.AddRange(leftComponents.Take(nestingLevel));
-            //}
 
             // Generate new position between left and right at this nesting level
-            decimal newPosition = GenerateIdBetweenInternal(
+            decimal newPosition = GenerateIdBetween(
                 leftBoundary,
                 rightBoundary,
-                clientId,
-                depth: 1);
+                clientId);
 
             resultComponents.Add(new IdComponent { Position = newPosition, SiteId = clientId });
         
@@ -160,12 +150,9 @@ namespace CRDTLibrary.Cursor
             public override string ToString() => $"({Position},{SiteId})";
         }
 
-        private decimal GenerateIdBetweenInternal(decimal? leftId, decimal? rightId, Guid clientId, int depth)
+        internal decimal GenerateIdBetween(decimal? leftId, decimal? rightId, Guid clientId)
         {
-            if (depth > MAX_PRECISION)
-                throw new InvalidOperationException("Cannot generate ID: reached maximum precision. Too many conflicts at this position.");
-
-            decimal minGapAtDepth = (decimal)Math.Pow(10, -depth);
+         
 
             // Case 1: Insert at start
             if (leftId == null && rightId == null)
@@ -181,6 +168,14 @@ namespace CRDTLibrary.Cursor
 
             // Case 4: Insert between two characters
             decimal gap = rightId.Value - leftId.Value;
+
+            if (gap <= MinGapThreshold)
+            {
+
+                throw new InvalidOperationException(
+                    $"Cannot generate ID: gap {gap} between {leftId} and {rightId} is below the minimum " +
+                    $"safe threshold ({MinGapThreshold}). A new nesting level is required.");
+            }
 
             // Generate midpoint between left and right
             return leftId.Value + (gap / 2);

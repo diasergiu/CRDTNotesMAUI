@@ -38,7 +38,7 @@ namespace DatabaseLibrary.Entities
         }
 
         /// <summary>
-        /// Composite ID string in format: decimal (simple) or (pos,site)(pos,site)... (composite)
+        /// Composite ID string in format: (pos,site)(pos,site)... (composite)
         /// Used as primary key component for conflict resolution
         /// </summary>
         public string IdCharacter { get; set; }

@@ -5,6 +5,7 @@
   </Folder>
   <Project Path="CRDTCursor/CRDTLibrary.csproj" />
   <Project Path="DatabaseLibrary/DatabaseLibrary.csproj" />
+  <Project Path="EndToEndTest/EndToEndTest.csproj" Id="1ac8e1f0-12c0-4acd-b363-c860a7c33783" />
   <Project Path="MAUIClientUI.Test/MAUIClientUI.Test.csproj" Id="80a36fc0-eb2a-4b13-a696-63dd1ab43a9c" />
   <Project Path="MAUIClientUI/MAUIClientUI.csproj">
     <Deploy Solution="Debug|*" />

@@ -45,7 +45,7 @@ namespace CRDTLibrary.Cursor
             }
         }
 
-        public CRDTCharacterPayload deleteCharacter(int cursorPosition)
+        public CRDTCharacterPayload DeleteCharacter(int cursorPosition)
         {
            var (leftId, rightId) = GetAdjacentCharacterIds(cursorPosition);
             _characterList[leftId].Tombstone = true;

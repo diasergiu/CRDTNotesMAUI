@@ -13,8 +13,6 @@ namespace MAUIClientUI.Platforms.Windows
         public WindowsContentEditorHandler(Editor editor) : base(editor)
         {
         }
-
-
         public override void HandleKeyPress(object sender, dynamic e)
         {
             var key = GetkeyPressed(e);
@@ -25,7 +23,7 @@ namespace MAUIClientUI.Platforms.Windows
             // Handle Backspace key
             if (key == VirtualKey.Back.ToString())
             {
-                _ = InvokeCharacterDeleted(cursorPosition);
+                _ = HandleBackspaceAsync(cursorPosition);
                 e.Handled = true;
                 Debug.WriteLine("Backspace pressed");
                 return;
@@ -37,9 +35,18 @@ namespace MAUIClientUI.Platforms.Windows
                 string charToInsert = key == "Space" ? " " : key;
                 char typedChar = ResolveTypedCharacter((VirtualKey)Enum.Parse(typeof(VirtualKey), key), charToInsert[0]);
 
-                _ = InvokeCharacterInserted(cursorPosition, typedChar);
+                _ = HandleInsertionAsync(cursorPosition, typedChar);
                 Debug.WriteLine("Key pressed");
             }
+        }
+
+        private async Task HandleInsertionAsync(int cursorPosition, char typedChar)
+        {
+            await InvokeCharacterInserted(cursorPosition, typedChar);
+        }
+        private async Task HandleBackspaceAsync(int cursorPosition)
+        {
+            await InvokeCharacterDeleted(cursorPosition);
         }
         public override void HandleTextChanged(object sender, dynamic e)
         {

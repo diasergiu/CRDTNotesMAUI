@@ -18,7 +18,7 @@ namespace MAUIClientUI.Miscellaneous
     public class NoteOrchestrator
     {
         private readonly Document _Document;
-        private readonly NoteClient _currentNote;
+        private readonly Guid _IdNote;
         private readonly CRDTCharacterRepository _crdtCharacterRepository;
         private readonly NoteRepository _noteRepository;
         private readonly INoteServices _noteServices;
@@ -27,16 +27,16 @@ namespace MAUIClientUI.Miscellaneous
         public NoteOrchestrator(NoteClient currentNote, NoteRepository noteRepository,
             INoteServices noteServices,  CRDTCharacterRepository characterRepository, ILogger<Document> cursorLogger = null, ILogger<NoteOrchestrator> logger = null)
         {
-            _currentNote = currentNote ?? throw new ArgumentNullException(nameof(currentNote));
-            _noteRepository = noteRepository ?? throw new ArgumentNullException(nameof(noteRepository));
-            _noteServices = noteServices ?? throw new ArgumentNullException(nameof(noteServices));
-            _crdtCharacterRepository = characterRepository ?? throw new ArgumentNullException(nameof(characterRepository));
+            _IdNote= currentNote.IdNote;
+            _noteRepository = noteRepository;
+            _noteServices = noteServices;
+            _crdtCharacterRepository = characterRepository;
             _logger = logger;
 
             // Convert CRDTCharacterClient list to CRDTCharacterPayload list for Document
             var payloads = currentNote.CRDTCharacter?.Select(c => UnwrapClientAsPayload(c)).ToList()
                 ?? new List<CRDTCharacterPayload>();
-            _Document = new Document(payloads, Guid.NewGuid(), cursorLogger);
+            _Document = new Document(payloads, Guid.NewGuid(), cursorLogger);// Guid.NewGuid should probably be client Id ( probably refactor if login becomes the main page
         }
 
         /// <summary>
@@ -91,43 +91,21 @@ namespace MAUIClientUI.Miscellaneous
             // Send batch of payloads to server
             await SendChangesToServerAsync(newPayloads);
         }
-        /// <summary>
-        /// Deletes the character to the left of the given cursor position and propagates the change.
-        /// </summary>
-        //public void DeleteCharacter(int cursorPosition)
-        //{
-        //    // Get payload from Document
-        //    var payload = _Document.deleteCharacter(cursorPosition + 1);
-        //    if (payload != null)
-        //    {
-        //        // Wrap in client object for persistence
-        //        var clientCharacter = WrapPayloadAsClient(payload);
-        //        _crdtCharacterRepository.UpdateCharacter(clientCharacter);
-
-        //        // Mark the note as dirty
-        //        MarkNoteAsDirty();
-
-        //        // Send to server
-        //        SendChangeToServerSafely(payload);
-        //    }
-        //}
 
         /// <summary>
         /// Async version of DeleteCharacter. Deletes the character to the left of the given cursor position and propagates the change.
         /// </summary>
         public async Task DeleteCharacter(int cursorPosition)
-        {
+       {
             // Get payload from Document
-            var payload = _Document.deleteCharacter(cursorPosition + 1);
-            if (payload != null)
+            var payload = _Document.DeleteCharacter(cursorPosition + 1);
+          if (payload != null)
             {
                 // Wrap in client object for persistence
                 var clientCharacter = WrapPayloadAsClient(payload);
                 _crdtCharacterRepository.UpdateCharacter(clientCharacter);
 
-                // Mark the note as dirty
                 MarkNoteAsDirty();
-
                 // Send to server
                 await SendChangeToServerAsync(payload);
             }
@@ -146,7 +124,7 @@ namespace MAUIClientUI.Miscellaneous
             for (int i = endPosition; i > startPosition; i--)
             {
                 // Get payload from Document
-                var payload = _Document.deleteCharacter(i);
+                var payload = _Document.DeleteCharacter(i);
                 if (payload != null)
                 {
                     // Wrap in client object for persistence
@@ -204,7 +182,7 @@ namespace MAUIClientUI.Miscellaneous
             {
                 // Wrap payload in a list for encoding
                 var encodedPayload = CharacterSerializer.Encode(new List<CRDTCharacterClient> { UnwrapPayloadAsClient(payload) });
-                var changePayload = new CRDTChangePayload(_currentNote.IdNote, encodedPayload);
+                var changePayload = new CRDTChangePayload(_IdNote, encodedPayload);
                 var result = await _noteServices.SendCRDTChangestoServer(changePayload);
 
                 if (!result.IsSuccess)
@@ -225,7 +203,7 @@ namespace MAUIClientUI.Miscellaneous
                 // Convert payloads to client objects for encoding
                 var clientCharacters = payloads.Select(p => UnwrapPayloadAsClient(p)).ToList();
                 var encodedPayload = CharacterSerializer.Encode(clientCharacters);
-                var changePayload = new CRDTChangePayload(_currentNote.IdNote, encodedPayload);
+                var changePayload = new CRDTChangePayload(_IdNote, encodedPayload);
                 var result = await _noteServices.SendCRDTChangestoServer(changePayload);
 
                 if (!result.IsSuccess)
@@ -249,7 +227,7 @@ namespace MAUIClientUI.Miscellaneous
                 IdCharacter = payload.IdCharacter,
                 Character = payload.Character,
                 Tombstone = payload.Tombstone,
-                IdNote = _currentNote.IdNote,
+                IdNote = _IdNote,
                 IsDirtyFlag = true,
                 ClockDateTime = DateTime.UtcNow
             };
@@ -278,7 +256,7 @@ namespace MAUIClientUI.Miscellaneous
                 IdCharacter = payload.IdCharacter,
                 Character = payload.Character,
                 Tombstone = payload.Tombstone,
-                IdNote = _currentNote.IdNote,
+                IdNote = _IdNote,
                 IsDirtyFlag = false,  // Doesn't matter for encoding
                 ClockDateTime = DateTime.UtcNow
             };
@@ -290,8 +268,7 @@ namespace MAUIClientUI.Miscellaneous
         /// </summary>
         private void MarkNoteAsDirty()
         {
-            _currentNote.DirtyFlagChangesMade = true;
-            _noteRepository.UpdateNote(_currentNote);
+            _noteRepository.MarkNoteAsDirty(_IdNote);
         }
     }
 }

@@ -73,7 +73,7 @@ namespace MAUIClientUI.MVVM
 
             _noteController = new NoteOrchestrator(_currentNote, _noteRepository, _noteServices, characterRepository, cursorLogger);
 
-            //LoadNoteData();
+            LoadNoteData();
         }
 
         private void LoadNoteData()
@@ -358,19 +358,19 @@ namespace MAUIClientUI.MVVM
         //        }
         //    }
 
-        //    private void ApplyServerVersion(NoteServer serverNote)
-        //    {
-        //        _currentNote.Title = serverNote.Title;
-        //        _currentNote.Content = serverNote.Content;
-        //        _currentNote.LastUpdate = serverNote.LastUpdate;
-        //        _currentNote.Version = serverNote.Version;
+        //private void ApplyServerVersion(NoteServer serverNote)
+        //{
+        //    _currentNote.Title = serverNote.Title;
+        //    _currentNote.Content = serverNote.Content;
+        //    _currentNote.LastUpdate = serverNote.LastUpdate;
+        //    _currentNote.Version = serverNote.Version;
 
-        //        // Reflect server version in the UI
-        //        Title = _currentNote.Title;
-        //        ContentRefreshRequested?.Invoke(_currentNote.Content);
+        //    // Reflect server version in the UI
+        //    Title = _currentNote.Title;
+        //    ContentRefreshRequested?.Invoke(_currentNote.Content);
 
-        //        _noteRepository.UpdateNote(_currentNote);
-        //    }
+        //    _noteRepository.UpdateNote(_currentNote);
+        //}
         #endregion
     }
 }
