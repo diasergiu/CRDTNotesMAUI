@@ -41,7 +41,7 @@ namespace Server.Filters
             // Check access
             if (!notesRepository.DoseUserHaveAccessToNote(noteId, userId))
             {
-                context.Result = new BadRequestObjectResult("You do not have access to this note.");
+                context.Result = new UnauthorizedObjectResult("You do not have access to this note.");
                 return;
             }
 

@@ -29,7 +29,7 @@ namespace EndToEndTest.EndToEndServiceTest
     /// 
     /// These are the same tests as CharacterUpdateE2ETest.cs but with real infrastructure.
     /// </summary>
-    [Collection("Integration")]
+    [Collection("Sequential")]
     public class CharacterUpdateE2EIntegrationTest : IAsyncLifetime
     {
         private readonly string _serverBaseUrl;

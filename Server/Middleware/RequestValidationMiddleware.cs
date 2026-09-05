@@ -39,7 +39,7 @@ public class RequestValidationMiddleware
 
             if (!Guid.TryParse(userIdHeader.ToString(), out var userId))
             {
-                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                 await context.Response.WriteAsJsonAsync(new { error = "Invalid x-user-id format" });
                 return;
             }

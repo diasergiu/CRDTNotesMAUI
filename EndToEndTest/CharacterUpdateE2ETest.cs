@@ -3,7 +3,7 @@ using EndToEndTest.Mocks;
 using MAUIClientUI.Miscellaneous;
 using MAUIClientUI.Services.HelperClasses;
 
-namespace EndToEndTest.EndToEndServiceTest
+namespace EndToEndTest
 {
     /// <summary>
     /// End-to-End tests for character update flow between two clients using CRDT.

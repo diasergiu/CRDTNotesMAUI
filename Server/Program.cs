@@ -18,6 +18,15 @@ public partial class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddSignalR();
 
+        // ====== CONFIGURE CONCURRENCY & KESTREL ======
+        // Allow more simultaneous connections for E2E tests and concurrent clients
+        builder.WebHost.ConfigureKestrel(options =>
+        {
+            options.Limits.MaxConcurrentConnections = 1000;           // Default: 100
+            options.Limits.MaxConcurrentUpgradedConnections = 1000;   // For WebSocket/SignalR
+            options.Limits.RequestHeadersTimeout = TimeSpan.FromSeconds(60);
+        });
+
         // ====== CONFIGURE ENTITY FRAMEWORK CORE ======
 
         // Method 1: Simple configuration (same path as DbContextServer uses)
