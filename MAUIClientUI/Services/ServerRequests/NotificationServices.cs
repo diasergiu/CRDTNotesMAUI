@@ -1,4 +1,4 @@
-﻿using DatabaseLibrary.Entities;
+using DatabaseLibrary.Entities;
 using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.WrapperClasses;
 using MAUIClientUI.Services.HelperClasses;
@@ -16,13 +16,16 @@ namespace MAUIClientUI.Services
 
         public event EventHandler<CRDTChangePayload> NoteUpdated;
         public event EventHandler<string> ConnectionStatusChanged;
+        private readonly IUserContext _userContext;
 
-        public NotificationServices(string serverUrl)
+        public NotificationServices(string serverUrl, IUserContext userContext)
         {
+            _userContext = userContext ?? throw new ArgumentNullException(nameof(userContext));
+
             _hubConnection = new HubConnectionBuilder()
                 .WithUrl($"{serverUrl}/notesHub", options =>
                 {
-                    options.Headers.Add("X-User-Id", UserDevice.LocalUser.ToString());
+                    options.Headers.Add("X-User-Id", _userContext.LocalUser.ToString());
                 })
                 .WithAutomaticReconnect(new[] { TimeSpan.Zero, TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(10) })
                 .Build();
@@ -45,14 +48,14 @@ namespace MAUIClientUI.Services
 
             _hubConnection.Reconnected += (connectionId) =>
             {
-                UserDevice.HubConnectionId = connectionId;
+                _userContext.HubConnectionId = connectionId;
                 ConnectionStatusChanged?.Invoke(this, "Reconnected");
                 return Task.CompletedTask;
             };
 
             _hubConnection.Closed += (ex) =>
             {
-                UserDevice.HubConnectionId = null;
+                _userContext.HubConnectionId = null;
                 ConnectionStatusChanged?.Invoke(this, "Disconnected");
                 return Task.CompletedTask;
             };
@@ -66,7 +69,7 @@ namespace MAUIClientUI.Services
             {
                 await _hubConnection.StartAsync();
                 _isConnected = true;
-                UserDevice.HubConnectionId = _hubConnection.ConnectionId;
+                _userContext.HubConnectionId = _hubConnection.ConnectionId;
                 ConnectionStatusChanged?.Invoke(this, "Connected");
             }
             catch (Exception ex)
@@ -97,7 +100,7 @@ namespace MAUIClientUI.Services
             {
                 await _hubConnection.StopAsync();
                 _isConnected = false;
-                UserDevice.HubConnectionId = null;
+                _userContext.HubConnectionId = null;
             }
         }
 
@@ -118,3 +121,4 @@ namespace MAUIClientUI.Services
     }
 
 }
+

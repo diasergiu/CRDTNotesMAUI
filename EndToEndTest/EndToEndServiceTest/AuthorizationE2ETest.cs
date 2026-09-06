@@ -50,7 +50,7 @@ namespace EndToEndTest.EndToEndServiceTest
         public AuthorizationE2ETest()
         {
             _httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
-            _userService = new UserServices("/api/user");
+            _userService = new UserServices("/api/user", new UserContext());
         }
 
         public async Task InitializeAsync()

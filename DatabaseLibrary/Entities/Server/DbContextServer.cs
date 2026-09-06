@@ -55,21 +55,6 @@ namespace DatabaseLibrary.Entities.Server
                 .WithMany(n => n.NoteUser)
                 .HasForeignKey(snu => snu.IdNote);
 
-            //// Device relationships
-            //modelBuilder.Entity<User_Device>()
-            //    .HasKey(ud => new { ud.IdUser, ud.IdDevice });
-
-            //modelBuilder.Entity<User_Device>()
-            //    .HasOne(ud => ud.Device)
-            //    .WithMany(d => d.UserDevices)
-            //    .HasForeignKey(ud => ud.IdDevice);
-
-            //modelBuilder.Entity<User_Device>()
-            //    .HasOne(ud => ud.User)
-            //    .WithMany(u => u.DevicesUser)
-            //    .HasForeignKey(ud => ud.IdUser);
-
-
             modelBuilder.Entity<NoteServer>()
                 .Property(n => n.CreationDate)
                 .HasDefaultValueSql("datetime('now')");

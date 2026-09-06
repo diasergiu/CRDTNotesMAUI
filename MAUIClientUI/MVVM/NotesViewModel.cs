@@ -38,6 +38,7 @@ namespace MAUIClientUI.MVVM
         private readonly NoteOrchestrator _noteController;
         private readonly iDialogHelper _dialogHelper;
         private readonly INavigationHelper _navigationHelper;
+        private readonly IAuthenticationService _authenticationServices = IPlatformApplication.Current.Services.GetService<IAuthenticationService>();
         #endregion
 
         #region Events
@@ -65,7 +66,7 @@ namespace MAUIClientUI.MVVM
             _notificationService = IPlatformApplication.Current.Services.GetService<NotificationServices>();
             _dialogHelper = IPlatformApplication.Current.Services.GetService<iDialogHelper>();
             _navigationHelper = IPlatformApplication.Current.Services.GetService<INavigationHelper>();
-
+            
             var loggerFactory = IPlatformApplication.Current.Services.GetService<ILoggerFactory>();
             _logger = loggerFactory?.CreateLogger<NoteView>();
             var cursorLogger = loggerFactory?.CreateLogger<CRDTLibrary.Cursor.Document>();
@@ -100,7 +101,7 @@ namespace MAUIClientUI.MVVM
             _currentNote.Version = 1;
             _logger?.LogInformation($"NoteView appearing for note: {_currentNote.IdNote}");
 
-            if (UserDevice.LocalUser == Guid.Empty)
+            if (!_authenticationServices.IsLoggedIn)
             {
                 _logger?.LogWarning("Not connecting to real-time notifications: user not logged in.");
                 return;
@@ -110,7 +111,7 @@ namespace MAUIClientUI.MVVM
             {
                 try
                 {
-                    await _notificationService.SubscribeToNoteAsync(UserDevice.LocalUser, _currentNote.IdNote);
+                    await _notificationService.SubscribeToNoteAsync(_authenticationServices.CurrentUser.IdUser, _currentNote.IdNote);
                     _logger?.LogDebug($"Subscribed to note updates for: {_currentNote.IdNote}");
 
                     _notificationService.NoteUpdated += OnRemoteNoteUpdated;

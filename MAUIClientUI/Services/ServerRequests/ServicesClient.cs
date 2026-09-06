@@ -21,8 +21,10 @@ namespace MAUIClientUI.Services.ServerRequests
                 BaseAddress = new Uri(_baseURL),
                 Timeout = TimeSpan.FromSeconds(30)
             };
-            // Use provided context or fall back to static UserDevice for backward compatibility
-            _userContext = userContext ?? new DefaultUserContextAdapter();
+            // Prefer explicit context (tests), then DI singleton (MAUI app), then fresh instance (other hosts)
+            _userContext = userContext
+                ?? IPlatformApplication.Current?.Services.GetService<IUserContext>()
+                ?? new UserContext();
         }
 
         protected HttpRequestMessage GetRequestWithIdHeader(HttpMethod method, string url, Guid? noteId = null)
@@ -64,21 +66,4 @@ namespace MAUIClientUI.Services.ServerRequests
         }        
     }
 
-    /// <summary>
-    /// Adapter to use static UserDevice as the default IUserContext for backward compatibility.
-    /// </summary>
-    internal class DefaultUserContextAdapter : IUserContext
-    {
-        public Guid LocalUser 
-        { 
-            get => UserDevice.LocalUser; 
-            set => UserDevice.LocalUser = value; 
-        }
-
-        public string? HubConnectionId 
-        { 
-            get => UserDevice.HubConnectionId; 
-            set => UserDevice.HubConnectionId = value; 
-        }
     }
-}

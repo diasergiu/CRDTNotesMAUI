@@ -134,7 +134,6 @@ namespace MAUIClientUI.MVVM
         {
             try
             {
-                //var notesResult = await _noteServices.GetAllNotesFromUser(UserDevice.LocalUser);
                 var serverChangesResult = await _noteServices.GetServerChanges();
 
                 //if (notesResult.IsSuccess)

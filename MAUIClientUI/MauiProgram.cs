@@ -28,7 +28,7 @@ namespace MAUIClientUI
 
             // Register services with DI container
             builder.Services
-                .AddSingleton(sp => new NotificationServices(BaseURLGetter.getBaseURL()))
+                .AddSingleton(sp => new NotificationServices(BaseURLGetter.getBaseURL(), sp.GetRequiredService<IUserContext>()))
                 .AddSingleton<iDialogHelper, DialogHelper>()
                 .AddSingleton<IDatabaseServices>(new DatabaseServices(instanceId))
                 .AddSingleton<INavigationHelper, NavigationHelper>()
@@ -37,7 +37,8 @@ namespace MAUIClientUI
                     var dbServices = sp.GetRequiredService<IDatabaseServices>();
                     return dbServices.GetContext();
                 })
-                .AddScoped<IAuthenticationService, AuthenticationService>()
+                .AddSingleton<IUserContext, UserContext>()
+                .AddSingleton<IAuthenticationService, AuthenticationService>()
                 .AddScoped<NoteRepository>()
                 .AddScoped<CRDTCharacterRepository>();
             //.AddScoped<NotesViewModel>();
@@ -99,20 +100,20 @@ namespace MAUIClientUI
             }
         }
 
-        private static void GetLocalUserFromEnviVariable()
-        {
-            Guid user = Guid.NewGuid();
-            var envId = Environment.GetEnvironmentVariable("INSTANCE_ID");
-            if (envId != null)
-            {
-                Guid.TryParse(envId, out user);
-            }
-            var args = Environment.GetCommandLineArgs();
-            if (args.Length > 2)
-                Guid.TryParse(args[1], out user);
+        //private static void GetLocalUserFromEnviVariable()
+        //{
+        //    Guid user = Guid.NewGuid();
+        //    var envId = Environment.GetEnvironmentVariable("INSTANCE_ID");
+        //    if (envId != null)
+        //    {
+        //        Guid.TryParse(envId, out user);
+        //    }
+        //    var args = Environment.GetCommandLineArgs();
+        //    if (args.Length > 2)
+        //        Guid.TryParse(args[1], out user);
 
-            // defautl
-            UserDevice.SetLocalUser(user);
-        }
+        //    // defautl
+        //    UserDevice.SetLocalUser(user);
+        //}
     }
 }

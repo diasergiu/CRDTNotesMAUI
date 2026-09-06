@@ -98,7 +98,7 @@ namespace EndToEndTest.EndToEndServiceTest
             }
 
             // Create user services for authentication
-            _userServices = new UserServices("/api/user");
+            _userServices = new UserServices("/api/user", new UserContext());
 
             // Register and login test users
             var userAResult = await _userServices.RegisterNewUser("Test User A", _testUsernameA, _testPassword);
@@ -128,9 +128,6 @@ namespace EndToEndTest.EndToEndServiceTest
                 throw new InvalidOperationException($"Failed to login user B: {loginBResult.ErrorMessage}");
             }
 
-            // Set local user for this context (for client A)
-            UserDevice.SetLocalUser(_userIdA);
-
             // Create separate user contexts for each client
             _userContextA = new UserContext { LocalUser = _userIdA };
             _userContextB = new UserContext { LocalUser = _userIdB };
@@ -153,9 +150,9 @@ namespace EndToEndTest.EndToEndServiceTest
             _noteServicesA = new NoteServices("/api/notes", _noteRepoA, _userContextA);
             _noteServicesB = new NoteServices("/api/notes", _noteRepoB, _userContextB);
 
-            // Create real notification services (SignalR) with server URL
-            _notificationServicesA = new NotificationServices(_serverBaseUrl);
-            _notificationServicesB = new NotificationServices(_serverBaseUrl);
+            // Create real notification services (SignalR) with server URL and per-client user context
+            _notificationServicesA = new NotificationServices(_serverBaseUrl, _userContextA);
+            _notificationServicesB = new NotificationServices(_serverBaseUrl, _userContextB);
 
             // Create test notes
             _noteClientA = new NoteClient

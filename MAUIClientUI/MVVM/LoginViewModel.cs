@@ -58,7 +58,6 @@ namespace MAUIClientUI.MVVM
 
                 if (result.IsSuccess)
                 {
-                    UserDevice.SetLocalUser(result.Data.IdUser); 
                     // Call auth service to update state
                     _authService.OnLoginSuccess(result.Data.IdUser);
                     ShowSuccess("Login successful!");

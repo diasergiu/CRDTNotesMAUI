@@ -54,7 +54,7 @@ namespace EndToEndTest.EndToEndServiceTest
         {
            
             _httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
-            _userService = new UserServices("/api/user");
+            _userService = new UserServices("/api/user", new UserContext());
             //_noteService = new NoteServices("/api/notes", noteRepository);
         }
 

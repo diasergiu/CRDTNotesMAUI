@@ -40,7 +40,7 @@ namespace EndToEndTest.EndToEndServiceTest
 
             // Generate unique username to avoid conflicts
             _uniqueTestUsername = $"{TEST_USERNAME_PREFIX}{Guid.NewGuid().ToString().Substring(0, 8)}";
-            _userService = new UserServices("/api/user");
+            _userService = new UserServices("/api/user", new UserContext());
         }
 
         public async Task InitializeAsync()

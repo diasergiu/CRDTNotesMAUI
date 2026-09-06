@@ -1,50 +1,55 @@
 ﻿using DatabaseLibrary.Entities.Client;
-using MAUIClientUI.UserInterface;
+using DatabaseLibrary.WrapperClasses;
 using Microsoft.Extensions.Logging;
-using SlackAPI;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MAUIClientUI.Services.HelperClasses
 {
     internal class AuthenticationService : IAuthenticationService
     {
-        public UserClient? CurrentUser { get; set; }
-        public Guid idUser { get; set; }
-        private ILogger<AuthenticationService> _logger;
+        private readonly IUserContext _userContext;
+        private readonly ILogger<AuthenticationService>? _logger;
+
+        public UserClient? CurrentUser { get; private set; }
+
+        public bool IsLoggedIn => CurrentUser != null;
 
         public event EventHandler<Guid>? LoginSucceeded;
 
-        public AuthenticationService()
+        public AuthenticationService(IUserContext userContext, ILogger<AuthenticationService>? logger = null)
         {
-            var loggerFactory = IPlatformApplication.Current.Services.GetService<ILoggerFactory>();
-            _logger = loggerFactory?.CreateLogger<AuthenticationService>();
-        }
-
-        public bool IsLoggedIn()
-        {
-            return CurrentUser != null;
-            _logger?.LogInformation("we are logging in ");
+            _userContext = userContext;
+            _logger = logger;
         }
 
         public void OnLoginSuccess(Guid userId)
         {
-            try
+            if (userId == Guid.Empty)
             {
-                this.idUser = userId;
-                LoginSucceeded?.Invoke(this, idUser);
-            }
-            catch(Exception e)
-            {
-                _logger?.LogInformation(e.Message);
+                _logger?.LogWarning("OnLoginSuccess called with empty user id; ignoring.");
+                return;
             }
 
+            try
+            {
+                // Initialize the shared session (IUserContext) for the freshly logged-in user.
+                _userContext.LocalUser = userId;
+                _userContext.HubConnectionId = null;
+                CurrentUser = new UserClient { IdUser = userId };
+
+                LoginSucceeded?.Invoke(this, userId);
+            }
+            catch (Exception e)
+            {
+                _logger?.LogError(e, "Error during login success handling");
+            }
         }
 
         public void Logout()
         {
             CurrentUser = null;
+            _userContext.LocalUser = Guid.Empty;
+            _userContext.HubConnectionId = null;
         }
     }
 }
