@@ -1,7 +1,6 @@
 using DatabaseLibrary.Entities;
 using DatabaseLibrary.Entities.Client;
 using DatabaseLibrary.Entities.Server;
-using DatabaseLibrary.Migrations;
 using DatabaseLibrary.WrapperClasses;
 using Microsoft.EntityFrameworkCore;
 

@@ -150,11 +150,16 @@ namespace MAUIClientUI.MVVM
         /// </summary>
         private async void OnRemoteNoteUpdated(object sender, CRDTChangePayload e)
         {
-            // Filter + persist + merge is handled by the controller; skip UI update if not our note.
-            if (!await _noteController.ApplyRemoteChangesAsync(e))
-                return;
+            // Merge on the UI thread. 
+            await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                // Filter + persist + merge is handled by the controller; skip UI update if not our note.
+                if (!await _noteController.ApplyRemoteChangesAsync(e))
+                    return;
 
-            ContentRefreshRequested?.Invoke(_noteController.GetText());
+         
+                ContentRefreshRequested?.Invoke(_noteController.GetText());
+            });
         }
         #endregion
 

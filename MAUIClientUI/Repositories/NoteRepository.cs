@@ -73,7 +73,7 @@ namespace MAUIClientUI.Repositories
             _dbContextUser.SaveChanges();
         }
 
-        public void MarkNoteAsDirty(Guid IdNote) 
+        public virtual void MarkNoteAsDirty(Guid IdNote) 
         {
             _dbContextUser.ChangeTracker.Clear();
             _dbContextUser.Notes

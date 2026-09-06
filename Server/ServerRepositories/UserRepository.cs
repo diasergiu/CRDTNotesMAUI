@@ -1,5 +1,4 @@
 using DatabaseLibrary.Entities.Server;
-using DatabaseLibrary.Migrations;
 using Microsoft.EntityFrameworkCore;
 using Server.Security;
 using System;

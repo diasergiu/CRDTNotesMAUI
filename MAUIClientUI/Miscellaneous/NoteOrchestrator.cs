@@ -18,6 +18,9 @@ namespace MAUIClientUI.Miscellaneous
     public class NoteOrchestrator
     {
         private readonly Document _Document;
+
+        private readonly object _documentLock = new();
+
         private readonly Guid _IdNote;
         private readonly CRDTCharacterRepository _crdtCharacterRepository;
         private readonly NoteRepository _noteRepository;
@@ -42,7 +45,13 @@ namespace MAUIClientUI.Miscellaneous
         /// <summary>
         /// Returns the current text of the note as reconstructed from the CRDT model.
         /// </summary>
-        public string GetText() => _Document.GetString();
+        public string GetText()
+        {
+            lock (_documentLock)
+            {
+                return _Document.GetString();
+            }
+        }
 
         /// <summary>
         /// Inserts a character at the given cursor position and propagates the change.
@@ -50,7 +59,11 @@ namespace MAUIClientUI.Miscellaneous
         public async Task InsertCharacter(int cursorPosition, char typedChar)
         {
             // Get payload from Document (pure CRDT logic)
-            var newCharacter = _Document.InsertCharacter(cursorPosition, typedChar);
+            CRDTCharacterPayload newCharacter;
+            lock (_documentLock)
+            {
+                newCharacter = _Document.InsertCharacter(cursorPosition, typedChar);
+            }
 
             // Wrap in client object with application-level metadata (idNote, isDirtyFlag, etc.)
             var clientCharacter = WrapPayloadAsClient(newCharacter);
@@ -73,16 +86,19 @@ namespace MAUIClientUI.Miscellaneous
                 return;
 
             var newPayloads = new List<CRDTCharacterPayload>();
-            foreach (char c in text)
+            lock (_documentLock)
             {
-                // Get payload from Document
-                var payload = _Document.InsertCharacter(cursorPosition++, c);
+                foreach (char c in text)
+                {
+                    // Get payload from Document
+                    var payload = _Document.InsertCharacter(cursorPosition++, c);
 
-                // Wrap in client object for persistence
-                var clientCharacter = WrapPayloadAsClient(payload);
-                _crdtCharacterRepository.SaveNewCrdtCharacter(clientCharacter);
+                    // Wrap in client object for persistence
+                    var clientCharacter = WrapPayloadAsClient(payload);
+                    _crdtCharacterRepository.SaveNewCrdtCharacter(clientCharacter);
 
-                newPayloads.Add(payload);
+                    newPayloads.Add(payload);
+                }
             }
 
             // Mark the note as dirty
@@ -98,7 +114,11 @@ namespace MAUIClientUI.Miscellaneous
         public async Task DeleteCharacter(int cursorPosition)
        {
             // Get payload from Document
-            var payload = _Document.DeleteCharacter(cursorPosition + 1);
+            CRDTCharacterPayload payload;
+            lock (_documentLock)
+            {
+                payload = _Document.DeleteCharacter(cursorPosition + 1);
+            }
           if (payload != null)
             {
                 // Wrap in client object for persistence
@@ -120,21 +140,24 @@ namespace MAUIClientUI.Miscellaneous
                 return;
 
             var deletedPayloads = new List<CRDTCharacterPayload>();
-            // Delete from end to start to avoid position shifting issues
-            for (int i = endPosition; i > startPosition; i--)
+            lock (_documentLock)
             {
-                // Get payload from Document
-                var payload = _Document.DeleteCharacter(i);
-                if (payload != null)
+                // Delete from end to start to avoid position shifting issues
+                for (int i = endPosition; i > startPosition; i--)
                 {
-                    // Wrap in client object for persistence
-                    var clientCharacter = WrapPayloadAsClient(payload);
-                    _crdtCharacterRepository.UpdateCharacter(clientCharacter);
+                    // Get payload from Document
+                    var payload = _Document.DeleteCharacter(i);
+                    if (payload != null)
+                    {
+                        // Wrap in client object for persistence
+                        var clientCharacter = WrapPayloadAsClient(payload);
+                        _crdtCharacterRepository.UpdateCharacter(clientCharacter);
 
-                    // Mark the note as dirty
-                    MarkNoteAsDirty();
+                        // Mark the note as dirty
+                        MarkNoteAsDirty();
 
-                    deletedPayloads.Add(payload);
+                        deletedPayloads.Add(payload);
+                    }
                 }
             }
 
@@ -167,9 +190,12 @@ namespace MAUIClientUI.Miscellaneous
                 await _noteRepository.SaveCRDTChanges(characters).ConfigureAwait(true);
 
                 // Convert to payloads and merge into CRDT model
-                foreach (var character in decodedCharacters)
+                lock (_documentLock)
                 {
-                    _Document.MergeCharacter(character);
+                    foreach (var character in decodedCharacters)
+                    {
+                        _Document.MergeCharacter(character);
+                    }
                 }
             }
             return true;
